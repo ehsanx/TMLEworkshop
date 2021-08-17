@@ -1,0 +1,24 @@
+# G-computation
+
+
+## Parametric G-computation
+
+### Steps
+
+### Treatment effect estimate
+
+## G-computation using ML
+
+### ML algorithms
+
+### Treatment effect estimate
+
+## G-computation using SuperLearner
+
+### SuperLearner Steps by hand
+
+### SuperLearner Steps by available package
+
+#### SuperLearner
+
+### Treatment effect estimate

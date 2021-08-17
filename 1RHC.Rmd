@@ -1,0 +1,216 @@
+# RHC data description
+
+```{r setup01, include=FALSE}
+require(tableone)
+require(Publish)
+require(MatchIt)
+require(cobalt)
+```
+
+There is a widespread belief among cardiologists that the right heart catheterization (RHC hereafter; a monitoring device for measurement of cardiac function) is helpful in managing critically ill patients in the intensive care unit. @connors1996effectiveness examined the association of 
+
+- *RHC use* during the first 24 hours of care in the intensive care unit and 
+- a number of health-outcomes such as *length of stay* (hospital).
+
+## Data download
+
+Data is freely available from [Vanderbilt Biostatistics](https://hbiostat.org/data/).
+
+```{r, cache=TRUE}
+# load the dataset
+ObsData <- read.csv("https://hbiostat.org/data/repo/rhc.csv", header = TRUE)
+saveRDS(ObsData, file = "data/rhc.RDS")
+```
+
+## Analytic data
+
+```{r, warning=FALSE}
+# add column for outcome Y: length of stay 
+# Y = date of discharge - study admission date
+# Y = date of death - study admission date if date of discharge not available
+ObsData$Y <- ObsData$dschdte - ObsData$sadmdte
+ObsData$Y[is.na(ObsData$Y)] <- ObsData$dthdte[is.na(ObsData$Y)] - 
+  ObsData$sadmdte[is.na(ObsData$Y)]
+# remove outcomes we are not examining in this example
+ObsData <- dplyr::select(ObsData, 
+                         !c(dthdte, lstctdte, dschdte, death, t3d30, dth30, surv2md1))
+# remove unnecessary and problematic variables 
+ObsData <- dplyr::select(ObsData, 
+                         !c(sadmdte, ptid, X, adld3p, urin1, cat2))
+
+# convert all categorical variables to factors 
+factors <- c("cat1", "ca", "cardiohx", "chfhx", "dementhx", "psychhx", 
+             "chrpulhx", "renalhx", "liverhx", "gibledhx", "malighx", 
+             "immunhx", "transhx", "amihx", "sex", "dnr1", "ninsclas", 
+             "resp", "card", "neuro", "gastr", "renal", "meta", "hema", 
+             "seps", "trauma", "ortho", "race", "income")
+ObsData[factors] <- lapply(ObsData[factors], as.factor)
+# convert our treatment A (RHC vs. No RHC) to a binary variable
+ObsData$A <- ifelse(ObsData$swang1 == "RHC", 1, 0)
+ObsData <- dplyr::select(ObsData, !swang1)
+# Categorize the variables to match with the original paper
+ObsData$age <- cut(ObsData$age,breaks=c(-Inf, 50, 60, 70, 80, Inf),right=FALSE)
+ObsData$race <- factor(ObsData$race, levels=c("white","black","other"))
+ObsData$sex <- as.factor(ObsData$sex)
+ObsData$sex <- relevel(ObsData$sex, ref = "Male")
+ObsData$cat1 <- as.factor(ObsData$cat1)
+levels(ObsData$cat1) <- c("ARF","CHF","Other","Other","Other",
+                          "Other","Other","MOSF","MOSF")
+ObsData$ca <- as.factor(ObsData$ca)
+levels(ObsData$ca) <- c("Metastatic","None","Localized (Yes)")
+ObsData$ca <- factor(ObsData$ca, levels=c("None",
+                                          "Localized (Yes)","Metastatic"))
+# Rename variables
+names(ObsData) <- c("Disease.category", "Cancer", "Cardiovascular", 
+                    "Congestive.HF", "Dementia", "Psychiatric", "Pulmonary", 
+                    "Renal", "Hepatic", "GI.Bleed", "Tumor", 
+                    "Immunosupperssion", "Transfer.hx", "MI", "age", "sex", 
+                    "edu", "DASIndex", "APACHE.score", "Glasgow.Coma.Score", 
+                    "blood.pressure", "WBC", "Heart.rate", "Respiratory.rate", 
+                    "Temperature", "PaO2vs.FIO2", "Albumin", "Hematocrit", 
+                    "Bilirubin", "Creatinine", "Sodium", "Potassium", "PaCo2", 
+                    "PH", "Weight", "DNR.status", "Medical.insurance", 
+                    "Respiratory.Diag", "Cardiovascular.Diag", 
+                    "Neurological.Diag", "Gastrointestinal.Diag", "Renal.Diag",
+                    "Metabolic.Diag", "Hematologic.Diag", "Sepsis.Diag", 
+                    "Trauma.Diag", "Orthopedic.Diag", "race", "income", 
+                    "Y", "A")
+saveRDS(ObsData, file = "data/rhcAnalytic.RDS")
+```
+
+## Notations
+
+|Notations| Example in RHC study|
+|---|---|
+|$A$: Exposure status  | RHC |  
+|$Y$: Observed outcome  | length of stay  |  
+|$Y(A=1)$ = potential outcome when exposed  | length of stay when RHC used  |  
+|$Y(A=0)$ = potential outcome when not exposed  | length of stay when RHC not used  |  
+|$L$: Covariates  | See below |  
+
+## Variables
+
+```{r vars, cache=TRUE, echo = TRUE}
+baselinevars <- names(dplyr::select(ObsData, 
+                         !c(A,Y)))
+baselinevars
+```
+
+## Table 1 stratified by RHC exposure
+
+Only for some demographic and co-morbidity variables; match with Table 1 in @connors1996effectiveness.
+
+```{r tab0, cache=TRUE, echo = TRUE}
+require(tableone)
+tab0 <- CreateTableOne(vars = c("age", "sex", "race", "Disease.category", "Cancer"),
+                       data = ObsData, 
+                       strata = "A", 
+                       test = FALSE)
+print(tab0, showAllLevels = FALSE, )
+```
+
+Only outcome variable (Length of stay); slightly different than Table 2 in @connors1996effectiveness (means 20.5 vs. 25.7; and medians 13 vs. 17).
+
+```{r tab1, cache=TRUE, echo = TRUE}
+tab1 <- CreateTableOne(vars = c("Y"),
+                       data = ObsData, 
+                       strata = "A", 
+                       test = FALSE)
+print(tab1, showAllLevels = FALSE, )
+median(ObsData$Y[ObsData$A==0]); median(ObsData$Y[ObsData$A==1])
+```
+
+## Basic regression analysis
+
+### Crude analysis
+
+```{r reg1, cache=TRUE, echo = TRUE, results='hide'}
+# adjust the exposure variable (primary interest)
+fit0 <- lm(Y~A, data = ObsData)
+require(Publish)
+crude.fit <- publish(fit0, digits=1)$regressionTable[2,]
+```
+
+```{r reg1c, cache=TRUE, echo = TRUE}
+crude.fit
+```
+
+
+### Adjusted analysis
+
+```{r reg2, cache=TRUE, echo = TRUE, results='hide'}
+# adjust the exposure variable (primary interest) + covariates
+out.formula <- as.formula(paste("Y~ A +", 
+                               paste(baselinevars, 
+                                     collapse = "+")))
+fit1 <- lm(out.formula, data = ObsData)
+adj.fit <- publish(fit1, digits=1)$regressionTable[2,]
+```
+
+
+### Regression diagnostics
+
+```{r reg2a, cache=TRUE, echo = TRUE}
+out.formula
+adj.fit 
+plot(fit1)
+```
+
+## Comparison with literature
+
+### PSM
+
+@connors1996effectiveness conducted a propensity score matching analysis. Table 5 in @connors1996effectiveness showed that, after propensity score pair (1-to-1) matching, means of length of stay ($Y$), when stratified by RHC ($A$) was significantly different. We also conduct propensity score pair matching analysis.
+
+```{r ps1, cache=TRUE, echo = TRUE}
+set.seed(123)
+require(MatchIt)
+ps.formula <- as.formula(paste("A~", 
+                paste(baselinevars, collapse = "+")))
+PS.fit <- glm(ps.formula,family="binomial", 
+              data=ObsData)
+ObsData$PS <- predict(PS.fit, 
+                      newdata = ObsData, type="response")
+```
+
+
+
+```{r ps2, cache=TRUE, echo = TRUE}
+logitPS <-  -log(1/ObsData$PS - 1) 
+match.obj <- matchit(ps.formula, data =ObsData,
+                     distance = ObsData$PS,
+                     method = "nearest", replace=FALSE,
+                     ratio = 1, caliper = .1*sd(logitPS))
+```
+
+### PSM diagnostics
+
+```{r ps2x, cache=TRUE, echo = TRUE}
+require(cobalt)
+bal.plot(match.obj, 
+         var.name = "distance", 
+         which = "both",
+         type = "histogram", 
+         mirror = TRUE)
+```
+
+
+```{r ps2b, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+love.plot(match.obj, binary = "std",
+          thresholds = c(m = .1))
+```
+
+The love plot suggests satisfactory propensity score matching (all SMD < 0.1).
+
+### PSM results
+
+```{r ps3, cache=TRUE, echo = TRUE}
+matched.data <- match.data(match.obj)
+tab1y <- CreateTableOne(vars = c("Y"),
+               data = matched.data, strata = "A", 
+               test = TRUE)
+print(tab1y, showAllLevels = FALSE, 
+      test = TRUE) 
+```
+
+We also find the same conclusion based on propensity score pair matched data.

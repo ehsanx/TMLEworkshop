@@ -1,0 +1,65 @@
+--- 
+title: "R Guide for TMLE in Medical Research"
+author: ""
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output:
+  bookdown::html_document2:
+    includes:
+      in_header: header.html
+  bookdown::gitbook:
+    includes:
+      in_header: header.html
+  bookdown::pdf_book:
+    includes:
+      in_header: header.html
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: ehsanx/intro2R
+description: "Intro to R."
+---
+
+# Preface {-}
+
+## Goal  {-}
+
+Insert abstract here.
+
+## Philosophy  {-}
+
+Code-first philosophy is adopted in this workshop. 
+
+## Pre-requisites {-}
+
+Fluency in R language is required. A general understanding of multiple regression and basic familiarity of machine learning and epidemiological core concepts is expected. Deep understanding of causal inference or advanced statistical inference knowledge is not expected. 
+
+## Version history {-}
+
+The workshop was first developed for [R/Medicine
+Virtual Conference](https://r-medicine.org/schedule/) 2021, August 24th.
+
+## Contributor list {-}
+
+|||
+|---|---|
+| [Hanna Frank](https://www.linkedin.com/in/hanna-f-940813b9/) (SPPH, UBC) | [Ehsan Karim](https://ehsank.com/) (SPPH, UBC) |  
+
+## Main references {-}
+
+- list refs here
+
+## License {-}
+
+```{r, echo=FALSE, out.width="25%"}
+knitr::include_graphics("images/by-nc-sa.png")
+```
+
+The online version of this book is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) International License. You may share, adapt the content and may distribute your contributions under the same license (CC BY-NC-SA 4.0), but you have to give appropriate credit, and cannot use material for the commercial purposes.
+
+
+
+
+
+

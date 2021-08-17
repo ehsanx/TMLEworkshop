@@ -1,0 +1,6 @@
+Package: placeholder
+Type: Book
+Title: Understanding Propensity Score Matching.
+Version: 0.0.1
+Imports: bookdown
+Remotes: ehsanx/UnderstandingPropensityScore
