@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 1 RHC data description | R Guide for TMLE in Medical Research</title>
+  <meta name="description" content="Intro to R." />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 1 RHC data description | R Guide for TMLE in Medical Research" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Intro to R." />
+  <meta name="github-repo" content="ehsanx/intro2R" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 1 RHC data description | R Guide for TMLE in Medical Research" />
+  
+  <meta name="twitter:description" content="Intro to R." />
+  
+
+
+
+<meta name="date" content="2021-08-16" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="g-computation.html"/>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script type="text/javascript">
+
+// toggle visibility of R source blocks in R Markdown output
+function toggle_R() {
+  var x = document.getElementsByClassName('r');
+  if (x.length == 0) return;
+  function toggle_vis(o) {
+    var d = o.style.display;
+    o.style.display = (d == 'block' || d == '') ? 'none':'block';
+  }
+
+  for (i = 0; i < x.length; i++) {
+    var y = x[i];
+    if (y.tagName.toLowerCase() === 'pre') toggle_vis(y);
+  }
+
+    var elem = document.getElementById("myButton1");
+    if (elem.value === "Hide Global") elem.value = "Show Global";
+    else elem.value = "Hide Global";
+}
+
+document.write('<input onclick="toggle_R();" type="button" value="Hide Global" id="myButton1" style="position: absolute; top: 10%; right: 2%; z-index: 200"></input>')
+
+</script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">TMLE in Medical Research</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#goal"><i class="fa fa-check"></i>Goal</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#philosophy"><i class="fa fa-check"></i>Philosophy</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#pre-requisites"><i class="fa fa-check"></i>Pre-requisites</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#version-history"><i class="fa fa-check"></i>Version history</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#contributor-list"><i class="fa fa-check"></i>Contributor list</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#main-references"><i class="fa fa-check"></i>Main references</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#license"><i class="fa fa-check"></i>License</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="rhc-data-description.html"><a href="rhc-data-description.html"><i class="fa fa-check"></i><b>1</b> RHC data description</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="rhc-data-description.html"><a href="rhc-data-description.html#data-download"><i class="fa fa-check"></i><b>1.1</b> Data download</a></li>
+<li class="chapter" data-level="1.2" data-path="rhc-data-description.html"><a href="rhc-data-description.html#analytic-data"><i class="fa fa-check"></i><b>1.2</b> Analytic data</a></li>
+<li class="chapter" data-level="1.3" data-path="rhc-data-description.html"><a href="rhc-data-description.html#notations"><i class="fa fa-check"></i><b>1.3</b> Notations</a></li>
+<li class="chapter" data-level="1.4" data-path="rhc-data-description.html"><a href="rhc-data-description.html#variables"><i class="fa fa-check"></i><b>1.4</b> Variables</a></li>
+<li class="chapter" data-level="1.5" data-path="rhc-data-description.html"><a href="rhc-data-description.html#table-1-stratified-by-rhc-exposure"><i class="fa fa-check"></i><b>1.5</b> Table 1 stratified by RHC exposure</a></li>
+<li class="chapter" data-level="1.6" data-path="rhc-data-description.html"><a href="rhc-data-description.html#basic-regression-analysis"><i class="fa fa-check"></i><b>1.6</b> Basic regression analysis</a>
+<ul>
+<li class="chapter" data-level="1.6.1" data-path="rhc-data-description.html"><a href="rhc-data-description.html#crude-analysis"><i class="fa fa-check"></i><b>1.6.1</b> Crude analysis</a></li>
+<li class="chapter" data-level="1.6.2" data-path="rhc-data-description.html"><a href="rhc-data-description.html#adjusted-analysis"><i class="fa fa-check"></i><b>1.6.2</b> Adjusted analysis</a></li>
+<li class="chapter" data-level="1.6.3" data-path="rhc-data-description.html"><a href="rhc-data-description.html#regression-diagnostics"><i class="fa fa-check"></i><b>1.6.3</b> Regression diagnostics</a></li>
+</ul></li>
+<li class="chapter" data-level="1.7" data-path="rhc-data-description.html"><a href="rhc-data-description.html#comparison-with-literature"><i class="fa fa-check"></i><b>1.7</b> Comparison with literature</a>
+<ul>
+<li class="chapter" data-level="1.7.1" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm"><i class="fa fa-check"></i><b>1.7.1</b> PSM</a></li>
+<li class="chapter" data-level="1.7.2" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm-diagnostics"><i class="fa fa-check"></i><b>1.7.2</b> PSM diagnostics</a></li>
+<li class="chapter" data-level="1.7.3" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm-results"><i class="fa fa-check"></i><b>1.7.3</b> PSM results</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="g-computation.html"><a href="g-computation.html"><i class="fa fa-check"></i><b>2</b> G-computation</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="g-computation.html"><a href="g-computation.html#parametric-g-computation"><i class="fa fa-check"></i><b>2.1</b> Parametric G-computation</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="g-computation.html"><a href="g-computation.html#steps"><i class="fa fa-check"></i><b>2.1.1</b> Steps</a></li>
+<li class="chapter" data-level="2.1.2" data-path="g-computation.html"><a href="g-computation.html#treatment-effect-estimate"><i class="fa fa-check"></i><b>2.1.2</b> Treatment effect estimate</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="g-computation.html"><a href="g-computation.html#g-computation-using-ml"><i class="fa fa-check"></i><b>2.2</b> G-computation using ML</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="g-computation.html"><a href="g-computation.html#ml-algorithms"><i class="fa fa-check"></i><b>2.2.1</b> ML algorithms</a></li>
+<li class="chapter" data-level="2.2.2" data-path="g-computation.html"><a href="g-computation.html#treatment-effect-estimate-1"><i class="fa fa-check"></i><b>2.2.2</b> Treatment effect estimate</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="g-computation.html"><a href="g-computation.html#g-computation-using-superlearner"><i class="fa fa-check"></i><b>2.3</b> G-computation using SuperLearner</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="g-computation.html"><a href="g-computation.html#superlearner-steps-by-hand"><i class="fa fa-check"></i><b>2.3.1</b> SuperLearner Steps by hand</a></li>
+<li class="chapter" data-level="2.3.2" data-path="g-computation.html"><a href="g-computation.html#superlearner-steps-by-available-package"><i class="fa fa-check"></i><b>2.3.2</b> SuperLearner Steps by available package</a></li>
+<li class="chapter" data-level="2.3.3" data-path="g-computation.html"><a href="g-computation.html#treatment-effect-estimate-2"><i class="fa fa-check"></i><b>2.3.3</b> Treatment effect estimate</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="iptw.html"><a href="iptw.html"><i class="fa fa-check"></i><b>3</b> IPTW</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="iptw.html"><a href="iptw.html#iptw-from-parametric-models"><i class="fa fa-check"></i><b>3.1</b> IPTW from parametric models</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="iptw.html"><a href="iptw.html#steps-1"><i class="fa fa-check"></i><b>3.1.1</b> Steps</a></li>
+<li class="chapter" data-level="3.1.2" data-path="iptw.html"><a href="iptw.html#treatment-effect-estimate-3"><i class="fa fa-check"></i><b>3.1.2</b> Treatment effect estimate</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="iptw.html"><a href="iptw.html#iptw-from-ml"><i class="fa fa-check"></i><b>3.2</b> IPTW from ML</a></li>
+<li class="chapter" data-level="3.3" data-path="iptw.html"><a href="iptw.html#iptw-from-superlearner"><i class="fa fa-check"></i><b>3.3</b> IPTW from SuperLearner</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="tmle.html"><a href="tmle.html"><i class="fa fa-check"></i><b>4</b> TMLE</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="tmle.html"><a href="tmle.html#transformation-of-continuous-outcome-variable"><i class="fa fa-check"></i><b>4.1</b> Transformation of continuous outcome variable</a></li>
+<li class="chapter" data-level="4.2" data-path="tmle.html"><a href="tmle.html#initial-estimate"><i class="fa fa-check"></i><b>4.2</b> Initial estimate</a></li>
+<li class="chapter" data-level="4.3" data-path="tmle.html"><a href="tmle.html#update"><i class="fa fa-check"></i><b>4.3</b> Update</a></li>
+<li class="chapter" data-level="4.4" data-path="tmle.html"><a href="tmle.html#treatment-effect-estimate-4"><i class="fa fa-check"></i><b>4.4</b> Treatment effect estimate</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>5</b> Pre-packaged software</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3"><i class="fa fa-check"></i><b>5.1</b> sl3</a></li>
+<li class="chapter" data-level="5.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-1"><i class="fa fa-check"></i><b>5.2</b> tmle</a></li>
+<li class="chapter" data-level="5.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#ltmle"><i class="fa fa-check"></i><b>5.3</b> ltmle</a></li>
+<li class="chapter" data-level="5.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle3"><i class="fa fa-check"></i><b>5.4</b> tmle3</a></li>
+<li class="chapter" data-level="5.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>5.5</b> AIPW</a></li>
+<li class="chapter" data-level="5.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>5.6</b> RHC results</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://ehsank.com/" target="blank">Contact</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">R Guide for TMLE in Medical Research</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="rhc-data-description" class="section level1" number="1">
+<h1><span class="header-section-number">Chapter 1</span> RHC data description</h1>
+<p>There is a widespread belief among cardiologists that the right heart catheterization (RHC hereafter; a monitoring device for measurement of cardiac function) is helpful in managing critically ill patients in the intensive care unit. <span class="citation"><a href="#ref-connors1996effectiveness" role="doc-biblioref">Connors et al.</a> (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span> examined the association of</p>
+<ul>
+<li><em>RHC use</em> during the first 24 hours of care in the intensive care unit and</li>
+<li>a number of health-outcomes such as <em>length of stay</em> (hospital).</li>
+</ul>
+<div id="data-download" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Data download</h2>
+<p>Data is freely available from <a href="https://hbiostat.org/data/">Vanderbilt Biostatistics</a>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="rhc-data-description.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load the dataset</span></span>
+<span id="cb1-2"><a href="rhc-data-description.html#cb1-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;https://hbiostat.org/data/repo/rhc.csv&quot;</span>, <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-3"><a href="rhc-data-description.html#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(ObsData, <span class="at">file =</span> <span class="st">&quot;data/rhc.RDS&quot;</span>)</span></code></pre></div>
+</div>
+<div id="analytic-data" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Analytic data</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="rhc-data-description.html#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># add column for outcome Y: length of stay </span></span>
+<span id="cb2-2"><a href="rhc-data-description.html#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Y = date of discharge - study admission date</span></span>
+<span id="cb2-3"><a href="rhc-data-description.html#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Y = date of death - study admission date if date of discharge not available</span></span>
+<span id="cb2-4"><a href="rhc-data-description.html#cb2-4" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Y <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>dschdte <span class="sc">-</span> ObsData<span class="sc">$</span>sadmdte</span>
+<span id="cb2-5"><a href="rhc-data-description.html#cb2-5" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Y[<span class="fu">is.na</span>(ObsData<span class="sc">$</span>Y)] <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>dthdte[<span class="fu">is.na</span>(ObsData<span class="sc">$</span>Y)] <span class="sc">-</span> </span>
+<span id="cb2-6"><a href="rhc-data-description.html#cb2-6" aria-hidden="true" tabindex="-1"></a>  ObsData<span class="sc">$</span>sadmdte[<span class="fu">is.na</span>(ObsData<span class="sc">$</span>Y)]</span>
+<span id="cb2-7"><a href="rhc-data-description.html#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># remove outcomes we are not examining in this example</span></span>
+<span id="cb2-8"><a href="rhc-data-description.html#cb2-8" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
+<span id="cb2-9"><a href="rhc-data-description.html#cb2-9" aria-hidden="true" tabindex="-1"></a>                         <span class="sc">!</span><span class="fu">c</span>(dthdte, lstctdte, dschdte, death, t3d30, dth30, surv2md1))</span>
+<span id="cb2-10"><a href="rhc-data-description.html#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># remove unnecessary and problematic variables </span></span>
+<span id="cb2-11"><a href="rhc-data-description.html#cb2-11" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
+<span id="cb2-12"><a href="rhc-data-description.html#cb2-12" aria-hidden="true" tabindex="-1"></a>                         <span class="sc">!</span><span class="fu">c</span>(sadmdte, ptid, X, adld3p, urin1, cat2))</span>
+<span id="cb2-13"><a href="rhc-data-description.html#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="rhc-data-description.html#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># convert all categorical variables to factors </span></span>
+<span id="cb2-15"><a href="rhc-data-description.html#cb2-15" aria-hidden="true" tabindex="-1"></a>factors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;cat1&quot;</span>, <span class="st">&quot;ca&quot;</span>, <span class="st">&quot;cardiohx&quot;</span>, <span class="st">&quot;chfhx&quot;</span>, <span class="st">&quot;dementhx&quot;</span>, <span class="st">&quot;psychhx&quot;</span>, </span>
+<span id="cb2-16"><a href="rhc-data-description.html#cb2-16" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;chrpulhx&quot;</span>, <span class="st">&quot;renalhx&quot;</span>, <span class="st">&quot;liverhx&quot;</span>, <span class="st">&quot;gibledhx&quot;</span>, <span class="st">&quot;malighx&quot;</span>, </span>
+<span id="cb2-17"><a href="rhc-data-description.html#cb2-17" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;immunhx&quot;</span>, <span class="st">&quot;transhx&quot;</span>, <span class="st">&quot;amihx&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;dnr1&quot;</span>, <span class="st">&quot;ninsclas&quot;</span>, </span>
+<span id="cb2-18"><a href="rhc-data-description.html#cb2-18" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;resp&quot;</span>, <span class="st">&quot;card&quot;</span>, <span class="st">&quot;neuro&quot;</span>, <span class="st">&quot;gastr&quot;</span>, <span class="st">&quot;renal&quot;</span>, <span class="st">&quot;meta&quot;</span>, <span class="st">&quot;hema&quot;</span>, </span>
+<span id="cb2-19"><a href="rhc-data-description.html#cb2-19" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;seps&quot;</span>, <span class="st">&quot;trauma&quot;</span>, <span class="st">&quot;ortho&quot;</span>, <span class="st">&quot;race&quot;</span>, <span class="st">&quot;income&quot;</span>)</span>
+<span id="cb2-20"><a href="rhc-data-description.html#cb2-20" aria-hidden="true" tabindex="-1"></a>ObsData[factors] <span class="ot">&lt;-</span> <span class="fu">lapply</span>(ObsData[factors], as.factor)</span>
+<span id="cb2-21"><a href="rhc-data-description.html#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># convert our treatment A (RHC vs. No RHC) to a binary variable</span></span>
+<span id="cb2-22"><a href="rhc-data-description.html#cb2-22" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(ObsData<span class="sc">$</span>swang1 <span class="sc">==</span> <span class="st">&quot;RHC&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb2-23"><a href="rhc-data-description.html#cb2-23" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span>swang1)</span>
+<span id="cb2-24"><a href="rhc-data-description.html#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Categorize the variables to match with the original paper</span></span>
+<span id="cb2-25"><a href="rhc-data-description.html#cb2-25" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>age <span class="ot">&lt;-</span> <span class="fu">cut</span>(ObsData<span class="sc">$</span>age,<span class="at">breaks=</span><span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, <span class="dv">50</span>, <span class="dv">60</span>, <span class="dv">70</span>, <span class="dv">80</span>, <span class="cn">Inf</span>),<span class="at">right=</span><span class="cn">FALSE</span>)</span>
+<span id="cb2-26"><a href="rhc-data-description.html#cb2-26" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>race <span class="ot">&lt;-</span> <span class="fu">factor</span>(ObsData<span class="sc">$</span>race, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;black&quot;</span>,<span class="st">&quot;other&quot;</span>))</span>
+<span id="cb2-27"><a href="rhc-data-description.html#cb2-27" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(ObsData<span class="sc">$</span>sex)</span>
+<span id="cb2-28"><a href="rhc-data-description.html#cb2-28" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">relevel</span>(ObsData<span class="sc">$</span>sex, <span class="at">ref =</span> <span class="st">&quot;Male&quot;</span>)</span>
+<span id="cb2-29"><a href="rhc-data-description.html#cb2-29" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>cat1 <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(ObsData<span class="sc">$</span>cat1)</span>
+<span id="cb2-30"><a href="rhc-data-description.html#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(ObsData<span class="sc">$</span>cat1) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ARF&quot;</span>,<span class="st">&quot;CHF&quot;</span>,<span class="st">&quot;Other&quot;</span>,<span class="st">&quot;Other&quot;</span>,<span class="st">&quot;Other&quot;</span>,</span>
+<span id="cb2-31"><a href="rhc-data-description.html#cb2-31" aria-hidden="true" tabindex="-1"></a>                          <span class="st">&quot;Other&quot;</span>,<span class="st">&quot;Other&quot;</span>,<span class="st">&quot;MOSF&quot;</span>,<span class="st">&quot;MOSF&quot;</span>)</span>
+<span id="cb2-32"><a href="rhc-data-description.html#cb2-32" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>ca <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(ObsData<span class="sc">$</span>ca)</span>
+<span id="cb2-33"><a href="rhc-data-description.html#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(ObsData<span class="sc">$</span>ca) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Metastatic&quot;</span>,<span class="st">&quot;None&quot;</span>,<span class="st">&quot;Localized (Yes)&quot;</span>)</span>
+<span id="cb2-34"><a href="rhc-data-description.html#cb2-34" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>ca <span class="ot">&lt;-</span> <span class="fu">factor</span>(ObsData<span class="sc">$</span>ca, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;None&quot;</span>,</span>
+<span id="cb2-35"><a href="rhc-data-description.html#cb2-35" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">&quot;Localized (Yes)&quot;</span>,<span class="st">&quot;Metastatic&quot;</span>))</span>
+<span id="cb2-36"><a href="rhc-data-description.html#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename variables</span></span>
+<span id="cb2-37"><a href="rhc-data-description.html#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ObsData) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Disease.category&quot;</span>, <span class="st">&quot;Cancer&quot;</span>, <span class="st">&quot;Cardiovascular&quot;</span>, </span>
+<span id="cb2-38"><a href="rhc-data-description.html#cb2-38" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Congestive.HF&quot;</span>, <span class="st">&quot;Dementia&quot;</span>, <span class="st">&quot;Psychiatric&quot;</span>, <span class="st">&quot;Pulmonary&quot;</span>, </span>
+<span id="cb2-39"><a href="rhc-data-description.html#cb2-39" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Renal&quot;</span>, <span class="st">&quot;Hepatic&quot;</span>, <span class="st">&quot;GI.Bleed&quot;</span>, <span class="st">&quot;Tumor&quot;</span>, </span>
+<span id="cb2-40"><a href="rhc-data-description.html#cb2-40" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Immunosupperssion&quot;</span>, <span class="st">&quot;Transfer.hx&quot;</span>, <span class="st">&quot;MI&quot;</span>, <span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, </span>
+<span id="cb2-41"><a href="rhc-data-description.html#cb2-41" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;edu&quot;</span>, <span class="st">&quot;DASIndex&quot;</span>, <span class="st">&quot;APACHE.score&quot;</span>, <span class="st">&quot;Glasgow.Coma.Score&quot;</span>, </span>
+<span id="cb2-42"><a href="rhc-data-description.html#cb2-42" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;blood.pressure&quot;</span>, <span class="st">&quot;WBC&quot;</span>, <span class="st">&quot;Heart.rate&quot;</span>, <span class="st">&quot;Respiratory.rate&quot;</span>, </span>
+<span id="cb2-43"><a href="rhc-data-description.html#cb2-43" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Temperature&quot;</span>, <span class="st">&quot;PaO2vs.FIO2&quot;</span>, <span class="st">&quot;Albumin&quot;</span>, <span class="st">&quot;Hematocrit&quot;</span>, </span>
+<span id="cb2-44"><a href="rhc-data-description.html#cb2-44" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Bilirubin&quot;</span>, <span class="st">&quot;Creatinine&quot;</span>, <span class="st">&quot;Sodium&quot;</span>, <span class="st">&quot;Potassium&quot;</span>, <span class="st">&quot;PaCo2&quot;</span>, </span>
+<span id="cb2-45"><a href="rhc-data-description.html#cb2-45" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;PH&quot;</span>, <span class="st">&quot;Weight&quot;</span>, <span class="st">&quot;DNR.status&quot;</span>, <span class="st">&quot;Medical.insurance&quot;</span>, </span>
+<span id="cb2-46"><a href="rhc-data-description.html#cb2-46" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Respiratory.Diag&quot;</span>, <span class="st">&quot;Cardiovascular.Diag&quot;</span>, </span>
+<span id="cb2-47"><a href="rhc-data-description.html#cb2-47" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Neurological.Diag&quot;</span>, <span class="st">&quot;Gastrointestinal.Diag&quot;</span>, <span class="st">&quot;Renal.Diag&quot;</span>,</span>
+<span id="cb2-48"><a href="rhc-data-description.html#cb2-48" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Metabolic.Diag&quot;</span>, <span class="st">&quot;Hematologic.Diag&quot;</span>, <span class="st">&quot;Sepsis.Diag&quot;</span>, </span>
+<span id="cb2-49"><a href="rhc-data-description.html#cb2-49" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Trauma.Diag&quot;</span>, <span class="st">&quot;Orthopedic.Diag&quot;</span>, <span class="st">&quot;race&quot;</span>, <span class="st">&quot;income&quot;</span>, </span>
+<span id="cb2-50"><a href="rhc-data-description.html#cb2-50" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Y&quot;</span>, <span class="st">&quot;A&quot;</span>)</span>
+<span id="cb2-51"><a href="rhc-data-description.html#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(ObsData, <span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span></code></pre></div>
+</div>
+<div id="notations" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Notations</h2>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Notations</th>
+<th>Example in RHC study</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(A\)</span>: Exposure status</td>
+<td>RHC</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(Y\)</span>: Observed outcome</td>
+<td>length of stay</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(Y(A=1)\)</span> = potential outcome when exposed</td>
+<td>length of stay when RHC used</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(Y(A=0)\)</span> = potential outcome when not exposed</td>
+<td>length of stay when RHC not used</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(L\)</span>: Covariates</td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="variables" class="section level2" number="1.4">
+<h2><span class="header-section-number">1.4</span> Variables</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="rhc-data-description.html#cb3-1" aria-hidden="true" tabindex="-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
+<span id="cb3-2"><a href="rhc-data-description.html#cb3-2" aria-hidden="true" tabindex="-1"></a>                         <span class="sc">!</span><span class="fu">c</span>(A,Y)))</span>
+<span id="cb3-3"><a href="rhc-data-description.html#cb3-3" aria-hidden="true" tabindex="-1"></a>baselinevars</span></code></pre></div>
+<pre><code>##  [1] &quot;Disease.category&quot;      &quot;Cancer&quot;                &quot;Cardiovascular&quot;       
+##  [4] &quot;Congestive.HF&quot;         &quot;Dementia&quot;              &quot;Psychiatric&quot;          
+##  [7] &quot;Pulmonary&quot;             &quot;Renal&quot;                 &quot;Hepatic&quot;              
+## [10] &quot;GI.Bleed&quot;              &quot;Tumor&quot;                 &quot;Immunosupperssion&quot;    
+## [13] &quot;Transfer.hx&quot;           &quot;MI&quot;                    &quot;age&quot;                  
+## [16] &quot;sex&quot;                   &quot;edu&quot;                   &quot;DASIndex&quot;             
+## [19] &quot;APACHE.score&quot;          &quot;Glasgow.Coma.Score&quot;    &quot;blood.pressure&quot;       
+## [22] &quot;WBC&quot;                   &quot;Heart.rate&quot;            &quot;Respiratory.rate&quot;     
+## [25] &quot;Temperature&quot;           &quot;PaO2vs.FIO2&quot;           &quot;Albumin&quot;              
+## [28] &quot;Hematocrit&quot;            &quot;Bilirubin&quot;             &quot;Creatinine&quot;           
+## [31] &quot;Sodium&quot;                &quot;Potassium&quot;             &quot;PaCo2&quot;                
+## [34] &quot;PH&quot;                    &quot;Weight&quot;                &quot;DNR.status&quot;           
+## [37] &quot;Medical.insurance&quot;     &quot;Respiratory.Diag&quot;      &quot;Cardiovascular.Diag&quot;  
+## [40] &quot;Neurological.Diag&quot;     &quot;Gastrointestinal.Diag&quot; &quot;Renal.Diag&quot;           
+## [43] &quot;Metabolic.Diag&quot;        &quot;Hematologic.Diag&quot;      &quot;Sepsis.Diag&quot;          
+## [46] &quot;Trauma.Diag&quot;           &quot;Orthopedic.Diag&quot;       &quot;race&quot;                 
+## [49] &quot;income&quot;</code></pre>
+</div>
+<div id="table-1-stratified-by-rhc-exposure" class="section level2" number="1.5">
+<h2><span class="header-section-number">1.5</span> Table 1 stratified by RHC exposure</h2>
+<p>Only for some demographic and co-morbidity variables; match with Table 1 in <span class="citation"><a href="#ref-connors1996effectiveness" role="doc-biblioref">Connors et al.</a> (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="rhc-data-description.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(tableone)</span>
+<span id="cb5-2"><a href="rhc-data-description.html#cb5-2" aria-hidden="true" tabindex="-1"></a>tab0 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;race&quot;</span>, <span class="st">&quot;Disease.category&quot;</span>, <span class="st">&quot;Cancer&quot;</span>),</span>
+<span id="cb5-3"><a href="rhc-data-description.html#cb5-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">data =</span> ObsData, </span>
+<span id="cb5-4"><a href="rhc-data-description.html#cb5-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">strata =</span> <span class="st">&quot;A&quot;</span>, </span>
+<span id="cb5-5"><a href="rhc-data-description.html#cb5-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-6"><a href="rhc-data-description.html#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(tab0, <span class="at">showAllLevels =</span> <span class="cn">FALSE</span>, )</span></code></pre></div>
+<pre><code>##                       Stratified by A
+##                        0            1           
+##   n                    3551         2184        
+##   age (%)                                       
+##      [-Inf,50)          884 (24.9)   540 (24.7) 
+##      [50,60)            546 (15.4)   371 (17.0) 
+##      [60,70)            812 (22.9)   577 (26.4) 
+##      [70,80)            809 (22.8)   529 (24.2) 
+##      [80, Inf)          500 (14.1)   167 ( 7.6) 
+##   sex = Female (%)     1637 (46.1)   906 (41.5) 
+##   race (%)                                      
+##      white             2753 (77.5)  1707 (78.2) 
+##      black              585 (16.5)   335 (15.3) 
+##      other              213 ( 6.0)   142 ( 6.5) 
+##   Disease.category (%)                          
+##      ARF               1581 (44.5)   909 (41.6) 
+##      CHF                247 ( 7.0)   209 ( 9.6) 
+##      Other              955 (26.9)   208 ( 9.5) 
+##      MOSF               768 (21.6)   858 (39.3) 
+##   Cancer (%)                                    
+##      None              2652 (74.7)  1727 (79.1) 
+##      Localized (Yes)    638 (18.0)   334 (15.3) 
+##      Metastatic         261 ( 7.4)   123 ( 5.6)</code></pre>
+<p>Only outcome variable (Length of stay); slightly different than Table 2 in <span class="citation"><a href="#ref-connors1996effectiveness" role="doc-biblioref">Connors et al.</a> (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span> (means 20.5 vs. 25.7; and medians 13 vs. 17).</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="rhc-data-description.html#cb7-1" aria-hidden="true" tabindex="-1"></a>tab1 <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>),</span>
+<span id="cb7-2"><a href="rhc-data-description.html#cb7-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">data =</span> ObsData, </span>
+<span id="cb7-3"><a href="rhc-data-description.html#cb7-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">strata =</span> <span class="st">&quot;A&quot;</span>, </span>
+<span id="cb7-4"><a href="rhc-data-description.html#cb7-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">test =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-5"><a href="rhc-data-description.html#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(tab1, <span class="at">showAllLevels =</span> <span class="cn">FALSE</span>, )</span></code></pre></div>
+<pre><code>##                Stratified by A
+##                 0             1            
+##   n              3551          2184        
+##   Y (mean (SD)) 19.53 (23.59) 24.86 (28.90)</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="rhc-data-description.html#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(ObsData<span class="sc">$</span>Y[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">0</span>]); <span class="fu">median</span>(ObsData<span class="sc">$</span>Y[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">1</span>])</span></code></pre></div>
+<pre><code>## [1] 12</code></pre>
+<pre><code>## [1] 16</code></pre>
+</div>
+<div id="basic-regression-analysis" class="section level2" number="1.6">
+<h2><span class="header-section-number">1.6</span> Basic regression analysis</h2>
+<div id="crude-analysis" class="section level3" number="1.6.1">
+<h3><span class="header-section-number">1.6.1</span> Crude analysis</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="rhc-data-description.html#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># adjust the exposure variable (primary interest)</span></span>
+<span id="cb12-2"><a href="rhc-data-description.html#cb12-2" aria-hidden="true" tabindex="-1"></a>fit0 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y<span class="sc">~</span>A, <span class="at">data =</span> ObsData)</span>
+<span id="cb12-3"><a href="rhc-data-description.html#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(Publish)</span>
+<span id="cb12-4"><a href="rhc-data-description.html#cb12-4" aria-hidden="true" tabindex="-1"></a>crude.fit <span class="ot">&lt;-</span> <span class="fu">publish</span>(fit0, <span class="at">digits=</span><span class="dv">1</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>,]</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="rhc-data-description.html#cb13-1" aria-hidden="true" tabindex="-1"></a>crude.fit</span></code></pre></div>
+<pre><code>##   Variable Units Coefficient     CI.95 p-value
+## 2        A               5.3 [4.0;6.7]    &lt;0.1</code></pre>
+</div>
+<div id="adjusted-analysis" class="section level3" number="1.6.2">
+<h3><span class="header-section-number">1.6.2</span> Adjusted analysis</h3>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="rhc-data-description.html#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># adjust the exposure variable (primary interest) + covariates</span></span>
+<span id="cb15-2"><a href="rhc-data-description.html#cb15-2" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;Y~ A +&quot;</span>, </span>
+<span id="cb15-3"><a href="rhc-data-description.html#cb15-3" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">paste</span>(baselinevars, </span>
+<span id="cb15-4"><a href="rhc-data-description.html#cb15-4" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span>
+<span id="cb15-5"><a href="rhc-data-description.html#cb15-5" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(out.formula, <span class="at">data =</span> ObsData)</span>
+<span id="cb15-6"><a href="rhc-data-description.html#cb15-6" aria-hidden="true" tabindex="-1"></a>adj.fit <span class="ot">&lt;-</span> <span class="fu">publish</span>(fit1, <span class="at">digits=</span><span class="dv">1</span>)<span class="sc">$</span>regressionTable[<span class="dv">2</span>,]</span></code></pre></div>
+</div>
+<div id="regression-diagnostics" class="section level3" number="1.6.3">
+<h3><span class="header-section-number">1.6.3</span> Regression diagnostics</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="rhc-data-description.html#cb16-1" aria-hidden="true" tabindex="-1"></a>out.formula</span></code></pre></div>
+<pre><code>## Y ~ A + Disease.category + Cancer + Cardiovascular + Congestive.HF + 
+##     Dementia + Psychiatric + Pulmonary + Renal + Hepatic + GI.Bleed + 
+##     Tumor + Immunosupperssion + Transfer.hx + MI + age + sex + 
+##     edu + DASIndex + APACHE.score + Glasgow.Coma.Score + blood.pressure + 
+##     WBC + Heart.rate + Respiratory.rate + Temperature + PaO2vs.FIO2 + 
+##     Albumin + Hematocrit + Bilirubin + Creatinine + Sodium + 
+##     Potassium + PaCo2 + PH + Weight + DNR.status + Medical.insurance + 
+##     Respiratory.Diag + Cardiovascular.Diag + Neurological.Diag + 
+##     Gastrointestinal.Diag + Renal.Diag + Metabolic.Diag + Hematologic.Diag + 
+##     Sepsis.Diag + Trauma.Diag + Orthopedic.Diag + race + income</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="rhc-data-description.html#cb18-1" aria-hidden="true" tabindex="-1"></a>adj.fit </span></code></pre></div>
+<pre><code>##   Variable Units Coefficient     CI.95 p-value
+## 2        A               2.9 [1.4;4.4]    &lt;0.1</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="rhc-data-description.html#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit1)</span></code></pre></div>
+<p><img src="TMLEw_files/figure-html/reg2a-1.png" width="672" /><img src="TMLEw_files/figure-html/reg2a-2.png" width="672" /><img src="TMLEw_files/figure-html/reg2a-3.png" width="672" /><img src="TMLEw_files/figure-html/reg2a-4.png" width="672" /></p>
+</div>
+</div>
+<div id="comparison-with-literature" class="section level2" number="1.7">
+<h2><span class="header-section-number">1.7</span> Comparison with literature</h2>
+<div id="psm" class="section level3" number="1.7.1">
+<h3><span class="header-section-number">1.7.1</span> PSM</h3>
+<p><span class="citation"><a href="#ref-connors1996effectiveness" role="doc-biblioref">Connors et al.</a> (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span> conducted a propensity score matching analysis. Table 5 in <span class="citation"><a href="#ref-connors1996effectiveness" role="doc-biblioref">Connors et al.</a> (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span> showed that, after propensity score pair (1-to-1) matching, means of length of stay (<span class="math inline">\(Y\)</span>), when stratified by RHC (<span class="math inline">\(A\)</span>) was significantly different. We also conduct propensity score pair matching analysis.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="rhc-data-description.html#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb21-2"><a href="rhc-data-description.html#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(MatchIt)</span>
+<span id="cb21-3"><a href="rhc-data-description.html#cb21-3" aria-hidden="true" tabindex="-1"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;A~&quot;</span>, </span>
+<span id="cb21-4"><a href="rhc-data-description.html#cb21-4" aria-hidden="true" tabindex="-1"></a>                <span class="fu">paste</span>(baselinevars, <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span>
+<span id="cb21-5"><a href="rhc-data-description.html#cb21-5" aria-hidden="true" tabindex="-1"></a>PS.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(ps.formula,<span class="at">family=</span><span class="st">&quot;binomial&quot;</span>, </span>
+<span id="cb21-6"><a href="rhc-data-description.html#cb21-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">data=</span>ObsData)</span>
+<span id="cb21-7"><a href="rhc-data-description.html#cb21-7" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>PS <span class="ot">&lt;-</span> <span class="fu">predict</span>(PS.fit, </span>
+<span id="cb21-8"><a href="rhc-data-description.html#cb21-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">newdata =</span> ObsData, <span class="at">type=</span><span class="st">&quot;response&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="rhc-data-description.html#cb22-1" aria-hidden="true" tabindex="-1"></a>logitPS <span class="ot">&lt;-</span>  <span class="sc">-</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">/</span>ObsData<span class="sc">$</span>PS <span class="sc">-</span> <span class="dv">1</span>) </span>
+<span id="cb22-2"><a href="rhc-data-description.html#cb22-2" aria-hidden="true" tabindex="-1"></a>match.obj <span class="ot">&lt;-</span> <span class="fu">matchit</span>(ps.formula, <span class="at">data =</span>ObsData,</span>
+<span id="cb22-3"><a href="rhc-data-description.html#cb22-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">distance =</span> ObsData<span class="sc">$</span>PS,</span>
+<span id="cb22-4"><a href="rhc-data-description.html#cb22-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">method =</span> <span class="st">&quot;nearest&quot;</span>, <span class="at">replace=</span><span class="cn">FALSE</span>,</span>
+<span id="cb22-5"><a href="rhc-data-description.html#cb22-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ratio =</span> <span class="dv">1</span>, <span class="at">caliper =</span> .<span class="dv">1</span><span class="sc">*</span><span class="fu">sd</span>(logitPS))</span></code></pre></div>
+</div>
+<div id="psm-diagnostics" class="section level3" number="1.7.2">
+<h3><span class="header-section-number">1.7.2</span> PSM diagnostics</h3>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="rhc-data-description.html#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(cobalt)</span>
+<span id="cb23-2"><a href="rhc-data-description.html#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bal.plot</span>(match.obj, </span>
+<span id="cb23-3"><a href="rhc-data-description.html#cb23-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">var.name =</span> <span class="st">&quot;distance&quot;</span>, </span>
+<span id="cb23-4"><a href="rhc-data-description.html#cb23-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">which =</span> <span class="st">&quot;both&quot;</span>,</span>
+<span id="cb23-5"><a href="rhc-data-description.html#cb23-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">&quot;histogram&quot;</span>, </span>
+<span id="cb23-6"><a href="rhc-data-description.html#cb23-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">mirror =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="TMLEw_files/figure-html/ps2x-1.png" width="672" /></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="rhc-data-description.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">love.plot</span>(match.obj, <span class="at">binary =</span> <span class="st">&quot;std&quot;</span>,</span>
+<span id="cb24-2"><a href="rhc-data-description.html#cb24-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> .<span class="dv">1</span>))</span></code></pre></div>
+<p><img src="TMLEw_files/figure-html/ps2b-1.png" width="480" /></p>
+<p>The love plot suggests satisfactory propensity score matching (all SMD &lt; 0.1).</p>
+</div>
+<div id="psm-results" class="section level3" number="1.7.3">
+<h3><span class="header-section-number">1.7.3</span> PSM results</h3>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="rhc-data-description.html#cb25-1" aria-hidden="true" tabindex="-1"></a>matched.data <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj)</span>
+<span id="cb25-2"><a href="rhc-data-description.html#cb25-2" aria-hidden="true" tabindex="-1"></a>tab1y <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>),</span>
+<span id="cb25-3"><a href="rhc-data-description.html#cb25-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> matched.data, <span class="at">strata =</span> <span class="st">&quot;A&quot;</span>, </span>
+<span id="cb25-4"><a href="rhc-data-description.html#cb25-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">test =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb25-5"><a href="rhc-data-description.html#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(tab1y, <span class="at">showAllLevels =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb25-6"><a href="rhc-data-description.html#cb25-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">test =</span> <span class="cn">TRUE</span>) </span></code></pre></div>
+<pre><code>##                Stratified by A
+##                 0             1             p      test
+##   n              1628          1628                    
+##   Y (mean (SD)) 21.20 (25.58) 24.05 (27.49)  0.002</code></pre>
+<p>We also find the same conclusion based on propensity score pair matched data.</p>
+
+</div>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-connors1996effectiveness" class="csl-entry">
+Connors, Alfred F, Theodore Speroff, Neal V Dawson, Charles Thomas, Frank E Harrell, Douglas Wagner, Norman Desbiens, et al. 1996. <span>“The Effectiveness of Right Heart Catheterization in the Initial Care of Critically III Patients.”</span> <em>Jama</em> 276 (11): 889–97. <a href="https://tinyurl.com/Connors1996">https://tinyurl.com/Connors1996</a>.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="g-computation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/ehsanx/TMLEworkshop/edit/master/1RHC.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["TMLEw.pdf", "TMLEw.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

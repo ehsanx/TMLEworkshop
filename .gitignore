@@ -5,7 +5,6 @@
 .rdx
 _publish.R
 _bookdown_files
-_book
 rsconnect
 *.RData
 *.rdb
