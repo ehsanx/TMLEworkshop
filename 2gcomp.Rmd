@@ -1,21 +1,336 @@
 # G-computation
 
+```{r setup01, include=FALSE}
+require(knitr)
+require(kableExtra)
+require(dplyr)
+require(xgboost)
+require(SuperLearner)
+options(knitr.kable.NA = '')
+cachex=TRUE
+```
+
+
+## Closer look at the data
+
+```{r reg2r, cache=cachex, echo = TRUE, results='hide'}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+```
+
+
+### View data from 6 participants
+Let's focus on only first 6 columns.
+
+```{r reg2rb, cache=cachex, echo = TRUE}
+small.data <- ObsData[1:6,c("sex","A","Y")]
+kable(small.data)
+```
+
+### Restructure the data to estimate treatment effect
+In causal inference literature, often the data is structured in such a way that the outcomes under different treatments are in different columns:
+
+```{r reg2rc, cache=cachex, echo = TRUE}
+small.data$id <- c("John","Emma","Isabella","Sophia","Luke", "Mia")
+small.data$Y1 <- ifelse(small.data$A==1, small.data$Y, NA)
+small.data$Y0 <- ifelse(small.data$A==0, small.data$Y, NA)
+small.data$TE <- small.data$Y1 - small.data$Y0
+small.data <- small.data[c("id", "sex","A","Y1","Y0", "TE")]
+small.data$Y <- NULL
+small.data$sex <- as.character(small.data$sex)
+m.Y1 <- mean(small.data$Y1, na.rm = TRUE)
+m.Y0 <- mean(small.data$Y0, na.rm = TRUE)
+mean.values <- round(c(NA,NA, NA, m.Y1, m.Y0,
+                 m.Y1 - m.Y0),0)
+small.data2 <- rbind(small.data, mean.values)
+kable(small.data2, booktabs = TRUE, digits=1,
+             col.names = c("Subject ID","Sex",
+                           "RHC status (A)", 
+                           "Y when A=1 (RHC)", 
+                           "Y when A=0 (no RHC)", 
+                           "Treatment Effect"))%>%
+  row_spec(7, bold = TRUE, color = "white", 
+           background = "#D7261E")
+```
+
+Then it is easy to see 
+
+- the mean outcome under treated group (`RHC`)
+- the mean outcome under untreated group (`no RHC`)
+
+and the difference between these two means are the treatment effect.
+
+### Treat the problem as a missing value problem
+
+Instead of just estimating treatment effect on an average level, an alternate could be to
+
+- impute mean outcomes for the treated subjects
+- impute mean outcomes for the untreated subjects
+- Calculate individual treatment effect estimate
+- then calculate the average treatment effect
+
+```{r reg2rd, cache=cachex, echo = TRUE}
+small.data0 <- small.data
+small.data$Y1[is.na(small.data$Y1)] <- round(m.Y1)
+small.data$Y0[is.na(small.data$Y0)] <- round(m.Y0)
+small.data$TE <- small.data$Y1 - small.data$Y0
+m.Y1 <- mean(small.data$Y1)
+m.Y0 <- mean(small.data$Y0)
+m.TE <- mean(small.data$TE)
+mean.values <- round(c(NA,NA, NA, m.Y1, m.Y0, m.TE),0)
+small.data2 <- rbind(small.data, mean.values)
+kable(small.data2, booktabs = TRUE, digits=1,
+             col.names = c("Subject ID","Sex",
+                           "RHC status (A)", 
+                           "Y when A=1 (RHC)", 
+                           "Y when A=0 (no RHC)", 
+                           "Treatment Effect"))%>%
+  row_spec(7, bold = TRUE, color = "white", 
+           background = "#D7261E")
+```
+
+### Impute better value?
+
+However, assume that the effect of the treatment for male and female are not the same. Then, it might make more sense to impute means specific to males for male subjects, and separately impute means specific to females for female subjects.
+
+```{r reg2re, cache=cachex, echo = TRUE}
+small.data <- small.data0
+m.Y1m <- mean(small.data$Y1[small.data$sex == "Male"], na.rm = TRUE)
+m.Y1f <- mean(small.data$Y1[small.data$sex == "Female"], na.rm = TRUE)
+m.Y0m <- mean(small.data$Y0[small.data$sex == "Male"], na.rm = TRUE)
+m.Y0f <- mean(small.data$Y0[small.data$sex == "Female"], na.rm = TRUE)
+m.TE.m <- m.Y1m-m.Y0m
+m.TE.f <- m.Y1f-m.Y0f
+mean.values.m <- round(c(NA,NA, NA, m.Y1m, m.Y0m, m.TE.m),0)
+mean.values.f <- round(c(NA,NA, NA, m.Y1f, m.Y0f, m.TE.f),0)
+small.data$Y1[small.data$sex == 
+                "Male"][is.na(small.data$Y1[small.data$sex == 
+                                              "Male"])] <- round(m.Y1m)
+small.data$Y0[small.data$sex == 
+                "Male"][is.na(small.data$Y0[small.data$sex == 
+                                              "Male"])] <- round(m.Y0m)
+small.data$Y1[small.data$sex == 
+                "Female"][is.na(small.data$Y1[small.data$sex == 
+                                                "Female"])] <- round(m.Y1f)
+small.data$Y0[small.data$sex == 
+                "Female"][is.na(small.data$Y0[small.data$sex == 
+                                                "Female"])] <- round(m.Y0f)
+small.data$TE <- small.data$Y1 - small.data$Y0
+small.data2 <- rbind(small.data, mean.values.m,mean.values.f)
+kable(small.data2, booktabs = TRUE, digits=1,
+             col.names = c("Subject ID","Sex","RHC status (A)", 
+                           "Y when A=1 (RHC)", "Y when A=0 (no RHC)", 
+                           "Treatment Effect"))%>%
+  row_spec(7, bold = TRUE, color = "white", background = "#D7261E")%>%
+  row_spec(8, bold = TRUE, color = "white", background = "#D7261E")
+```
+
+- Extending the problem to other covariates, you can see that we could condition on rest of the covariates (such as age, income, race, disease category) to get better imputation values. 
+- Regression is a generalized method to take mean conditional on many covariates.
+
+## Use Regression for predicting outcome
+
+Let us fit the outcome with all covariates, including the exposure status.
+
+```{r reg2r2b, cachex=TRUE, echo = TRUE}
+# isolate the names of baseline covariates
+baselinevars <- names(dplyr::select(ObsData, !c(A,Y)))
+# adjust the exposure variable (primary interest) + covariates
+out.formula <- as.formula(paste("Y~ A +", 
+                               paste(baselinevars, 
+                                     collapse = "+")))
+fit1 <- lm(out.formula, data = ObsData)
+coef(fit1)
+```
+
+### Predict outcome for treated
+
+- Using the regression fit, we can obtain predicted outcome values for the treated. 
+- We are not only predicting for the unobserved, but also for the observed values when a person was treated.
+
+```{r reg2ab, cachex=TRUE, echo = TRUE}
+ObsData$Pred.Y1 <- predict(fit1, 
+                           newdata = data.frame(A = 1, 
+                                                dplyr::select(ObsData, !c(A,Y))), 
+                           type = "response")
+mean(ObsData$Pred.Y1)
+hist(ObsData$Pred.Y1, 
+     main = "Histogram for predicted outcome for treated", 
+     xlab = "Y(A=1)")
+abline(v=mean(ObsData$Pred.Y1),col="blue", lwd = 4)
+```
+
+### Look at the predicted outcome data for treated
+
+```{r reg2abx, cachex=TRUE, echo = TRUE}
+small.data1 <- ObsData[1:6,c("A","Pred.Y1")]
+small.data1$id <- c("John","Emma","Isabella","Sophia","Luke", "Mia")
+small.data1 <- small.data1[c("id", "A","Pred.Y1")]
+kable(small.data1, booktabs = TRUE, digits=1,
+             col.names = c("id","RHC status (A)", 
+                           "Y.hat when A=1 (RHC)"))
+```
+
+### Predict outcome for untreated
+
+```{r reg2ac, cachex=TRUE, echo = TRUE}
+ObsData$Pred.Y0 <- predict(fit1, 
+                           newdata = data.frame(A = 0, 
+                                                dplyr::select(ObsData, !c(A,Y))), 
+                           type = "response")
+```
+
+Mean predicted outcome for untreated
+
+```{r reg2ac2, cachex=TRUE, echo = TRUE}
+mean(ObsData$Pred.Y0)
+hist(ObsData$Pred.Y0, 
+     main = "Histogram for predicted outcome for untreated", 
+     xlab = "Y(A=0)")
+abline(v=mean(ObsData$Pred.Y0),col="blue", lwd = 4)
+```
+
+### Look at the predicted outcome data for untreated
+
+```{r reg2acx, cachex=TRUE, echo = TRUE}
+small.data0 <- ObsData[1:6,c("A","Pred.Y0")]
+small.data0$id <- c("John","Emma","Isabella","Sophia","Luke", "Mia")
+small.data0 <- small.data0[c("id", "A","Pred.Y0")]
+kable(small.data0, booktabs = TRUE, digits=1,
+             col.names = c("id","RHC status (A)", 
+                           "Y.hat when A=0 (no RHC)"))
+```
+
+### Look at the predicted outcome data for all!
+
+```{r reg2ad, cachex=TRUE, echo = TRUE}
+small.data01 <- small.data1
+small.data01$Pred.Y0 <- small.data0$Pred.Y0
+small.data01$Pred.TE <- small.data01$Pred.Y1 - small.data01$Pred.Y0
+m.Y1 <- mean(small.data01$Pred.Y1)
+m.Y0 <- mean(small.data01$Pred.Y0)
+mean.values <- round(c(NA,NA, m.Y1, m.Y0, m.Y1 -m.Y0),1)
+small.data2 <- rbind(small.data01, mean.values)
+kable(small.data2, booktabs = TRUE, digits=1,
+             col.names = c("id","RHC status (A)",
+                           "Y.hat when A=1 (RHC)",
+                           "Y.hat when A=0 (no RHC)",
+                           "Treatment Effect"))%>%
+  row_spec(7, bold = TRUE, color = "white", background = "#D7261E")
+```
+
+From this table, it is easy to calculate treatment effect estimate. The process we just went through, is a simplified version of **parametric G-computation**!
 
 ## Parametric G-computation
 
 ### Steps
 
+1. Fit the outcome regression on the exposure and covariates
+2. Extract outcome prediction by setting all $A=1$
+3. Extract outcome prediction by setting all $A=0$
+4. Substract these two outcome predictions to get treatment effect estimate
+
+```{r reg2acnx, cachex=TRUE, echo = TRUE}
+out.formula <- as.formula(paste("Y~ A +",
+                               paste(baselinevars,
+                                     collapse = "+")))
+fit1 <- lm(out.formula, data = ObsData)
+ObsData$Pred.Y1 <- predict(fit1, 
+                           newdata = data.frame(A = 1, 
+                                                dplyr::select(ObsData, !c(A,Y))), 
+                           type = "response")
+ObsData$Pred.Y0 <- predict(fit1, 
+                           newdata = data.frame(A = 0, 
+                                                dplyr::select(ObsData, !c(A,Y))), 
+                           type = "response")
+ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
+```
+
 ### Treatment effect estimate
+
+Mean value of predicted treatment effect 
+
+```{r reg2acnx1, cachex=TRUE, echo = TRUE}
+mean(ObsData$Pred.TE)
+```
+
+SD of treatment effect
+
+```{r reg2acnx2, cachex=TRUE, echo = TRUE}
+sd(ObsData$Pred.TE)
+```
+
+
+```{r reg2acnx3, cachex=TRUE, echo = TRUE}
+hist(ObsData$Pred.TE, main = "Histogram for predicted treatment effect", xlab = "Y(A=1) - Y(A=0)")
+abline(v=mean(ObsData$Pred.TE),col="blue", lwd = 4)
+```
+
+G-computation is highly sensitive to on model misspecification. Therefore, it is usually a good idea to use machine learning mehods that are flexible.
 
 ## G-computation using ML
 
-### ML algorithms
+### A tree based algorithm
+
+XGBoost is a fast version of gradient boosting algotithm. Let us use this one to fit the data first.
+
+```{r ML1, cache=cachex, echo = TRUE}
+require(xgboost)
+Y <-ObsData$Y
+ObsData.matrix <- model.matrix(out.formula, data = ObsData)
+fit3 <- xgboost(data = ObsData.matrix, 
+                label = Y,
+                max.depth = 10, 
+                eta = 1, 
+                nthread = 15, 
+                nrounds = 100, 
+                alpha = 0.5,
+                objective = "reg:squarederror", 
+                verbose = 0)
+```
+
+
+### Extract outcome prediction as if everyone is treated
+
+```{r ML12, cache=cachex, echo = TRUE}
+ObsData.matrix.A1 <- ObsData.matrix 
+ObsData.matrix.A1[,"A"] <- 1
+ObsData$Pred.Y1 <- predict(fit3, newdata = ObsData.matrix.A1)
+summary(ObsData$Pred.Y1)
+```
+
+### Extract outcome prediction as if everyone is untreated
+
+
+```{r ML13, cache=cachex, echo = TRUE}
+ObsData.matrix.A0 <- ObsData.matrix
+ObsData.matrix.A0[,"A"] <- 0
+ObsData$Pred.Y0 <- predict(fit3, newdata = ObsData.matrix.A0)
+summary(ObsData$Pred.Y0)
+```
 
 ### Treatment effect estimate
 
+
+```{r ML13b, cache=cachex, echo = TRUE}
+ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
+
+```
+
+
+Mean value of predicted treatment effect 
+
+```{r reg2acnx1b, cachex=TRUE, echo = TRUE}
+summary(ObsData$Pred.TE)
+```
+
+
+
 ## G-computation using SuperLearner
 
-### SuperLearner Steps by hand
+```{r sl234, cachex=TRUE, echo = TRUE}
+require(SuperLearner)
+```
 
 ### SuperLearner Steps by available package
 

@@ -1,0 +1,143 @@
+# Final Words
+
+```{r setup2vf, include=FALSE}
+require(knitr)
+require(kableExtra)
+require(DiagrammeR)
+require(DiagrammeRsvg)
+require(rsvg)
+library(magrittr)
+library(svglite)
+library(png)
+require(nhanesA)
+library(skimr)
+library(jtools)
+require(cobalt)
+require(tableone)
+require(Publish)
+```
+
+## Why SL and TMLE
+
+### Prediction goal
+
+```{r dag1, echo=FALSE, cache=TRUE}
+g2 <- grViz("
+	digraph causal {
+	
+	  # Nodes
+    node [shape = circle]
+    y [label = 'Length of stay']
+    
+    node [shape = box]
+    a [label = 'RHC']
+    b [label = 'age']
+    c [label = 'sex']
+    d [label = 'race']
+    e [label = 'education']
+    f [label = 'Disease.category']
+    g [label = 'Cancer']
+    h [label = 'Income']
+    
+	  # Edges
+	  edge [color = black,
+	        arrowhead = vee]
+	  rankdir = LR
+	  {b c d e f g h} -> y
+	  a -> y
+	  
+	  # Graph
+	  graph [overlap = true, fontsize = 10]
+	}")
+g2 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("images/dagpred.png")
+```
+
+```{r plot1, echo=FALSE}
+knitr::include_graphics("images/dagpred.png")
+```
+
+- Assuming all covariates are measured, parametric models such as linear and logistic regressions are very efficient, but relies on strong assumptions. In real-world scenarios, it is often hard (if not impossible) to guess the correct specification of the right hand side of the regression equation.
+- Machine learning (ML) methods are very helpful for prediction goals. They are also helpful in identifying complex functions (non-linearities and non-additive terms) of the covariates (again, assuming they are measured). 
+- There are many ML methods, but the procedures are very different, and they come with their own advantages and disadvantages. In a given real data, it is hard to apriori predict which is the best ML algorithm.
+- That's where super learner is helpful in combining strength from various algorithms, and producing 1 prediction column that has optimal statistical properties.
+
+### Causal inference
+
+```{r dag2, echo=FALSE, cache=TRUE}
+g2 <- grViz("
+	digraph causal {
+	
+	  # Nodes
+    node [shape = circle]
+    a [label = 'RHC']
+    y [label = 'Length of stay']
+    
+    node [shape = box]
+    b [label = 'age']
+    c [label = 'sex']
+    d [label = 'race']
+    e [label = 'education']
+    f [label = 'Disease.category']
+    g [label = 'Cancer']
+    h [label = 'Income']
+    
+	  # Edges
+	  edge [color = black,
+	        arrowhead = vee]
+	  rankdir = LR
+	  {b c d e f g h} -> y
+	  {b c d e f g h} -> a
+	  a -> y
+	  
+	  # Graph
+	  graph [overlap = true, fontsize = 10]
+	}")
+g2 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("images/dagci.png")
+```
+
+```{r plot2, echo=FALSE}
+knitr::include_graphics("images/dagci.png")
+```
+
+- For causal inference goals (when we have a primary exposure of interest), machine learning methods are often misleading. This is primarily due to the fact that they usually do not have an inherent mechanism of focusing on primary exposure (RHC in this example); and treats the primary exposure as any other predictors. 
+- When using g-computation with ML methods, estimation of variance becomes a difficult problem. Generalized procedures such as robust SE or bootstrap methods are not supported by theory.
+- That's where TMLE methods shine, with the help of it's important statistical properties (double robustness, finite sample properties).
+
+### Identifiability assumptions
+
+However, causal inference requires satisfying identifiability assumptions for us to interpret causality based on association measures from statistical models (see below). Many of these assumptions are not empirically testable. That is why, it is extremely important to work with **subject area experts** to assess the plausibility of those assumptions in the given context.  No ML method, no matter how fancy it is,  can automatically produce estimates that can be directly interpreted as causal, unless the identifiability assumptions are properly taken into account. 
+
+|  |  |  |
+|-|-|-|
+|Conditional Exchangeability| $Y(1), Y(0) \perp A | L$ |Treatment assignment is independent of the potential outcome, given covariates|
+|Positivity| $0 < P(A=1 | L) < 1$ |Subjects are eligible to receive both treatment, given covariates|
+|Consistency| $Y = Y(a)  \forall A=a$ |No multiple version of the treatment; and well defined treatment|
+
+## Further reading
+
+### Key articles
+
+- TMLE Procedure: 
+  - @luque2018targeted
+  - @schuler2017targeted
+- Super learner: 
+  - @rose2013mortality 
+  - @naimi2018stacked
+  
+### Workshops
+
+- [SER Workshop](https://epiresearch.org/) Introduction to Parametric and Semi-parametric Estimators for Causal Inference by Laura B. Balzer & Jennifer Ahern, 2020
+- [SER Workshop](https://epiresearch.org/) Machine Learning and Artificial Intelligence for Causal Inference and Prediction: A Primer by Naimi A, 2021
+
+### Recorded webinars
+
+The following webinars and workshops are freely accessible, and great for understanding the intuitions, theories and mechanisms behind these methods!
+
+- [Targeted Machine Learning for Causal Inference based on Real World Data](https://www.youtube.com/watch?v=PrPNP5RVcLg) by Mark van der Laan (Putnam Data Sciences)
+- [An Introduction to Targeted Maximum Likelihood Estimation of Causal Effects](https://www.youtube.com/watch?v=8Q9dfW3oOi4) by Susan Gruber (Putnam Data Sciences)
+- [An introduction to Super Learning](https://www.youtube.com/watch?v=1zT17HtvtF8) by Eric Polly (Putnam Data Sciences)
+- [Cross-validated Targeted Maximum Likelihood Estimation (CV-TMLE)](https://www.youtube.com/watch?v=MDmddX267Ys) by Alan Hubbard (Putnam Data Sciences)
+- [Applications of Targeted Maximum Likelihood Estimation](https://www.youtube.com/watch?v=foY7HoCeo88) by Laura Balzar (UCSF Epi & Biostats)
+- [Higher order Targeted Maximum Likelihood Estimation](https://www.youtube.com/watch?v=2jumfnRQpxs) by Mark van der Laan (Online Causal Inference Seminar)
+- [Targeted learning for the estimation of drug safety and effectiveness: Getting better answers by asking better questions](http://bcooltv.mcgill.ca/FDownloader.aspx?rid=e3143be2-918d-49d9-82ce-4dfea75ef1dc&DLType=VGAMP4) by Mireille Schnitzer (CNODES)
+- [Applying targeted maximum likelihood estimation to pharmacoepidemiology](https://www.cnodes.ca/online-lecture/targeted-learning-estimation/) by Menglan Pang (CNODES)

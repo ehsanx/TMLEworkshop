@@ -156,11 +156,17 @@ adj.fit
 plot(fit1)
 ```
 
+Diagnostics do not necessarily look so good. 
+
 ## Comparison with literature
+
+@connors1996effectiveness conducted a propensity score matching analysis. Table 5 in @connors1996effectiveness showed that, after propensity score pair (1-to-1) matching, means of length of stay ($Y$), when stratified by RHC ($A$) was significantly different. 
 
 ### PSM
 
-@connors1996effectiveness conducted a propensity score matching analysis. Table 5 in @connors1996effectiveness showed that, after propensity score pair (1-to-1) matching, means of length of stay ($Y$), when stratified by RHC ($A$) was significantly different. We also conduct propensity score pair matching analysis.
+We also conduct propensity score pair matching analysis, as follows. 
+
+**Note**: In this workshop, we will not cover Propensity Score Matching (PSM) in this workshop. If you want to learn more about this, feel free to check out this other workshop: [Understanding Propensity Score Matching](https://ehsanx.github.io/psw/).
 
 ```{r ps1, cache=TRUE, echo = TRUE}
 set.seed(123)
