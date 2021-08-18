@@ -27,6 +27,8 @@ description: "Intro to R."
 
 In comparative effectiveness studies, researchers typically use propensity score methods. However, propensity score methods have known limitations in real-world scenarios, when the true data generating mechanism is unknown. Targeted maximum likelihood estimation (TMLE) is an alternative estimation method with a number of desirable statistical properties. It is a doubly robust method, making use of both the outcome model and propensity score model to generate an unbiased estimate as long as at least one of the models is correctly specified. TMLE also enables the integration of machine learning approaches. Despite the fact that this method has been shown to perform better than propensity score methods in a variety of scenarios, it is not widely used in medical research as the technical details of this approach are generally not well understood. 
 
+change
+
 ## Goal  {-}
 
 In this workshop we will present an <ins>introductory tutorial explaining an overview of TMLE using one real epidemiological data</ins>, the steps to use the method in R, and a demonstration of relevant R packages. 
