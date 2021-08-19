@@ -1,6 +1,7 @@
 # G-computation
 
 ```{r setup01, include=FALSE}
+require(boot)
 require(knitr)
 require(glmnet)
 require(kableExtra)
@@ -20,6 +21,12 @@ ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
 dim(ObsData)
 ```
 
+In this dataset, we have 
+
+- `r prettyNum(dim(ObsData)[1],big.mark=",",scientific=FALSE)` subjects, 
+- 1 outcome variable ($Y$ = length of stay), 
+- 1 exposure variable ($A$ = RHC status), and 
+- `r dim(ObsData)[2]-2` covariates.
 
 ### View data from 6 participants
 Let's focus on only first 6 columns, with only 3 variables.
@@ -30,7 +37,8 @@ kable(small.data)
 ```
 
 ### Restructure the data to estimate treatment effect
-In causal inference literature, often the data is structured in such a way that the outcomes under different treatments are in different columns:
+
+In causal inference literature, often the data is structured in such a way that the outcomes $Y$ under different treatments $A$ are in different columns. What we are doing here is we are distinguishing $Y(A=1)$ from $Y(A=0)$.
 
 ```{r reg2rc, cache=cachex, echo = TRUE}
 small.data$id <- c("John","Emma","Isabella","Sophia","Luke", "Mia")
@@ -60,16 +68,16 @@ Then it is easy to see
 - the mean outcome under treated group (`RHC`)
 - the mean outcome under untreated group (`no RHC`)
 
-and the difference between these two means are the treatment effect.
+and the difference between these two means is the **treatment effect**.
 
 ### Treat the problem as a missing value problem
 
 Instead of just estimating treatment effect on an average level, an alternate could be to
 
-- impute mean outcomes for the treated subjects
-- impute mean outcomes for the untreated subjects
+- impute **mean outcomes for the treated subjects**
+- impute **mean outcomes for the untreated subjects**
 - Calculate individual treatment effect estimate
-- then calculate the average treatment effect
+- then calculate the **average treatment effect**
 
 ```{r reg2rd, cache=cachex, echo = TRUE}
 small.data0 <- small.data
@@ -93,7 +101,10 @@ kable(small.data2, booktabs = TRUE, digits=1,
 
 ### Impute better value?
 
-However, assume that the effect of the treatment for male and female are not the same. Then, it might make more sense to impute means specific to males for male subjects, and separately impute means specific to females for female subjects.
+However, assume that the effect of the treatment for **male** and **female** are not the same. Then, it might make more sense to 
+
+- impute **means specific to males for male subjects**, and separately 
+- impute **means specific to females for female subjects**.
 
 ```{r reg2re, cache=cachex, echo = TRUE}
 small.data <- small.data0
@@ -103,20 +114,20 @@ m.Y0m <- mean(small.data$Y0[small.data$sex == "Male"], na.rm = TRUE)
 m.Y0f <- mean(small.data$Y0[small.data$sex == "Female"], na.rm = TRUE)
 m.TE.m <- m.Y1m-m.Y0m
 m.TE.f <- m.Y1f-m.Y0f
-mean.values.m <- round(c(NA,NA, NA, m.Y1m, m.Y0m, m.TE.m),0)
-mean.values.f <- round(c(NA,NA, NA, m.Y1f, m.Y0f, m.TE.f),0)
+mean.values.m <- c(NA,"Mean for males", NA, round(c(m.Y1m, m.Y0m, m.TE.m),1))
+mean.values.f <- c(NA,"Mean for females", NA, round(c(m.Y1f, m.Y0f, m.TE.f),1))
 small.data$Y1[small.data$sex == 
                 "Male"][is.na(small.data$Y1[small.data$sex == 
-                                              "Male"])] <- round(m.Y1m)
+                                              "Male"])] <- round(m.Y1m,1)
 small.data$Y0[small.data$sex == 
                 "Male"][is.na(small.data$Y0[small.data$sex == 
-                                              "Male"])] <- round(m.Y0m)
+                                              "Male"])] <- round(m.Y0m,1)
 small.data$Y1[small.data$sex == 
                 "Female"][is.na(small.data$Y1[small.data$sex == 
-                                                "Female"])] <- round(m.Y1f)
+                                                "Female"])] <- round(m.Y1f,1)
 small.data$Y0[small.data$sex == 
                 "Female"][is.na(small.data$Y0[small.data$sex == 
-                                                "Female"])] <- round(m.Y0f)
+                                                "Female"])] <- round(m.Y0f,1)
 small.data$TE <- small.data$Y1 - small.data$Y0
 small.data2 <- rbind(small.data, mean.values.m,mean.values.f)
 kable(small.data2, booktabs = TRUE, digits=1,
@@ -127,14 +138,14 @@ kable(small.data2, booktabs = TRUE, digits=1,
   row_spec(8, bold = TRUE, color = "white", background = "#D7261E")
 ```
 
-- Extending the problem to other covariates, you can see that we could condition on rest of the covariates (such as age, income, race, disease category) to get better imputation values. 
-- Regression is a generalized method to take mean conditional on many covariates.
+- Extending the problem to **other covariates**, you can see that we could condition on rest of the covariates (such as age, income, race, disease category) to get better imputation values. 
+- **Regression** is a generalized method to take mean conditional on many covariates.
 
 ## Use Regression for predicting outcome
 
 Let us fit the outcome with all covariates, including the exposure status.
 
-```{r reg2r2b, cachex=TRUE, echo = TRUE}
+```{r reg2r2b, cache=cachex, echo = TRUE}
 # isolate the names of baseline covariates
 baselinevars <- names(dplyr::select(ObsData, !c(A,Y)))
 # adjust the exposure variable (primary interest) + covariates
@@ -150,11 +161,16 @@ coef(fit1)
 - Using the regression fit, we can obtain predicted outcome values for the treated. 
 - We are not only predicting for the unobserved, but also for the observed values when a person was treated.
 
-```{r reg2ab, cachex=TRUE, echo = TRUE}
+```{r reg2ab, cache=cachex, echo = TRUE}
 ObsData$Pred.Y1 <- predict(fit1, 
                            newdata = data.frame(A = 1, 
                                                 dplyr::select(ObsData, !c(A,Y))), 
                            type = "response")
+```
+
+Mean predicted outcome for treated
+
+```{r reg2abv, cache=cachex, echo = TRUE}
 mean(ObsData$Pred.Y1)
 hist(ObsData$Pred.Y1, 
      main = "Histogram for predicted outcome for treated", 
@@ -164,7 +180,7 @@ abline(v=mean(ObsData$Pred.Y1),col="blue", lwd = 4)
 
 ### Look at the predicted outcome data for treated
 
-```{r reg2abx, cachex=TRUE, echo = TRUE}
+```{r reg2abx, cache=cachex, echo = TRUE}
 small.data1 <- ObsData[1:6,c("A","Pred.Y1")]
 small.data1$id <- c("John","Emma","Isabella","Sophia","Luke", "Mia")
 small.data1 <- small.data1[c("id", "A","Pred.Y1")]
@@ -175,7 +191,7 @@ kable(small.data1, booktabs = TRUE, digits=1,
 
 ### Predict outcome for untreated
 
-```{r reg2ac, cachex=TRUE, echo = TRUE}
+```{r reg2ac, cache=cachex, echo = TRUE}
 ObsData$Pred.Y0 <- predict(fit1, 
                            newdata = data.frame(A = 0, 
                                                 dplyr::select(ObsData, !c(A,Y))), 
@@ -184,7 +200,7 @@ ObsData$Pred.Y0 <- predict(fit1,
 
 Mean predicted outcome for untreated
 
-```{r reg2ac2, cachex=TRUE, echo = TRUE}
+```{r reg2ac2, cache=cachex, echo = TRUE}
 mean(ObsData$Pred.Y0)
 hist(ObsData$Pred.Y0, 
      main = "Histogram for predicted outcome for untreated", 
@@ -194,7 +210,7 @@ abline(v=mean(ObsData$Pred.Y0),col="blue", lwd = 4)
 
 ### Look at the predicted outcome data for untreated
 
-```{r reg2acx, cachex=TRUE, echo = TRUE}
+```{r reg2acx, cache=cachex, echo = TRUE}
 small.data0 <- ObsData[1:6,c("A","Pred.Y0")]
 small.data0$id <- c("John","Emma","Isabella","Sophia","Luke", "Mia")
 small.data0 <- small.data0[c("id", "A","Pred.Y0")]
@@ -205,7 +221,7 @@ kable(small.data0, booktabs = TRUE, digits=1,
 
 ### Look at the predicted outcome data for all!
 
-```{r reg2ad, cachex=TRUE, echo = TRUE}
+```{r reg2ad, cache=cachex, echo = TRUE}
 small.data01 <- small.data1
 small.data01$Pred.Y0 <- small.data0$Pred.Y0
 small.data01$Pred.TE <- small.data01$Pred.Y1 - small.data01$Pred.Y0
@@ -221,9 +237,13 @@ kable(small.data2, booktabs = TRUE, digits=1,
   row_spec(7, bold = TRUE, color = "white", background = "#D7261E")
 ```
 
-From this table, it is easy to calculate treatment effect estimate. The process we just went through, is a simplified version of **parametric G-computation**!
+From this table, it is easy to calculate treatment effect estimate. The process we just went through, is a version of **parametric G-computation**!
 
 ## Parametric G-computation
+
+```{r gcomppic, echo=FALSE, fig.cap="Defining treatment effect in terms of potential outcomes and observations", out.width = '70%'}
+knitr::include_graphics("images/gcomp.png")
+```
 
 ### Steps
 
@@ -232,19 +252,23 @@ From this table, it is easy to calculate treatment effect estimate. The process 
 3. Extract outcome prediction by setting all $A=0$
 4. Substract these two outcome predictions to get treatment effect estimate
 
-```{r reg2acnx, cachex=TRUE, echo = TRUE}
+```{r reg2acnx, cache=cachex, echo = TRUE}
 out.formula <- as.formula(paste("Y~ A +",
                                paste(baselinevars,
                                      collapse = "+")))
+# Step 1
 fit1 <- lm(out.formula, data = ObsData)
+# Step 2
 ObsData$Pred.Y1 <- predict(fit1, 
                            newdata = data.frame(A = 1, 
                                                 dplyr::select(ObsData, !c(A,Y))), 
                            type = "response")
+# Step 3
 ObsData$Pred.Y0 <- predict(fit1, 
                            newdata = data.frame(A = 0, 
                                                 dplyr::select(ObsData, !c(A,Y))), 
                            type = "response")
+# Step 4
 ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
 ```
 
@@ -252,21 +276,73 @@ ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0
 
 Mean value of predicted treatment effect 
 
-```{r reg2acnx1, cachex=TRUE, echo = TRUE}
+```{r reg2acnx1, cache=cachex, echo = TRUE}
 mean(ObsData$Pred.TE)
 ```
 
 SD of treatment effect
 
-```{r reg2acnx2, cachex=TRUE, echo = TRUE}
+```{r reg2acnx2, cache=cachex, echo = TRUE}
 sd(ObsData$Pred.TE)
 ```
 
 
-```{r reg2acnx3, cachex=TRUE, echo = TRUE}
-hist(ObsData$Pred.TE, main = "Histogram for predicted treatment effect", xlab = "Y(A=1) - Y(A=0)")
+```{r reg2acnx3, cache=cachex, echo = TRUE}
+hist(ObsData$Pred.TE, 
+     main = "Histogram for predicted treatment effect", 
+     xlab = "Y(A=1) - Y(A=0)")
 abline(v=mean(ObsData$Pred.TE),col="blue", lwd = 4)
 ```
 
-G-computation is highly sensitive to on model misspecification. Therefore, it is usually a good idea to use machine learning mehods that are flexible.
+This shows that the SD estimate is useless from g-computation method directly.
+
+## Estimating the confidence intervals
+
+We already have an idea about the point estimate of the treatment effect:
+
+```{r reg2acnx1rev, cache=cachex, echo = TRUE}
+mean(ObsData$Pred.TE)
+```
+
+However, for confidence interval estimates, bootstrap would be necessary. In the following example, we use $R = 250$.
+
+```{r bootx, cache=cachex, echo = TRUE}
+require(boot)
+gcomp.boot <- function(formula = out.formula, data = ObsData, indices) {
+  boot_sample <- data[indices, ]
+  fit.boot <- lm(formula, data = boot_sample)
+  Pred.Y1 <- predict(fit.boot, 
+                     newdata = data.frame(A = 1, 
+                                          dplyr::select(boot_sample, !c(A,Y))), 
+                           type = "response")
+  Pred.Y0 <- predict(fit.boot, 
+                     newdata = data.frame(A = 0, 
+                                          dplyr::select(boot_sample, !c(A,Y))), 
+                           type = "response")
+  Pred.TE <- mean(Pred.Y1) - mean(Pred.Y0)
+  return(Pred.TE)
+}
+set.seed(123)
+gcomp.res <- boot(data=ObsData, 
+                  statistic=gcomp.boot,
+                  R=250, 
+                  formula=out.formula)
+```
+
+Below we show the resulting estimates from $R$ bootstrap samples.
+
+```{r bootx2, cache=cachex, echo = TRUE}
+plot(gcomp.res) 
+```
+
+Below are two versions of confidence interval. 
+
+- One is based on normality assumption: point estimate - and + with 1.96 multiplied by SD estimate
+- Another is based on percentiles
+
+```{r bootx3, cache=cachex, echo = TRUE}
+boot.ci(gcomp.res, type="norm") 
+boot.ci(gcomp.res, type="perc")
+```
+
 

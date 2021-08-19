@@ -11,17 +11,20 @@ options(knitr.kable.NA = '')
 cachex=TRUE
 ```
 
+- G-computation is highly sensitive to on **model misspecification**; and when model is not correctly specified, result is subject to bias. 
+- Therefore, it can be a good idea to use **machine learning** methods, that are more flexible, than parametric methods to estimate the treatment effect.
+- Although ML methods are powerful in point estimation, the coverage probabilities are usually poor when more flexible methods are used, if inference is one of the goals. Hence we are focusing on **point estimation** here.
+
 ## G-comp using Regression tree
 
 ```{r reg2sl, cache=cachex, echo = TRUE}
 # Read the data saved at the last chapter
 ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
-dim(ObsData)
 ```
 
 ### A tree based algorithm
 
-XGBoost is a fast version of gradient boosting algorithm. Let us use this one to fit the data first.
+XGBoost is a fast version of gradient boosting algorithm. Let us use this one to fit the data first. We follow the exact same procedure that we followed in the parametric G-computation setting.
 
 ```{r ML1, cache=cachex, echo = TRUE}
 require(xgboost)
@@ -69,15 +72,17 @@ ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0
 
 Mean value of predicted treatment effect 
 
-```{r reg2acnx1b, cachex=TRUE, echo = TRUE}
+```{r reg2acnx1b, cache=cachex, echo = TRUE}
 summary(ObsData$Pred.TE)
 ```
+
+Notice that the mean is slightly different than the parametric G-computation method.
 
 ## G-comp using regularized methods
 
 ### A regularized model
 
-LASSO is a regularized method. Let us use this one to fit the data first.
+LASSO is a regularized method. One of the use of these methods is variable selection. Let us use this method to fit our data.
 
 ```{r ML1r, cache=cachex, echo = TRUE}
 require(glmnet)
@@ -122,12 +127,30 @@ ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0
 
 Mean value of predicted treatment effect 
 
-```{r reg2acnx1br, cachex=TRUE, echo = TRUE}
+```{r reg2acnx1br, cache=cachex, echo = TRUE}
 summary(ObsData$Pred.TE)
 ```
 
+Notice that the mean is very similar to the parametric G-computation method.
 
 ## G-comp using SuperLearner
+
+- SuperLearner is an ensemble MLtechnique, that uses **cross-validation** to find a weighted combination of estimates provided by different **candidate learners** (that help predict).
+- There exists many candidate learners. Here we are using a combination of
+  - linear regression
+  - Regularized regression (lasso)
+  - gradient boosting (tree based)
+  
+## Steps  
+
+- SuperLearner first **splits** the data according to chosen $K$ fold for the cross-validation
+- for each fold, it estimates a **measure of performance** (could be RMSE) in test sets based on models that was built using training sets
+- we could go one of **two routes** here
+  - measure of performance from all folds are averaged, and choose the **best** one. The prediction from the chosen learners are then used.
+  - we fit a meta regression of the following equation: $Y_{obs}$ $\sim$ $\hat{Y}_{lin.reg}$ + $\hat{Y}_{lasso}$ + $\hat{Y}_{tree}$, estimate the regression coefs, scale them to 1, and the scaled coefficients represents the **value of the corresponding candidate learner**. A new prediction column is produced based on the fitted values from this meta regression.
+
+
+
 
 ### SuperLearner
 
@@ -143,15 +166,23 @@ fit.sl <- SuperLearner(Y=ObsData$Y,
                        family="gaussian")
 ```
 
+Performance measures
+
 ```{r ML12stestrisk, cache=cachex, echo = TRUE}
 fit.sl$cvRisk
 ```
 
+scaled coefs
 
 ```{r ML12stestcoef, cache=cachex, echo = TRUE}
 fit.sl$coef
 ```
 
+Hence, in creating superlearner prediction column,
+
+- Linear regression has no contribution
+- lasso has majority contribution
+- gradient boosting of tree has some minimal contribution
 
 ```{r ML12stest, cache=cachex, echo = TRUE}
 all.pred <- predict(fit.sl, type = "response")
@@ -190,8 +221,29 @@ ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0
 
 Mean value of predicted treatment effect 
 
-```{r reg2acnx1bs, cachex=TRUE, echo = TRUE}
+```{r reg2acnx1bs, cache=cachex, echo = TRUE}
 summary(ObsData$Pred.TE)
 ```
 
+### Guideline for SuperLearner
 
+- Think about the role of variables first
+  - ideally include confounders to reduce bias
+  - consider including risk factor for outcome for greater accuracy
+  - IV, collider, mediators should be avoided
+  - if something is unmeasured, consider adding proxy (with causion)
+- Choose variety of candidate learners 
+   - parametric
+   - non-parametric
+   - tree based
+   - regularized
+   - smoothing
+- tune the candidate learners for better performance
+  - tree depth
+  - tune regularization parameters
+- cross-validation is a core part of superlearner
+  - select $K$ judiciously
+  - large sample size means small $K$ may be adequate
+  - smaller sample size means larger $K$ may be necessary
+  - other similar algorithms such as cross-fitting had been shown to have better performances
+  - for rare outcomes, consider using stratification to attempt to maintain training and test sample ratios the same

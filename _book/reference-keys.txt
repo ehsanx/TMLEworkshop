@@ -78,3 +78,7 @@ additional-readings
 more-theory-talks
 more-applied-talks
 g-comp-using-regression-tree
+estimating-the-confidence-intervals
+fig:gcomppic
+guideline-for-superlearner
+steps-2

@@ -235,6 +235,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.1" data-path="g-computation.html"><a href="g-computation.html#steps"><i class="fa fa-check"></i><b>2.3.1</b> Steps</a></li>
 <li class="chapter" data-level="2.3.2" data-path="g-computation.html"><a href="g-computation.html#treatment-effect-estimate"><i class="fa fa-check"></i><b>2.3.2</b> Treatment effect estimate</a></li>
 </ul></li>
+<li class="chapter" data-level="2.4" data-path="g-computation.html"><a href="g-computation.html#estimating-the-confidence-intervals"><i class="fa fa-check"></i><b>2.4</b> Estimating the confidence intervals</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html"><i class="fa fa-check"></i><b>3</b> G-computation using ML</a>
 <ul>
@@ -331,6 +332,13 @@ div.csl-indent {
 <span id="cb1-2"><a href="g-computation.html#cb1-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span>
 <span id="cb1-3"><a href="g-computation.html#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ObsData)</span></code></pre></div>
 <pre><code>## [1] 5735   51</code></pre>
+<p>In this dataset, we have</p>
+<ul>
+<li>5,735 subjects,</li>
+<li>1 outcome variable (<span class="math inline">\(Y\)</span> = length of stay),</li>
+<li>1 exposure variable (<span class="math inline">\(A\)</span> = RHC status), and</li>
+<li>49 covariates.</li>
+</ul>
 <div id="view-data-from-6-participants" class="section level3" number="2.1.1">
 <h3><span class="header-section-number">2.1.1</span> View data from 6 participants</h3>
 <p>Let’s focus on only first 6 columns, with only 3 variables.</p>
@@ -422,7 +430,7 @@ Female
 </div>
 <div id="restructure-the-data-to-estimate-treatment-effect" class="section level3" number="2.1.2">
 <h3><span class="header-section-number">2.1.2</span> Restructure the data to estimate treatment effect</h3>
-<p>In causal inference literature, often the data is structured in such a way that the outcomes under different treatments are in different columns:</p>
+<p>In causal inference literature, often the data is structured in such a way that the outcomes <span class="math inline">\(Y\)</span> under different treatments <span class="math inline">\(A\)</span> are in different columns. What we are doing here is we are distinguishing <span class="math inline">\(Y(A=1)\)</span> from <span class="math inline">\(Y(A=0)\)</span>.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="g-computation.html#cb4-1" aria-hidden="true" tabindex="-1"></a>small.data<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;John&quot;</span>,<span class="st">&quot;Emma&quot;</span>,<span class="st">&quot;Isabella&quot;</span>,<span class="st">&quot;Sophia&quot;</span>,<span class="st">&quot;Luke&quot;</span>, <span class="st">&quot;Mia&quot;</span>)</span>
 <span id="cb4-2"><a href="g-computation.html#cb4-2" aria-hidden="true" tabindex="-1"></a>small.data<span class="sc">$</span>Y1 <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(small.data<span class="sc">$</span>A<span class="sc">==</span><span class="dv">1</span>, small.data<span class="sc">$</span>Y, <span class="cn">NA</span>)</span>
 <span id="cb4-3"><a href="g-computation.html#cb4-3" aria-hidden="true" tabindex="-1"></a>small.data<span class="sc">$</span>Y0 <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(small.data<span class="sc">$</span>A<span class="sc">==</span><span class="dv">0</span>, small.data<span class="sc">$</span>Y, <span class="cn">NA</span>)</span>
@@ -599,16 +607,16 @@ Female
 <li>the mean outcome under treated group (<code>RHC</code>)</li>
 <li>the mean outcome under untreated group (<code>no RHC</code>)</li>
 </ul>
-<p>and the difference between these two means are the treatment effect.</p>
+<p>and the difference between these two means is the <strong>treatment effect</strong>.</p>
 </div>
 <div id="treat-the-problem-as-a-missing-value-problem" class="section level3" number="2.1.3">
 <h3><span class="header-section-number">2.1.3</span> Treat the problem as a missing value problem</h3>
 <p>Instead of just estimating treatment effect on an average level, an alternate could be to</p>
 <ul>
-<li>impute mean outcomes for the treated subjects</li>
-<li>impute mean outcomes for the untreated subjects</li>
+<li>impute <strong>mean outcomes for the treated subjects</strong></li>
+<li>impute <strong>mean outcomes for the untreated subjects</strong></li>
 <li>Calculate individual treatment effect estimate</li>
-<li>then calculate the average treatment effect</li>
+<li>then calculate the <strong>average treatment effect</strong></li>
 </ul>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="g-computation.html#cb5-1" aria-hidden="true" tabindex="-1"></a>small.data0 <span class="ot">&lt;-</span> small.data</span>
 <span id="cb5-2"><a href="g-computation.html#cb5-2" aria-hidden="true" tabindex="-1"></a>small.data<span class="sc">$</span>Y1[<span class="fu">is.na</span>(small.data<span class="sc">$</span>Y1)] <span class="ot">&lt;-</span> <span class="fu">round</span>(m.Y1)</span>
@@ -793,7 +801,11 @@ Female
 </div>
 <div id="impute-better-value" class="section level3" number="2.1.4">
 <h3><span class="header-section-number">2.1.4</span> Impute better value?</h3>
-<p>However, assume that the effect of the treatment for male and female are not the same. Then, it might make more sense to impute means specific to males for male subjects, and separately impute means specific to females for female subjects.</p>
+<p>However, assume that the effect of the treatment for <strong>male</strong> and <strong>female</strong> are not the same. Then, it might make more sense to</p>
+<ul>
+<li>impute <strong>means specific to males for male subjects</strong>, and separately</li>
+<li>impute <strong>means specific to females for female subjects</strong>.</li>
+</ul>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="g-computation.html#cb6-1" aria-hidden="true" tabindex="-1"></a>small.data <span class="ot">&lt;-</span> small.data0</span>
 <span id="cb6-2"><a href="g-computation.html#cb6-2" aria-hidden="true" tabindex="-1"></a>m.Y1m <span class="ot">&lt;-</span> <span class="fu">mean</span>(small.data<span class="sc">$</span>Y1[small.data<span class="sc">$</span>sex <span class="sc">==</span> <span class="st">&quot;Male&quot;</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb6-3"><a href="g-computation.html#cb6-3" aria-hidden="true" tabindex="-1"></a>m.Y1f <span class="ot">&lt;-</span> <span class="fu">mean</span>(small.data<span class="sc">$</span>Y1[small.data<span class="sc">$</span>sex <span class="sc">==</span> <span class="st">&quot;Female&quot;</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
@@ -801,20 +813,20 @@ Female
 <span id="cb6-5"><a href="g-computation.html#cb6-5" aria-hidden="true" tabindex="-1"></a>m.Y0f <span class="ot">&lt;-</span> <span class="fu">mean</span>(small.data<span class="sc">$</span>Y0[small.data<span class="sc">$</span>sex <span class="sc">==</span> <span class="st">&quot;Female&quot;</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb6-6"><a href="g-computation.html#cb6-6" aria-hidden="true" tabindex="-1"></a>m.TE.m <span class="ot">&lt;-</span> m.Y1m<span class="sc">-</span>m.Y0m</span>
 <span id="cb6-7"><a href="g-computation.html#cb6-7" aria-hidden="true" tabindex="-1"></a>m.TE.f <span class="ot">&lt;-</span> m.Y1f<span class="sc">-</span>m.Y0f</span>
-<span id="cb6-8"><a href="g-computation.html#cb6-8" aria-hidden="true" tabindex="-1"></a>mean.values.m <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="cn">NA</span>,<span class="cn">NA</span>, <span class="cn">NA</span>, m.Y1m, m.Y0m, m.TE.m),<span class="dv">0</span>)</span>
-<span id="cb6-9"><a href="g-computation.html#cb6-9" aria-hidden="true" tabindex="-1"></a>mean.values.f <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="cn">NA</span>,<span class="cn">NA</span>, <span class="cn">NA</span>, m.Y1f, m.Y0f, m.TE.f),<span class="dv">0</span>)</span>
+<span id="cb6-8"><a href="g-computation.html#cb6-8" aria-hidden="true" tabindex="-1"></a>mean.values.m <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>,<span class="st">&quot;Mean for males&quot;</span>, <span class="cn">NA</span>, <span class="fu">round</span>(<span class="fu">c</span>(m.Y1m, m.Y0m, m.TE.m),<span class="dv">1</span>))</span>
+<span id="cb6-9"><a href="g-computation.html#cb6-9" aria-hidden="true" tabindex="-1"></a>mean.values.f <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>,<span class="st">&quot;Mean for females&quot;</span>, <span class="cn">NA</span>, <span class="fu">round</span>(<span class="fu">c</span>(m.Y1f, m.Y0f, m.TE.f),<span class="dv">1</span>))</span>
 <span id="cb6-10"><a href="g-computation.html#cb6-10" aria-hidden="true" tabindex="-1"></a>small.data<span class="sc">$</span>Y1[small.data<span class="sc">$</span>sex <span class="sc">==</span> </span>
 <span id="cb6-11"><a href="g-computation.html#cb6-11" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Male&quot;</span>][<span class="fu">is.na</span>(small.data<span class="sc">$</span>Y1[small.data<span class="sc">$</span>sex <span class="sc">==</span> </span>
-<span id="cb6-12"><a href="g-computation.html#cb6-12" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">&quot;Male&quot;</span>])] <span class="ot">&lt;-</span> <span class="fu">round</span>(m.Y1m)</span>
+<span id="cb6-12"><a href="g-computation.html#cb6-12" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">&quot;Male&quot;</span>])] <span class="ot">&lt;-</span> <span class="fu">round</span>(m.Y1m,<span class="dv">1</span>)</span>
 <span id="cb6-13"><a href="g-computation.html#cb6-13" aria-hidden="true" tabindex="-1"></a>small.data<span class="sc">$</span>Y0[small.data<span class="sc">$</span>sex <span class="sc">==</span> </span>
 <span id="cb6-14"><a href="g-computation.html#cb6-14" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Male&quot;</span>][<span class="fu">is.na</span>(small.data<span class="sc">$</span>Y0[small.data<span class="sc">$</span>sex <span class="sc">==</span> </span>
-<span id="cb6-15"><a href="g-computation.html#cb6-15" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">&quot;Male&quot;</span>])] <span class="ot">&lt;-</span> <span class="fu">round</span>(m.Y0m)</span>
+<span id="cb6-15"><a href="g-computation.html#cb6-15" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">&quot;Male&quot;</span>])] <span class="ot">&lt;-</span> <span class="fu">round</span>(m.Y0m,<span class="dv">1</span>)</span>
 <span id="cb6-16"><a href="g-computation.html#cb6-16" aria-hidden="true" tabindex="-1"></a>small.data<span class="sc">$</span>Y1[small.data<span class="sc">$</span>sex <span class="sc">==</span> </span>
 <span id="cb6-17"><a href="g-computation.html#cb6-17" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Female&quot;</span>][<span class="fu">is.na</span>(small.data<span class="sc">$</span>Y1[small.data<span class="sc">$</span>sex <span class="sc">==</span> </span>
-<span id="cb6-18"><a href="g-computation.html#cb6-18" aria-hidden="true" tabindex="-1"></a>                                                <span class="st">&quot;Female&quot;</span>])] <span class="ot">&lt;-</span> <span class="fu">round</span>(m.Y1f)</span>
+<span id="cb6-18"><a href="g-computation.html#cb6-18" aria-hidden="true" tabindex="-1"></a>                                                <span class="st">&quot;Female&quot;</span>])] <span class="ot">&lt;-</span> <span class="fu">round</span>(m.Y1f,<span class="dv">1</span>)</span>
 <span id="cb6-19"><a href="g-computation.html#cb6-19" aria-hidden="true" tabindex="-1"></a>small.data<span class="sc">$</span>Y0[small.data<span class="sc">$</span>sex <span class="sc">==</span> </span>
 <span id="cb6-20"><a href="g-computation.html#cb6-20" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Female&quot;</span>][<span class="fu">is.na</span>(small.data<span class="sc">$</span>Y0[small.data<span class="sc">$</span>sex <span class="sc">==</span> </span>
-<span id="cb6-21"><a href="g-computation.html#cb6-21" aria-hidden="true" tabindex="-1"></a>                                                <span class="st">&quot;Female&quot;</span>])] <span class="ot">&lt;-</span> <span class="fu">round</span>(m.Y0f)</span>
+<span id="cb6-21"><a href="g-computation.html#cb6-21" aria-hidden="true" tabindex="-1"></a>                                                <span class="st">&quot;Female&quot;</span>])] <span class="ot">&lt;-</span> <span class="fu">round</span>(m.Y0f,<span class="dv">1</span>)</span>
 <span id="cb6-22"><a href="g-computation.html#cb6-22" aria-hidden="true" tabindex="-1"></a>small.data<span class="sc">$</span>TE <span class="ot">&lt;-</span> small.data<span class="sc">$</span>Y1 <span class="sc">-</span> small.data<span class="sc">$</span>Y0</span>
 <span id="cb6-23"><a href="g-computation.html#cb6-23" aria-hidden="true" tabindex="-1"></a>small.data2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(small.data, mean.values.m,mean.values.f)</span>
 <span id="cb6-24"><a href="g-computation.html#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(small.data2, <span class="at">booktabs =</span> <span class="cn">TRUE</span>, <span class="at">digits=</span><span class="dv">1</span>,</span>
@@ -832,16 +844,16 @@ Subject ID
 <th style="text-align:left;">
 Sex
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
 RHC status (A)
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
 Y when A=1 (RHC)
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
 Y when A=0 (no RHC)
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
 Treatment Effect
 </th>
 </tr>
@@ -854,16 +866,16 @@ John
 <td style="text-align:left;">
 Male
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 0
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 9
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 -7
 </td>
 </tr>
@@ -874,16 +886,16 @@ Emma
 <td style="text-align:left;">
 Female
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 45
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 22
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 23
 </td>
 </tr>
@@ -894,16 +906,16 @@ Isabella
 <td style="text-align:left;">
 Female
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 60
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 22
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 38
 </td>
 </tr>
@@ -914,17 +926,17 @@ Sophia
 <td style="text-align:left;">
 Female
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 0
 </td>
-<td style="text-align:right;">
-52
+<td style="text-align:left;">
+52.5
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 37
 </td>
-<td style="text-align:right;">
-15
+<td style="text-align:left;">
+15.5
 </td>
 </tr>
 <tr>
@@ -934,16 +946,16 @@ Luke
 <td style="text-align:left;">
 Male
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 1
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 2
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 9
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 -7
 </td>
 </tr>
@@ -954,33 +966,34 @@ Mia
 <td style="text-align:left;">
 Female
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 0
 </td>
-<td style="text-align:right;">
-52
+<td style="text-align:left;">
+52.5
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
 7
 </td>
-<td style="text-align:right;">
-45
+<td style="text-align:left;">
+45.5
 </td>
 </tr>
 <tr>
 <td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
 </td>
 <td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
+Mean for males
 </td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #D7261E !important;">
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
 </td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #D7261E !important;">
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
 2
 </td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #D7261E !important;">
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
 9
 </td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #D7261E !important;">
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
 -7
 </td>
 </tr>
@@ -988,24 +1001,25 @@ Female
 <td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
 </td>
 <td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
+Mean for females
 </td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #D7261E !important;">
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
 </td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #D7261E !important;">
-52
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
+52.5
 </td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #D7261E !important;">
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
 22
 </td>
-<td style="text-align:right;font-weight: bold;color: white !important;background-color: #D7261E !important;">
-30
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #D7261E !important;">
+30.5
 </td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li>Extending the problem to other covariates, you can see that we could condition on rest of the covariates (such as age, income, race, disease category) to get better imputation values.</li>
-<li>Regression is a generalized method to take mean conditional on many covariates.</li>
+<li>Extending the problem to <strong>other covariates</strong>, you can see that we could condition on rest of the covariates (such as age, income, race, disease category) to get better imputation values.</li>
+<li><strong>Regression</strong> is a generalized method to take mean conditional on many covariates.</li>
 </ul>
 </div>
 </div>
@@ -1093,23 +1107,24 @@ Female
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="g-computation.html#cb9-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
 <span id="cb9-2"><a href="g-computation.html#cb9-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">1</span>, </span>
 <span id="cb9-3"><a href="g-computation.html#cb9-3" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
-<span id="cb9-4"><a href="g-computation.html#cb9-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
-<span id="cb9-5"><a href="g-computation.html#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
+<span id="cb9-4"><a href="g-computation.html#cb9-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
+<p>Mean predicted outcome for treated</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="g-computation.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
 <pre><code>## [1] 23.35625</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="g-computation.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ObsData<span class="sc">$</span>Pred.Y1, </span>
-<span id="cb11-2"><a href="g-computation.html#cb11-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Histogram for predicted outcome for treated&quot;</span>, </span>
-<span id="cb11-3"><a href="g-computation.html#cb11-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;Y(A=1)&quot;</span>)</span>
-<span id="cb11-4"><a href="g-computation.html#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.Y1),<span class="at">col=</span><span class="st">&quot;blue&quot;</span>, <span class="at">lwd =</span> <span class="dv">4</span>)</span></code></pre></div>
-<p><img src="TMLEw_files/figure-html/reg2ab-1.png" width="672" /></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="g-computation.html#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ObsData<span class="sc">$</span>Pred.Y1, </span>
+<span id="cb12-2"><a href="g-computation.html#cb12-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Histogram for predicted outcome for treated&quot;</span>, </span>
+<span id="cb12-3"><a href="g-computation.html#cb12-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;Y(A=1)&quot;</span>)</span>
+<span id="cb12-4"><a href="g-computation.html#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.Y1),<span class="at">col=</span><span class="st">&quot;blue&quot;</span>, <span class="at">lwd =</span> <span class="dv">4</span>)</span></code></pre></div>
+<p><img src="TMLEw_files/figure-html/reg2abv-1.png" width="672" /></p>
 </div>
 <div id="look-at-the-predicted-outcome-data-for-treated" class="section level3" number="2.2.2">
 <h3><span class="header-section-number">2.2.2</span> Look at the predicted outcome data for treated</h3>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="g-computation.html#cb12-1" aria-hidden="true" tabindex="-1"></a>small.data1 <span class="ot">&lt;-</span> ObsData[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>,<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;Pred.Y1&quot;</span>)]</span>
-<span id="cb12-2"><a href="g-computation.html#cb12-2" aria-hidden="true" tabindex="-1"></a>small.data1<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;John&quot;</span>,<span class="st">&quot;Emma&quot;</span>,<span class="st">&quot;Isabella&quot;</span>,<span class="st">&quot;Sophia&quot;</span>,<span class="st">&quot;Luke&quot;</span>, <span class="st">&quot;Mia&quot;</span>)</span>
-<span id="cb12-3"><a href="g-computation.html#cb12-3" aria-hidden="true" tabindex="-1"></a>small.data1 <span class="ot">&lt;-</span> small.data1[<span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;A&quot;</span>,<span class="st">&quot;Pred.Y1&quot;</span>)]</span>
-<span id="cb12-4"><a href="g-computation.html#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(small.data1, <span class="at">booktabs =</span> <span class="cn">TRUE</span>, <span class="at">digits=</span><span class="dv">1</span>,</span>
-<span id="cb12-5"><a href="g-computation.html#cb12-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;RHC status (A)&quot;</span>, </span>
-<span id="cb12-6"><a href="g-computation.html#cb12-6" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;Y.hat when A=1 (RHC)&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="g-computation.html#cb13-1" aria-hidden="true" tabindex="-1"></a>small.data1 <span class="ot">&lt;-</span> ObsData[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>,<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;Pred.Y1&quot;</span>)]</span>
+<span id="cb13-2"><a href="g-computation.html#cb13-2" aria-hidden="true" tabindex="-1"></a>small.data1<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;John&quot;</span>,<span class="st">&quot;Emma&quot;</span>,<span class="st">&quot;Isabella&quot;</span>,<span class="st">&quot;Sophia&quot;</span>,<span class="st">&quot;Luke&quot;</span>, <span class="st">&quot;Mia&quot;</span>)</span>
+<span id="cb13-3"><a href="g-computation.html#cb13-3" aria-hidden="true" tabindex="-1"></a>small.data1 <span class="ot">&lt;-</span> small.data1[<span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;A&quot;</span>,<span class="st">&quot;Pred.Y1&quot;</span>)]</span>
+<span id="cb13-4"><a href="g-computation.html#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(small.data1, <span class="at">booktabs =</span> <span class="cn">TRUE</span>, <span class="at">digits=</span><span class="dv">1</span>,</span>
+<span id="cb13-5"><a href="g-computation.html#cb13-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;RHC status (A)&quot;</span>, </span>
+<span id="cb13-6"><a href="g-computation.html#cb13-6" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;Y.hat when A=1 (RHC)&quot;</span>))</span></code></pre></div>
 <table>
 <thead>
 <tr>
@@ -1196,27 +1211,27 @@ Mia
 </div>
 <div id="predict-outcome-for-untreated" class="section level3" number="2.2.3">
 <h3><span class="header-section-number">2.2.3</span> Predict outcome for untreated</h3>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="g-computation.html#cb13-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
-<span id="cb13-2"><a href="g-computation.html#cb13-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">0</span>, </span>
-<span id="cb13-3"><a href="g-computation.html#cb13-3" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
-<span id="cb13-4"><a href="g-computation.html#cb13-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="g-computation.html#cb14-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
+<span id="cb14-2"><a href="g-computation.html#cb14-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">0</span>, </span>
+<span id="cb14-3"><a href="g-computation.html#cb14-3" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb14-4"><a href="g-computation.html#cb14-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
 <p>Mean predicted outcome for untreated</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="g-computation.html#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="g-computation.html#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
 <pre><code>## [1] 20.45422</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="g-computation.html#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ObsData<span class="sc">$</span>Pred.Y0, </span>
-<span id="cb16-2"><a href="g-computation.html#cb16-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Histogram for predicted outcome for untreated&quot;</span>, </span>
-<span id="cb16-3"><a href="g-computation.html#cb16-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;Y(A=0)&quot;</span>)</span>
-<span id="cb16-4"><a href="g-computation.html#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.Y0),<span class="at">col=</span><span class="st">&quot;blue&quot;</span>, <span class="at">lwd =</span> <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="g-computation.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ObsData<span class="sc">$</span>Pred.Y0, </span>
+<span id="cb17-2"><a href="g-computation.html#cb17-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Histogram for predicted outcome for untreated&quot;</span>, </span>
+<span id="cb17-3"><a href="g-computation.html#cb17-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;Y(A=0)&quot;</span>)</span>
+<span id="cb17-4"><a href="g-computation.html#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.Y0),<span class="at">col=</span><span class="st">&quot;blue&quot;</span>, <span class="at">lwd =</span> <span class="dv">4</span>)</span></code></pre></div>
 <p><img src="TMLEw_files/figure-html/reg2ac2-1.png" width="672" /></p>
 </div>
 <div id="look-at-the-predicted-outcome-data-for-untreated" class="section level3" number="2.2.4">
 <h3><span class="header-section-number">2.2.4</span> Look at the predicted outcome data for untreated</h3>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="g-computation.html#cb17-1" aria-hidden="true" tabindex="-1"></a>small.data0 <span class="ot">&lt;-</span> ObsData[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>,<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;Pred.Y0&quot;</span>)]</span>
-<span id="cb17-2"><a href="g-computation.html#cb17-2" aria-hidden="true" tabindex="-1"></a>small.data0<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;John&quot;</span>,<span class="st">&quot;Emma&quot;</span>,<span class="st">&quot;Isabella&quot;</span>,<span class="st">&quot;Sophia&quot;</span>,<span class="st">&quot;Luke&quot;</span>, <span class="st">&quot;Mia&quot;</span>)</span>
-<span id="cb17-3"><a href="g-computation.html#cb17-3" aria-hidden="true" tabindex="-1"></a>small.data0 <span class="ot">&lt;-</span> small.data0[<span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;A&quot;</span>,<span class="st">&quot;Pred.Y0&quot;</span>)]</span>
-<span id="cb17-4"><a href="g-computation.html#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(small.data0, <span class="at">booktabs =</span> <span class="cn">TRUE</span>, <span class="at">digits=</span><span class="dv">1</span>,</span>
-<span id="cb17-5"><a href="g-computation.html#cb17-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;RHC status (A)&quot;</span>, </span>
-<span id="cb17-6"><a href="g-computation.html#cb17-6" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;Y.hat when A=0 (no RHC)&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="g-computation.html#cb18-1" aria-hidden="true" tabindex="-1"></a>small.data0 <span class="ot">&lt;-</span> ObsData[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>,<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;Pred.Y0&quot;</span>)]</span>
+<span id="cb18-2"><a href="g-computation.html#cb18-2" aria-hidden="true" tabindex="-1"></a>small.data0<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;John&quot;</span>,<span class="st">&quot;Emma&quot;</span>,<span class="st">&quot;Isabella&quot;</span>,<span class="st">&quot;Sophia&quot;</span>,<span class="st">&quot;Luke&quot;</span>, <span class="st">&quot;Mia&quot;</span>)</span>
+<span id="cb18-3"><a href="g-computation.html#cb18-3" aria-hidden="true" tabindex="-1"></a>small.data0 <span class="ot">&lt;-</span> small.data0[<span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;A&quot;</span>,<span class="st">&quot;Pred.Y0&quot;</span>)]</span>
+<span id="cb18-4"><a href="g-computation.html#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(small.data0, <span class="at">booktabs =</span> <span class="cn">TRUE</span>, <span class="at">digits=</span><span class="dv">1</span>,</span>
+<span id="cb18-5"><a href="g-computation.html#cb18-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;RHC status (A)&quot;</span>, </span>
+<span id="cb18-6"><a href="g-computation.html#cb18-6" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;Y.hat when A=0 (no RHC)&quot;</span>))</span></code></pre></div>
 <table>
 <thead>
 <tr>
@@ -1303,19 +1318,19 @@ Mia
 </div>
 <div id="look-at-the-predicted-outcome-data-for-all" class="section level3" number="2.2.5">
 <h3><span class="header-section-number">2.2.5</span> Look at the predicted outcome data for all!</h3>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="g-computation.html#cb18-1" aria-hidden="true" tabindex="-1"></a>small.data01 <span class="ot">&lt;-</span> small.data1</span>
-<span id="cb18-2"><a href="g-computation.html#cb18-2" aria-hidden="true" tabindex="-1"></a>small.data01<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> small.data0<span class="sc">$</span>Pred.Y0</span>
-<span id="cb18-3"><a href="g-computation.html#cb18-3" aria-hidden="true" tabindex="-1"></a>small.data01<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> small.data01<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> small.data01<span class="sc">$</span>Pred.Y0</span>
-<span id="cb18-4"><a href="g-computation.html#cb18-4" aria-hidden="true" tabindex="-1"></a>m.Y1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(small.data01<span class="sc">$</span>Pred.Y1)</span>
-<span id="cb18-5"><a href="g-computation.html#cb18-5" aria-hidden="true" tabindex="-1"></a>m.Y0 <span class="ot">&lt;-</span> <span class="fu">mean</span>(small.data01<span class="sc">$</span>Pred.Y0)</span>
-<span id="cb18-6"><a href="g-computation.html#cb18-6" aria-hidden="true" tabindex="-1"></a>mean.values <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="cn">NA</span>,<span class="cn">NA</span>, m.Y1, m.Y0, m.Y1 <span class="sc">-</span>m.Y0),<span class="dv">1</span>)</span>
-<span id="cb18-7"><a href="g-computation.html#cb18-7" aria-hidden="true" tabindex="-1"></a>small.data2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(small.data01, mean.values)</span>
-<span id="cb18-8"><a href="g-computation.html#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(small.data2, <span class="at">booktabs =</span> <span class="cn">TRUE</span>, <span class="at">digits=</span><span class="dv">1</span>,</span>
-<span id="cb18-9"><a href="g-computation.html#cb18-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;RHC status (A)&quot;</span>,</span>
-<span id="cb18-10"><a href="g-computation.html#cb18-10" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;Y.hat when A=1 (RHC)&quot;</span>,</span>
-<span id="cb18-11"><a href="g-computation.html#cb18-11" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;Y.hat when A=0 (no RHC)&quot;</span>,</span>
-<span id="cb18-12"><a href="g-computation.html#cb18-12" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;Treatment Effect&quot;</span>))<span class="sc">%&gt;%</span></span>
-<span id="cb18-13"><a href="g-computation.html#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="dv">7</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">background =</span> <span class="st">&quot;#D7261E&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="g-computation.html#cb19-1" aria-hidden="true" tabindex="-1"></a>small.data01 <span class="ot">&lt;-</span> small.data1</span>
+<span id="cb19-2"><a href="g-computation.html#cb19-2" aria-hidden="true" tabindex="-1"></a>small.data01<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> small.data0<span class="sc">$</span>Pred.Y0</span>
+<span id="cb19-3"><a href="g-computation.html#cb19-3" aria-hidden="true" tabindex="-1"></a>small.data01<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> small.data01<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> small.data01<span class="sc">$</span>Pred.Y0</span>
+<span id="cb19-4"><a href="g-computation.html#cb19-4" aria-hidden="true" tabindex="-1"></a>m.Y1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(small.data01<span class="sc">$</span>Pred.Y1)</span>
+<span id="cb19-5"><a href="g-computation.html#cb19-5" aria-hidden="true" tabindex="-1"></a>m.Y0 <span class="ot">&lt;-</span> <span class="fu">mean</span>(small.data01<span class="sc">$</span>Pred.Y0)</span>
+<span id="cb19-6"><a href="g-computation.html#cb19-6" aria-hidden="true" tabindex="-1"></a>mean.values <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="cn">NA</span>,<span class="cn">NA</span>, m.Y1, m.Y0, m.Y1 <span class="sc">-</span>m.Y0),<span class="dv">1</span>)</span>
+<span id="cb19-7"><a href="g-computation.html#cb19-7" aria-hidden="true" tabindex="-1"></a>small.data2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(small.data01, mean.values)</span>
+<span id="cb19-8"><a href="g-computation.html#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(small.data2, <span class="at">booktabs =</span> <span class="cn">TRUE</span>, <span class="at">digits=</span><span class="dv">1</span>,</span>
+<span id="cb19-9"><a href="g-computation.html#cb19-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;RHC status (A)&quot;</span>,</span>
+<span id="cb19-10"><a href="g-computation.html#cb19-10" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;Y.hat when A=1 (RHC)&quot;</span>,</span>
+<span id="cb19-11"><a href="g-computation.html#cb19-11" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;Y.hat when A=0 (no RHC)&quot;</span>,</span>
+<span id="cb19-12"><a href="g-computation.html#cb19-12" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;Treatment Effect&quot;</span>))<span class="sc">%&gt;%</span></span>
+<span id="cb19-13"><a href="g-computation.html#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="dv">7</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">background =</span> <span class="st">&quot;#D7261E&quot;</span>)</span></code></pre></div>
 <table>
 <thead>
 <tr>
@@ -1456,11 +1471,17 @@ Mia
 </tr>
 </tbody>
 </table>
-<p>From this table, it is easy to calculate treatment effect estimate. The process we just went through, is a simplified version of <strong>parametric G-computation</strong>!</p>
+<p>From this table, it is easy to calculate treatment effect estimate. The process we just went through, is a version of <strong>parametric G-computation</strong>!</p>
 </div>
 </div>
 <div id="parametric-g-computation" class="section level2" number="2.3">
 <h2><span class="header-section-number">2.3</span> Parametric G-computation</h2>
+<div class="figure"><span id="fig:gcomppic"></span>
+<img src="images/gcomp.png" alt="Defining treatment effect in terms of potential outcomes and observations" width="70%" />
+<p class="caption">
+Figure 2.1: Defining treatment effect in terms of potential outcomes and observations
+</p>
+</div>
 <div id="steps" class="section level3" number="2.3.1">
 <h3><span class="header-section-number">2.3.1</span> Steps</h3>
 <ol style="list-style-type: decimal">
@@ -1469,36 +1490,100 @@ Mia
 <li>Extract outcome prediction by setting all <span class="math inline">\(A=0\)</span></li>
 <li>Substract these two outcome predictions to get treatment effect estimate</li>
 </ol>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="g-computation.html#cb19-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;Y~ A +&quot;</span>,</span>
-<span id="cb19-2"><a href="g-computation.html#cb19-2" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">paste</span>(baselinevars,</span>
-<span id="cb19-3"><a href="g-computation.html#cb19-3" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span>
-<span id="cb19-4"><a href="g-computation.html#cb19-4" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(out.formula, <span class="at">data =</span> ObsData)</span>
-<span id="cb19-5"><a href="g-computation.html#cb19-5" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
-<span id="cb19-6"><a href="g-computation.html#cb19-6" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">1</span>, </span>
-<span id="cb19-7"><a href="g-computation.html#cb19-7" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
-<span id="cb19-8"><a href="g-computation.html#cb19-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
-<span id="cb19-9"><a href="g-computation.html#cb19-9" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
-<span id="cb19-10"><a href="g-computation.html#cb19-10" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">0</span>, </span>
-<span id="cb19-11"><a href="g-computation.html#cb19-11" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
-<span id="cb19-12"><a href="g-computation.html#cb19-12" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
-<span id="cb19-13"><a href="g-computation.html#cb19-13" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="g-computation.html#cb20-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;Y~ A +&quot;</span>,</span>
+<span id="cb20-2"><a href="g-computation.html#cb20-2" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">paste</span>(baselinevars,</span>
+<span id="cb20-3"><a href="g-computation.html#cb20-3" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span>
+<span id="cb20-4"><a href="g-computation.html#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1</span></span>
+<span id="cb20-5"><a href="g-computation.html#cb20-5" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(out.formula, <span class="at">data =</span> ObsData)</span>
+<span id="cb20-6"><a href="g-computation.html#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2</span></span>
+<span id="cb20-7"><a href="g-computation.html#cb20-7" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
+<span id="cb20-8"><a href="g-computation.html#cb20-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">1</span>, </span>
+<span id="cb20-9"><a href="g-computation.html#cb20-9" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb20-10"><a href="g-computation.html#cb20-10" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb20-11"><a href="g-computation.html#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3</span></span>
+<span id="cb20-12"><a href="g-computation.html#cb20-12" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
+<span id="cb20-13"><a href="g-computation.html#cb20-13" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">0</span>, </span>
+<span id="cb20-14"><a href="g-computation.html#cb20-14" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb20-15"><a href="g-computation.html#cb20-15" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb20-16"><a href="g-computation.html#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4</span></span>
+<span id="cb20-17"><a href="g-computation.html#cb20-17" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
 </div>
 <div id="treatment-effect-estimate" class="section level3" number="2.3.2">
 <h3><span class="header-section-number">2.3.2</span> Treatment effect estimate</h3>
 <p>Mean value of predicted treatment effect</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="g-computation.html#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="g-computation.html#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
 <pre><code>## [1] 2.90203</code></pre>
 <p>SD of treatment effect</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="g-computation.html#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="g-computation.html#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
 <pre><code>## [1] 5.132733e-15</code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="g-computation.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ObsData<span class="sc">$</span>Pred.TE, <span class="at">main =</span> <span class="st">&quot;Histogram for predicted treatment effect&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;Y(A=1) - Y(A=0)&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="g-computation.html#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ObsData<span class="sc">$</span>Pred.TE, </span>
+<span id="cb25-2"><a href="g-computation.html#cb25-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Histogram for predicted treatment effect&quot;</span>, </span>
+<span id="cb25-3"><a href="g-computation.html#cb25-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;Y(A=1) - Y(A=0)&quot;</span>)</span></code></pre></div>
 <pre><code>## Warning in plot.window(xlim, ylim, &quot;&quot;, ...): relative range of values ( 93 *
 ## EPS) is small (axis 1)</code></pre>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="g-computation.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE),<span class="at">col=</span><span class="st">&quot;blue&quot;</span>, <span class="at">lwd =</span> <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="g-computation.html#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE),<span class="at">col=</span><span class="st">&quot;blue&quot;</span>, <span class="at">lwd =</span> <span class="dv">4</span>)</span></code></pre></div>
 <p><img src="TMLEw_files/figure-html/reg2acnx3-1.png" width="672" /></p>
-<p>G-computation is highly sensitive to on model misspecification. Therefore, it is usually a good idea to use machine learning mehods that are flexible.</p>
-
+<p>This shows that the SD estimate is useless from g-computation method directly.</p>
 </div>
+</div>
+<div id="estimating-the-confidence-intervals" class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> Estimating the confidence intervals</h2>
+<p>We already have an idea about the point estimate of the treatment effect:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="g-computation.html#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
+<pre><code>## [1] 2.90203</code></pre>
+<p>However, for confidence interval estimates, bootstrap would be necessary. In the following example, we use <span class="math inline">\(R = 250\)</span>.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="g-computation.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(boot)</span>
+<span id="cb30-2"><a href="g-computation.html#cb30-2" aria-hidden="true" tabindex="-1"></a>gcomp.boot <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">formula =</span> out.formula, <span class="at">data =</span> ObsData, indices) {</span>
+<span id="cb30-3"><a href="g-computation.html#cb30-3" aria-hidden="true" tabindex="-1"></a>  boot_sample <span class="ot">&lt;-</span> data[indices, ]</span>
+<span id="cb30-4"><a href="g-computation.html#cb30-4" aria-hidden="true" tabindex="-1"></a>  fit.boot <span class="ot">&lt;-</span> <span class="fu">lm</span>(formula, <span class="at">data =</span> boot_sample)</span>
+<span id="cb30-5"><a href="g-computation.html#cb30-5" aria-hidden="true" tabindex="-1"></a>  Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.boot, </span>
+<span id="cb30-6"><a href="g-computation.html#cb30-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">1</span>, </span>
+<span id="cb30-7"><a href="g-computation.html#cb30-7" aria-hidden="true" tabindex="-1"></a>                                          dplyr<span class="sc">::</span><span class="fu">select</span>(boot_sample, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb30-8"><a href="g-computation.html#cb30-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb30-9"><a href="g-computation.html#cb30-9" aria-hidden="true" tabindex="-1"></a>  Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.boot, </span>
+<span id="cb30-10"><a href="g-computation.html#cb30-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">0</span>, </span>
+<span id="cb30-11"><a href="g-computation.html#cb30-11" aria-hidden="true" tabindex="-1"></a>                                          dplyr<span class="sc">::</span><span class="fu">select</span>(boot_sample, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb30-12"><a href="g-computation.html#cb30-12" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb30-13"><a href="g-computation.html#cb30-13" aria-hidden="true" tabindex="-1"></a>  Pred.TE <span class="ot">&lt;-</span> <span class="fu">mean</span>(Pred.Y1) <span class="sc">-</span> <span class="fu">mean</span>(Pred.Y0)</span>
+<span id="cb30-14"><a href="g-computation.html#cb30-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Pred.TE)</span>
+<span id="cb30-15"><a href="g-computation.html#cb30-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb30-16"><a href="g-computation.html#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb30-17"><a href="g-computation.html#cb30-17" aria-hidden="true" tabindex="-1"></a>gcomp.res <span class="ot">&lt;-</span> <span class="fu">boot</span>(<span class="at">data=</span>ObsData, </span>
+<span id="cb30-18"><a href="g-computation.html#cb30-18" aria-hidden="true" tabindex="-1"></a>                  <span class="at">statistic=</span>gcomp.boot,</span>
+<span id="cb30-19"><a href="g-computation.html#cb30-19" aria-hidden="true" tabindex="-1"></a>                  <span class="at">R=</span><span class="dv">250</span>, </span>
+<span id="cb30-20"><a href="g-computation.html#cb30-20" aria-hidden="true" tabindex="-1"></a>                  <span class="at">formula=</span>out.formula)</span></code></pre></div>
+<p>Below we show the resulting estimates from <span class="math inline">\(R\)</span> bootstrap samples.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="g-computation.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(gcomp.res) </span></code></pre></div>
+<p><img src="TMLEw_files/figure-html/bootx2-1.png" width="672" /></p>
+<p>Below are two versions of confidence interval.</p>
+<ul>
+<li>One is based on normality assumption: point estimate - and + with 1.96 multiplied by SD estimate</li>
+<li>Another is based on percentiles</li>
+</ul>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="g-computation.html#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boot.ci</span>(gcomp.res, <span class="at">type=</span><span class="st">&quot;norm&quot;</span>) </span></code></pre></div>
+<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+## Based on 250 bootstrap replicates
+## 
+## CALL : 
+## boot.ci(boot.out = gcomp.res, type = &quot;norm&quot;)
+## 
+## Intervals : 
+## Level      Normal        
+## 95%   ( 1.315,  4.444 )  
+## Calculations and Intervals on Original Scale</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="g-computation.html#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boot.ci</span>(gcomp.res, <span class="at">type=</span><span class="st">&quot;perc&quot;</span>)</span></code></pre></div>
+<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+## Based on 250 bootstrap replicates
+## 
+## CALL : 
+## boot.ci(boot.out = gcomp.res, type = &quot;perc&quot;)
+## 
+## Intervals : 
+## Level     Percentile     
+## 95%   ( 1.515,  4.589 )  
+## Calculations and Intervals on Original Scale
+## Some percentile intervals may be unstable</code></pre>
+
 </div>
 </div>
             </section>
