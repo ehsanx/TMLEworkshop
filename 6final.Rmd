@@ -123,8 +123,19 @@ However, causal inference requires satisfying identifiability assumptions for us
 - Super learner: 
   - @rose2013mortality 
   - @naimi2018stacked
+
+### Additional readings
+
+- @rose2020intersections
+- @snowden2011implementation
+- @naimi2017introduction
+- @austin2015moving
+- @naimi2017challenges
+- @balzer2021demystifying
   
 ### Workshops
+
+Highly recommend joining SER if interested in Epi methods development. The following workshops are very useful.
 
 - [SER Workshop](https://epiresearch.org/) Introduction to Parametric and Semi-parametric Estimators for Causal Inference by Laura B. Balzer & Jennifer Ahern, 2020
 - [SER Workshop](https://epiresearch.org/) Machine Learning and Artificial Intelligence for Causal Inference and Prediction: A Primer by Naimi A, 2021
@@ -133,11 +144,21 @@ However, causal inference requires satisfying identifiability assumptions for us
 
 The following webinars and workshops are freely accessible, and great for understanding the intuitions, theories and mechanisms behind these methods!
 
-- [Targeted Machine Learning for Causal Inference based on Real World Data](https://www.youtube.com/watch?v=PrPNP5RVcLg) by Mark van der Laan (Putnam Data Sciences)
+#### Introductory materials
+
 - [An Introduction to Targeted Maximum Likelihood Estimation of Causal Effects](https://www.youtube.com/watch?v=8Q9dfW3oOi4) by Susan Gruber (Putnam Data Sciences)
+- [Practical Considerations for Specifying a Super Learner](https://www.youtube.com/watch?v=WYnjja8DKPg) by Rachael Phillips (Putnam Data Sciences)
+
+
+#### More theory talks
+
+- [Targeted Machine Learning for Causal Inference based on Real World Data](https://www.youtube.com/watch?v=PrPNP5RVcLg) by Mark van der Laan (Putnam Data Sciences)
 - [An introduction to Super Learning](https://www.youtube.com/watch?v=1zT17HtvtF8) by Eric Polly (Putnam Data Sciences)
 - [Cross-validated Targeted Maximum Likelihood Estimation (CV-TMLE)](https://www.youtube.com/watch?v=MDmddX267Ys) by Alan Hubbard (Putnam Data Sciences)
-- [Applications of Targeted Maximum Likelihood Estimation](https://www.youtube.com/watch?v=foY7HoCeo88) by Laura Balzar (UCSF Epi & Biostats)
 - [Higher order Targeted Maximum Likelihood Estimation](https://www.youtube.com/watch?v=2jumfnRQpxs) by Mark van der Laan (Online Causal Inference Seminar)
 - [Targeted learning for the estimation of drug safety and effectiveness: Getting better answers by asking better questions](http://bcooltv.mcgill.ca/FDownloader.aspx?rid=e3143be2-918d-49d9-82ce-4dfea75ef1dc&DLType=VGAMP4) by Mireille Schnitzer (CNODES)
+
+#### More applied talks
+
+- [Applications of Targeted Maximum Likelihood Estimation](https://www.youtube.com/watch?v=foY7HoCeo88) by Laura Balzar (UCSF Epi & Biostats)
 - [Applying targeted maximum likelihood estimation to pharmacoepidemiology](https://www.cnodes.ca/online-lecture/targeted-learning-estimation/) by Menglan Pang (CNODES)

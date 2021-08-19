@@ -2,6 +2,7 @@
 
 ```{r setup01, include=FALSE}
 require(knitr)
+require(glmnet)
 require(kableExtra)
 require(dplyr)
 require(xgboost)
@@ -13,14 +14,15 @@ cachex=TRUE
 
 ## Closer look at the data
 
-```{r reg2r, cache=cachex, echo = TRUE, results='hide'}
+```{r reg2r, cache=cachex, echo = TRUE}
 # Read the data saved at the last chapter
 ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+dim(ObsData)
 ```
 
 
 ### View data from 6 participants
-Let's focus on only first 6 columns.
+Let's focus on only first 6 columns, with only 3 variables.
 
 ```{r reg2rb, cache=cachex, echo = TRUE}
 small.data <- ObsData[1:6,c("sex","A","Y")]
@@ -268,72 +270,3 @@ abline(v=mean(ObsData$Pred.TE),col="blue", lwd = 4)
 
 G-computation is highly sensitive to on model misspecification. Therefore, it is usually a good idea to use machine learning mehods that are flexible.
 
-## G-computation using ML
-
-### A tree based algorithm
-
-XGBoost is a fast version of gradient boosting algotithm. Let us use this one to fit the data first.
-
-```{r ML1, cache=cachex, echo = TRUE}
-require(xgboost)
-Y <-ObsData$Y
-ObsData.matrix <- model.matrix(out.formula, data = ObsData)
-fit3 <- xgboost(data = ObsData.matrix, 
-                label = Y,
-                max.depth = 10, 
-                eta = 1, 
-                nthread = 15, 
-                nrounds = 100, 
-                alpha = 0.5,
-                objective = "reg:squarederror", 
-                verbose = 0)
-```
-
-
-### Extract outcome prediction as if everyone is treated
-
-```{r ML12, cache=cachex, echo = TRUE}
-ObsData.matrix.A1 <- ObsData.matrix 
-ObsData.matrix.A1[,"A"] <- 1
-ObsData$Pred.Y1 <- predict(fit3, newdata = ObsData.matrix.A1)
-summary(ObsData$Pred.Y1)
-```
-
-### Extract outcome prediction as if everyone is untreated
-
-
-```{r ML13, cache=cachex, echo = TRUE}
-ObsData.matrix.A0 <- ObsData.matrix
-ObsData.matrix.A0[,"A"] <- 0
-ObsData$Pred.Y0 <- predict(fit3, newdata = ObsData.matrix.A0)
-summary(ObsData$Pred.Y0)
-```
-
-### Treatment effect estimate
-
-
-```{r ML13b, cache=cachex, echo = TRUE}
-ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
-
-```
-
-
-Mean value of predicted treatment effect 
-
-```{r reg2acnx1b, cachex=TRUE, echo = TRUE}
-summary(ObsData$Pred.TE)
-```
-
-
-
-## G-computation using SuperLearner
-
-```{r sl234, cachex=TRUE, echo = TRUE}
-require(SuperLearner)
-```
-
-### SuperLearner Steps by available package
-
-#### SuperLearner
-
-### Treatment effect estimate

@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 5 Pre-packaged software | R Guide for TMLE in Medical Research</title>
+  <title>Chapter 6 Pre-packaged software | R Guide for TMLE in Medical Research</title>
   <meta name="description" content="Intro to R." />
   <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 5 Pre-packaged software | R Guide for TMLE in Medical Research" />
+  <meta property="og:title" content="Chapter 6 Pre-packaged software | R Guide for TMLE in Medical Research" />
   <meta property="og:type" content="book" />
   
   
@@ -16,14 +16,14 @@
   <meta name="github-repo" content="ehsanx/intro2R" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 5 Pre-packaged software | R Guide for TMLE in Medical Research" />
+  <meta name="twitter:title" content="Chapter 6 Pre-packaged software | R Guide for TMLE in Medical Research" />
   
   <meta name="twitter:description" content="Intro to R." />
   
 
 
 
-<meta name="date" content="2021-08-17" />
+<meta name="date" content="2021-08-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,62 +150,91 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="2" data-path="g-computation.html"><a href="g-computation.html"><i class="fa fa-check"></i><b>2</b> G-computation</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="g-computation.html"><a href="g-computation.html#parametric-g-computation"><i class="fa fa-check"></i><b>2.1</b> Parametric G-computation</a>
+<li class="chapter" data-level="2.1" data-path="g-computation.html"><a href="g-computation.html#closer-look-at-the-data"><i class="fa fa-check"></i><b>2.1</b> Closer look at the data</a>
 <ul>
-<li class="chapter" data-level="2.1.1" data-path="g-computation.html"><a href="g-computation.html#steps"><i class="fa fa-check"></i><b>2.1.1</b> Steps</a></li>
-<li class="chapter" data-level="2.1.2" data-path="g-computation.html"><a href="g-computation.html#treatment-effect-estimate"><i class="fa fa-check"></i><b>2.1.2</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="2.1.1" data-path="g-computation.html"><a href="g-computation.html#view-data-from-6-participants"><i class="fa fa-check"></i><b>2.1.1</b> View data from 6 participants</a></li>
+<li class="chapter" data-level="2.1.2" data-path="g-computation.html"><a href="g-computation.html#restructure-the-data-to-estimate-treatment-effect"><i class="fa fa-check"></i><b>2.1.2</b> Restructure the data to estimate treatment effect</a></li>
+<li class="chapter" data-level="2.1.3" data-path="g-computation.html"><a href="g-computation.html#treat-the-problem-as-a-missing-value-problem"><i class="fa fa-check"></i><b>2.1.3</b> Treat the problem as a missing value problem</a></li>
+<li class="chapter" data-level="2.1.4" data-path="g-computation.html"><a href="g-computation.html#impute-better-value"><i class="fa fa-check"></i><b>2.1.4</b> Impute better value?</a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path="g-computation.html"><a href="g-computation.html#g-computation-using-ml"><i class="fa fa-check"></i><b>2.2</b> G-computation using ML</a>
+<li class="chapter" data-level="2.2" data-path="g-computation.html"><a href="g-computation.html#use-regression-for-predicting-outcome"><i class="fa fa-check"></i><b>2.2</b> Use Regression for predicting outcome</a>
 <ul>
-<li class="chapter" data-level="2.2.1" data-path="g-computation.html"><a href="g-computation.html#ml-algorithms"><i class="fa fa-check"></i><b>2.2.1</b> ML algorithms</a></li>
-<li class="chapter" data-level="2.2.2" data-path="g-computation.html"><a href="g-computation.html#treatment-effect-estimate-1"><i class="fa fa-check"></i><b>2.2.2</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="2.2.1" data-path="g-computation.html"><a href="g-computation.html#predict-outcome-for-treated"><i class="fa fa-check"></i><b>2.2.1</b> Predict outcome for treated</a></li>
+<li class="chapter" data-level="2.2.2" data-path="g-computation.html"><a href="g-computation.html#look-at-the-predicted-outcome-data-for-treated"><i class="fa fa-check"></i><b>2.2.2</b> Look at the predicted outcome data for treated</a></li>
+<li class="chapter" data-level="2.2.3" data-path="g-computation.html"><a href="g-computation.html#predict-outcome-for-untreated"><i class="fa fa-check"></i><b>2.2.3</b> Predict outcome for untreated</a></li>
+<li class="chapter" data-level="2.2.4" data-path="g-computation.html"><a href="g-computation.html#look-at-the-predicted-outcome-data-for-untreated"><i class="fa fa-check"></i><b>2.2.4</b> Look at the predicted outcome data for untreated</a></li>
+<li class="chapter" data-level="2.2.5" data-path="g-computation.html"><a href="g-computation.html#look-at-the-predicted-outcome-data-for-all"><i class="fa fa-check"></i><b>2.2.5</b> Look at the predicted outcome data for all!</a></li>
 </ul></li>
-<li class="chapter" data-level="2.3" data-path="g-computation.html"><a href="g-computation.html#g-computation-using-superlearner"><i class="fa fa-check"></i><b>2.3</b> G-computation using SuperLearner</a>
+<li class="chapter" data-level="2.3" data-path="g-computation.html"><a href="g-computation.html#parametric-g-computation"><i class="fa fa-check"></i><b>2.3</b> Parametric G-computation</a>
 <ul>
-<li class="chapter" data-level="2.3.1" data-path="g-computation.html"><a href="g-computation.html#superlearner-steps-by-hand"><i class="fa fa-check"></i><b>2.3.1</b> SuperLearner Steps by hand</a></li>
-<li class="chapter" data-level="2.3.2" data-path="g-computation.html"><a href="g-computation.html#superlearner-steps-by-available-package"><i class="fa fa-check"></i><b>2.3.2</b> SuperLearner Steps by available package</a></li>
-<li class="chapter" data-level="2.3.3" data-path="g-computation.html"><a href="g-computation.html#treatment-effect-estimate-2"><i class="fa fa-check"></i><b>2.3.3</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="2.3.1" data-path="g-computation.html"><a href="g-computation.html#steps"><i class="fa fa-check"></i><b>2.3.1</b> Steps</a></li>
+<li class="chapter" data-level="2.3.2" data-path="g-computation.html"><a href="g-computation.html#treatment-effect-estimate"><i class="fa fa-check"></i><b>2.3.2</b> Treatment effect estimate</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="iptw.html"><a href="iptw.html"><i class="fa fa-check"></i><b>3</b> IPTW</a>
+<li class="chapter" data-level="3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html"><i class="fa fa-check"></i><b>3</b> G-computation using ML</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="iptw.html"><a href="iptw.html#iptw-from-parametric-models"><i class="fa fa-check"></i><b>3.1</b> IPTW from parametric models</a>
+<li class="chapter" data-level="3.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-regression-tree"><i class="fa fa-check"></i><b>3.1</b> G-comp using Regression tree</a>
 <ul>
-<li class="chapter" data-level="3.1.1" data-path="iptw.html"><a href="iptw.html#steps-1"><i class="fa fa-check"></i><b>3.1.1</b> Steps</a></li>
-<li class="chapter" data-level="3.1.2" data-path="iptw.html"><a href="iptw.html#treatment-effect-estimate-3"><i class="fa fa-check"></i><b>3.1.2</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="3.1.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#a-tree-based-algorithm"><i class="fa fa-check"></i><b>3.1.1</b> A tree based algorithm</a></li>
+<li class="chapter" data-level="3.1.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-treated"><i class="fa fa-check"></i><b>3.1.2</b> Extract outcome prediction as if everyone is treated</a></li>
+<li class="chapter" data-level="3.1.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-untreated"><i class="fa fa-check"></i><b>3.1.3</b> Extract outcome prediction as if everyone is untreated</a></li>
+<li class="chapter" data-level="3.1.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#treatment-effect-estimate-1"><i class="fa fa-check"></i><b>3.1.4</b> Treatment effect estimate</a></li>
 </ul></li>
-<li class="chapter" data-level="3.2" data-path="iptw.html"><a href="iptw.html#iptw-from-ml"><i class="fa fa-check"></i><b>3.2</b> IPTW from ML</a></li>
-<li class="chapter" data-level="3.3" data-path="iptw.html"><a href="iptw.html#iptw-from-superlearner"><i class="fa fa-check"></i><b>3.3</b> IPTW from SuperLearner</a></li>
+<li class="chapter" data-level="3.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-regularized-methods"><i class="fa fa-check"></i><b>3.2</b> G-comp using regularized methods</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#a-regularized-model"><i class="fa fa-check"></i><b>3.2.1</b> A regularized model</a></li>
+<li class="chapter" data-level="3.2.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-treated-1"><i class="fa fa-check"></i><b>3.2.2</b> Extract outcome prediction as if everyone is treated</a></li>
+<li class="chapter" data-level="3.2.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-untreated-1"><i class="fa fa-check"></i><b>3.2.3</b> Extract outcome prediction as if everyone is untreated</a></li>
+<li class="chapter" data-level="3.2.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#treatment-effect-estimate-2"><i class="fa fa-check"></i><b>3.2.4</b> Treatment effect estimate</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="tmle.html"><a href="tmle.html"><i class="fa fa-check"></i><b>4</b> TMLE</a>
+<li class="chapter" data-level="3.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-superlearner"><i class="fa fa-check"></i><b>3.3</b> G-comp using SuperLearner</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="tmle.html"><a href="tmle.html#transformation-of-continuous-outcome-variable"><i class="fa fa-check"></i><b>4.1</b> Transformation of continuous outcome variable</a></li>
-<li class="chapter" data-level="4.2" data-path="tmle.html"><a href="tmle.html#initial-estimate"><i class="fa fa-check"></i><b>4.2</b> Initial estimate</a></li>
-<li class="chapter" data-level="4.3" data-path="tmle.html"><a href="tmle.html#update"><i class="fa fa-check"></i><b>4.3</b> Update</a></li>
-<li class="chapter" data-level="4.4" data-path="tmle.html"><a href="tmle.html#treatment-effect-estimate-4"><i class="fa fa-check"></i><b>4.4</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="3.3.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#superlearner"><i class="fa fa-check"></i><b>3.3.1</b> SuperLearner</a></li>
+<li class="chapter" data-level="3.3.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-treated-2"><i class="fa fa-check"></i><b>3.3.2</b> Extract outcome prediction as if everyone is treated</a></li>
+<li class="chapter" data-level="3.3.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-untreated-2"><i class="fa fa-check"></i><b>3.3.3</b> Extract outcome prediction as if everyone is untreated</a></li>
+<li class="chapter" data-level="3.3.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#treatment-effect-estimate-3"><i class="fa fa-check"></i><b>3.3.4</b> Treatment effect estimate</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>5</b> Pre-packaged software</a>
-<ul>
-<li class="chapter" data-level="5.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3"><i class="fa fa-check"></i><b>5.1</b> sl3</a></li>
-<li class="chapter" data-level="5.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-1"><i class="fa fa-check"></i><b>5.2</b> tmle</a></li>
-<li class="chapter" data-level="5.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#ltmle"><i class="fa fa-check"></i><b>5.3</b> ltmle</a></li>
-<li class="chapter" data-level="5.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle3"><i class="fa fa-check"></i><b>5.4</b> tmle3</a></li>
-<li class="chapter" data-level="5.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>5.5</b> AIPW</a></li>
-<li class="chapter" data-level="5.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>5.6</b> RHC results</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>6</b> Final Words</a>
+<li class="chapter" data-level="4" data-path="iptw.html"><a href="iptw.html"><i class="fa fa-check"></i><b>4</b> IPTW</a>
 <ul>
-<li class="chapter" data-level="6.1" data-path="final-words.html"><a href="final-words.html#why-sl-and-tmle"><i class="fa fa-check"></i><b>6.1</b> Why SL and TMLE</a>
+<li class="chapter" data-level="4.1" data-path="iptw.html"><a href="iptw.html#iptw-from-parametric-models"><i class="fa fa-check"></i><b>4.1</b> IPTW from parametric models</a>
 <ul>
-<li class="chapter" data-level="6.1.1" data-path="final-words.html"><a href="final-words.html#prediction-goal"><i class="fa fa-check"></i><b>6.1.1</b> Prediction goal</a></li>
-<li class="chapter" data-level="6.1.2" data-path="final-words.html"><a href="final-words.html#causal-inference"><i class="fa fa-check"></i><b>6.1.2</b> Causal inference</a></li>
-<li class="chapter" data-level="6.1.3" data-path="final-words.html"><a href="final-words.html#identifiability-assumptions"><i class="fa fa-check"></i><b>6.1.3</b> Identifiability assumptions</a></li>
+<li class="chapter" data-level="4.1.1" data-path="iptw.html"><a href="iptw.html#steps-1"><i class="fa fa-check"></i><b>4.1.1</b> Steps</a></li>
+<li class="chapter" data-level="4.1.2" data-path="iptw.html"><a href="iptw.html#treatment-effect-estimate-4"><i class="fa fa-check"></i><b>4.1.2</b> Treatment effect estimate</a></li>
 </ul></li>
-<li class="chapter" data-level="6.2" data-path="final-words.html"><a href="final-words.html#further-reading"><i class="fa fa-check"></i><b>6.2</b> Further reading</a>
+<li class="chapter" data-level="4.2" data-path="iptw.html"><a href="iptw.html#iptw-from-ml"><i class="fa fa-check"></i><b>4.2</b> IPTW from ML</a></li>
+<li class="chapter" data-level="4.3" data-path="iptw.html"><a href="iptw.html#iptw-from-superlearner"><i class="fa fa-check"></i><b>4.3</b> IPTW from SuperLearner</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="tmle.html"><a href="tmle.html"><i class="fa fa-check"></i><b>5</b> TMLE</a>
 <ul>
-<li class="chapter" data-level="6.2.1" data-path="final-words.html"><a href="final-words.html#key-articles"><i class="fa fa-check"></i><b>6.2.1</b> Key articles</a></li>
-<li class="chapter" data-level="6.2.2" data-path="final-words.html"><a href="final-words.html#workshops"><i class="fa fa-check"></i><b>6.2.2</b> Workshops</a></li>
-<li class="chapter" data-level="6.2.3" data-path="final-words.html"><a href="final-words.html#recorded-webinars"><i class="fa fa-check"></i><b>6.2.3</b> Recorded webinars</a></li>
+<li class="chapter" data-level="5.1" data-path="tmle.html"><a href="tmle.html#transformation-of-continuous-outcome-variable"><i class="fa fa-check"></i><b>5.1</b> Transformation of continuous outcome variable</a></li>
+<li class="chapter" data-level="5.2" data-path="tmle.html"><a href="tmle.html#initial-estimate"><i class="fa fa-check"></i><b>5.2</b> Initial estimate</a></li>
+<li class="chapter" data-level="5.3" data-path="tmle.html"><a href="tmle.html#update"><i class="fa fa-check"></i><b>5.3</b> Update</a></li>
+<li class="chapter" data-level="5.4" data-path="tmle.html"><a href="tmle.html#treatment-effect-estimate-5"><i class="fa fa-check"></i><b>5.4</b> Treatment effect estimate</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>6</b> Pre-packaged software</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3"><i class="fa fa-check"></i><b>6.1</b> sl3</a></li>
+<li class="chapter" data-level="6.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-1"><i class="fa fa-check"></i><b>6.2</b> tmle</a></li>
+<li class="chapter" data-level="6.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#ltmle"><i class="fa fa-check"></i><b>6.3</b> ltmle</a></li>
+<li class="chapter" data-level="6.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle3"><i class="fa fa-check"></i><b>6.4</b> tmle3</a></li>
+<li class="chapter" data-level="6.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>6.5</b> AIPW</a></li>
+<li class="chapter" data-level="6.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>6.6</b> RHC results</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>7</b> Final Words</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="final-words.html"><a href="final-words.html#why-sl-and-tmle"><i class="fa fa-check"></i><b>7.1</b> Why SL and TMLE</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="final-words.html"><a href="final-words.html#prediction-goal"><i class="fa fa-check"></i><b>7.1.1</b> Prediction goal</a></li>
+<li class="chapter" data-level="7.1.2" data-path="final-words.html"><a href="final-words.html#causal-inference"><i class="fa fa-check"></i><b>7.1.2</b> Causal inference</a></li>
+<li class="chapter" data-level="7.1.3" data-path="final-words.html"><a href="final-words.html#identifiability-assumptions"><i class="fa fa-check"></i><b>7.1.3</b> Identifiability assumptions</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="final-words.html"><a href="final-words.html#further-reading"><i class="fa fa-check"></i><b>7.2</b> Further reading</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="final-words.html"><a href="final-words.html#key-articles"><i class="fa fa-check"></i><b>7.2.1</b> Key articles</a></li>
+<li class="chapter" data-level="7.2.2" data-path="final-words.html"><a href="final-words.html#additional-readings"><i class="fa fa-check"></i><b>7.2.2</b> Additional readings</a></li>
+<li class="chapter" data-level="7.2.3" data-path="final-words.html"><a href="final-words.html#workshops"><i class="fa fa-check"></i><b>7.2.3</b> Workshops</a></li>
+<li class="chapter" data-level="7.2.4" data-path="final-words.html"><a href="final-words.html#recorded-webinars"><i class="fa fa-check"></i><b>7.2.4</b> Recorded webinars</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
@@ -229,25 +258,25 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="pre-packaged-software" class="section level1" number="5">
-<h1><span class="header-section-number">Chapter 5</span> Pre-packaged software</h1>
-<div id="sl3" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> sl3</h2>
+<div id="pre-packaged-software" class="section level1" number="6">
+<h1><span class="header-section-number">Chapter 6</span> Pre-packaged software</h1>
+<div id="sl3" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> sl3</h2>
 </div>
-<div id="tmle-1" class="section level2" number="5.2">
-<h2><span class="header-section-number">5.2</span> tmle</h2>
+<div id="tmle-1" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> tmle</h2>
 </div>
-<div id="ltmle" class="section level2" number="5.3">
-<h2><span class="header-section-number">5.3</span> ltmle</h2>
+<div id="ltmle" class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> ltmle</h2>
 </div>
-<div id="tmle3" class="section level2" number="5.4">
-<h2><span class="header-section-number">5.4</span> tmle3</h2>
+<div id="tmle3" class="section level2" number="6.4">
+<h2><span class="header-section-number">6.4</span> tmle3</h2>
 </div>
-<div id="aipw" class="section level2" number="5.5">
-<h2><span class="header-section-number">5.5</span> AIPW</h2>
+<div id="aipw" class="section level2" number="6.5">
+<h2><span class="header-section-number">6.5</span> AIPW</h2>
 </div>
-<div id="rhc-results" class="section level2" number="5.6">
-<h2><span class="header-section-number">5.6</span> RHC results</h2>
+<div id="rhc-results" class="section level2" number="6.6">
+<h2><span class="header-section-number">6.6</span> RHC results</h2>
 
 </div>
 </div>
