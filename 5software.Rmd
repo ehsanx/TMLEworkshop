@@ -1,10 +1,118 @@
+
+```{r setup04, include=FALSE}
+require(knitr)
+require(glmnet)
+require(kableExtra)
+require(dplyr)
+require(xgboost)
+require(SuperLearner)
+require(sl3)
+require(Rsolnp)
+require(ltmle)
+options(knitr.kable.NA = '')
+cachex=TRUE
+```
+
+```{r dataload_01, cache=cachex, echo = TRUE}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+dim(ObsData)
+```
+
 # Pre-packaged software
 
 ## sl3
+The _sl3_ package implements two types of Super Learning: discrete Super Learning, in which the best prediction algorithm (based on cross-validation) from a specified library is returned, and ensemble Super Learning, in which the best linear combination of the specified algorithms is returned (@coyle2021sl3).
+
+The first step is to create a sl3 task which keeps track of the roles of the variables in our problem (@coyle2021tlverse). 
+
+```{r}
+# create sl3 task, specifying outcome and covariates 
+rhc_task <- make_sl3_Task(
+  data = ObsData, 
+  covariates = colnames(ObsData)[-which(names(ObsData) == "Y")],
+  outcome = "Y"
+)
+rhc_task
+```
+
+Next, we create our SuperLearner. To do this, we need to specify a selection of machine learning algorithms we want to include as candidates, as well as a metalearner that the SuperLearner will use to combine or choose from the machine learning algorithms provided (@coyle2021tlverse). 
+```{r}
+# see what algorithms are available for a continuous outcome (similar can be done for a binary outcome)
+sl3_list_learners("continuous")
+```
+
+The chosen candidate algorithms can be created and collected in a Stack.
+```{r}
+# initialize candidate learners
+lrn_glm <- make_learner(Lrnr_glm)
+lrn_lasso <- make_learner(Lrnr_glmnet) # alpha default is 1
+lrn_ridge <- Lrnr_glmnet$new(alpha = 0)
+xgb_50 <- Lrnr_xgboost$new(nrounds = 50)
+
+# collect learners in stack
+stack <- make_learner(
+  Stack, lrn_glm, lrn_ridge, lrn_lasso, xgb_50
+)
+```
+
+The stack is then given to the SuperLearner.
+```{r}
+# to make an ensemble SuperLearner
+sl <- make_learner(Lrnr_sl, learners = stack)
+
+# or a discrete SuperLearner
+sl_disc_meta <- Lrnr_cv_selector$new()
+sl_disc <- Lrnr_sl$new(
+  learners = stack, 
+  metalearner = sl_disc_meta
+)
+```
+
+The SuperLearner is then trained on the sl3 task we created at the start and then it can be used to make predictions.
+```{r}
+set.seed(1444)
+
+# train SL
+sl_fit <- sl$train(rhc_task)
+# or for discrete SL
+# sl_fit <- sl_disc$train(rhc_task)
+
+# make predictions
+sl_preds <- sl_fit$predict()
+head(sl_preds)
+```
+
 
 ## tmle
+The _tmle_ package can handle both binary and continuous outcomes, and uses SuperLearner to construct both models just like we did in the steps above. The default SuperLearner library for estimating the outcome includes generalized linear models (GLMs), GLM with elastic net regularization, and Bayesian additive regression trees. The default library for estimating the propensity scores also includes GLMs and Bayesian additive regression trees (though specified slightly differently), and replaces the GLM with regularization with generalized additive models (GAMs) (@tmlePkgDocs). More methods can be added by specifying lists of models in the _Q.SL.library_ (for the outcome model) and _g.SL.library_ (for the propensity score model) arguments. Note also that the outcome $Y$ is required to be within the range of $[0,1]$ for this method as well, so we need to pass in the transformed data, then transform back the estimate.
+
+```{r tmle_pkg, cache=TRUE}
+set.seed(123) 
+
+# transform the outcome to fall within the range [0,1]
+a <- min(na.omit(ObsData$Y))
+b <- max(na.omit(ObsData$Y))
+ObsData$Y <- (ObsData$Y-a)/(b-a)
+
+# run tmle from the tmle package 
+W <- dplyr::select(ObsData, !c(Y, A))
+TMLE_PKG <- tmle::tmle(Y = ObsData$Y, A = ObsData$A, W = W, family = "gaussian")
+TMLE_PKG_ATE_tr <- TMLE_PKG$estimates$ATE$psi
+# transform back the ATE estimate
+TMLE_PKG_ATE <- (b-a)*TMLE_PKG_ATE_tr
+
+cat("ATE from tmle package: ", TMLE_PKG_ATE, "  (", (b-a)*TMLE_PKG$estimates$ATE$CI[1], ", ", (b-a)*TMLE_PKG$estimates$ATE$CI[2], ")", sep = "")
+```
 
 ## ltmle
+Similarly to the _tmle_ package, the _ltmle_ package gives the direct TMLE result with the call of one function. 
+
+```{r}
+ltmle_est <- ltmle(ObsData, Anodes = "A", Ynodes = "Y", abar = 1)
+ltmle_est
+```
+The main difference between the _tmle_ and the _ltmle_ package is that the _ltmle_ package is designed to handle longitudinal data, with measurements data recorded for each subject at multiple timepoints. More information on the use of the _ltmle_ package in these settings can be found [here](https://cran.r-project.org/web/packages/ltmle/vignettes/ltmle-intro.html).
 
 ## tmle3
 
