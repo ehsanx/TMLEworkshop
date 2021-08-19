@@ -9,6 +9,7 @@ require(SuperLearner)
 require(sl3)
 require(Rsolnp)
 require(ltmle)
+require(AIPW)
 options(knitr.kable.NA = '')
 cachex=TRUE
 ```
@@ -93,11 +94,11 @@ set.seed(123)
 # transform the outcome to fall within the range [0,1]
 a <- min(na.omit(ObsData$Y))
 b <- max(na.omit(ObsData$Y))
-ObsData$Y <- (ObsData$Y-a)/(b-a)
+ObsData$Y_transf <- (ObsData$Y-a)/(b-a)
 
 # run tmle from the tmle package 
-W <- dplyr::select(ObsData, !c(Y, A))
-TMLE_PKG <- tmle::tmle(Y = ObsData$Y, A = ObsData$A, W = W, family = "gaussian")
+W <- dplyr::select(ObsData, !c(Y_transf, Y, A))
+TMLE_PKG <- tmle::tmle(Y = ObsData$Y_transf, A = ObsData$A, W = W, family = "gaussian")
 TMLE_PKG_ATE_tr <- TMLE_PKG$estimates$ATE$psi
 # transform back the ATE estimate
 TMLE_PKG_ATE <- (b-a)*TMLE_PKG_ATE_tr
@@ -109,7 +110,7 @@ cat("ATE from tmle package: ", TMLE_PKG_ATE, "  (", (b-a)*TMLE_PKG$estimates$ATE
 Similarly to the _tmle_ package, the _ltmle_ package gives the direct TMLE result with the call of one function. 
 
 ```{r}
-ltmle_est <- ltmle(ObsData, Anodes = "A", Ynodes = "Y", abar = 1)
+ltmle_est <- ltmle(ObsData, Anodes = "A", Ynodes = "Y_transf", abar = 1)
 ltmle_est
 ```
 The main difference between the _tmle_ and the _ltmle_ package is that the _ltmle_ package is designed to handle longitudinal data, with measurements data recorded for each subject at multiple timepoints. More information on the use of the _ltmle_ package in these settings can be found [here](https://cran.r-project.org/web/packages/ltmle/vignettes/ltmle-intro.html).
@@ -117,5 +118,24 @@ The main difference between the _tmle_ and the _ltmle_ package is that the _ltml
 ## tmle3
 
 ## AIPW
+The _aipw_ package implements augmented inverse probability weighting. It has similar parameters as the _tmle_ package. It is typically used with the _SuperLearner_ library. 
+
+```{r}
+# construct AIPW estimator
+aipw <- AIPW$new(Y=ObsData$Y, 
+                 A=ObsData$A, 
+                 W=ObsData[colnames(ObsData)[-which(names(ObsData) == "Y")]], 
+                 Q.SL.library = c("SL.mean", "SL.glm"), 
+                 g.SL.library = c("SL.mean", "SL.glm"), 
+                 k_split=3, 
+                 verbose=FALSE)
+# fit AIPW object
+aipw$fit()
+
+# calculate ATE
+aipw$summary()
+aipw$estimates
+```
+
 
 ## RHC results
