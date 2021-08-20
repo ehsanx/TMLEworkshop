@@ -17,6 +17,25 @@ require(tableone)
 require(Publish)
 ```
 
+## Select variables judiciously
+
+
+```{r role, echo = FALSE, out.width = "650px", fig.cap="Variable roles: A = exposure or treatment; Y = outcome; L = confounder; R = risk factor for Y; M = mediator; C = collider; E = effect of Y; I = instrument; u = unmeasured confounder; P = proxy of U; N = noise variable"}
+knitr::include_graphics("images/role.png")
+```
+
+- Think about the role of variables first
+  - ideally include confounders to reduce bias
+  - consider including risk factor for outcome for greater accuracy
+  - IV, collider, mediators, effect of outcome, noise variables should be avoided
+  - if something is unmeasured, consider adding proxy (with caution)
+- If you do not have subject area expertise, talk to experts
+- do pre-screening
+    - sparse binary variables
+    - highly collinear variables
+
+Relying on just a blackbox ML method may be dangerous to identify the roles.  
+
 ## Why SL and TMLE
 
 ### Prediction goal

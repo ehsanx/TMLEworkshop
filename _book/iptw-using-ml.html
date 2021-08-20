@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 4 IPTW | R Guide for TMLE in Medical Research</title>
+  <title>Chapter 5 IPTW using ML | R Guide for TMLE in Medical Research</title>
   <meta name="description" content="Intro to R." />
   <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 4 IPTW | R Guide for TMLE in Medical Research" />
+  <meta property="og:title" content="Chapter 5 IPTW using ML | R Guide for TMLE in Medical Research" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ehsanx/intro2R" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 4 IPTW | R Guide for TMLE in Medical Research" />
+  <meta name="twitter:title" content="Chapter 5 IPTW using ML | R Guide for TMLE in Medical Research" />
   
   <meta name="twitter:description" content="Intro to R." />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="g-computation-using-ml.html"/>
-<link rel="next" href="iptw-using-ml.html"/>
+<link rel="prev" href="iptw.html"/>
+<link rel="next" href="tmle.html"/>
 <script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -344,46 +344,29 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="iptw" class="section level1" number="4">
-<h1><span class="header-section-number">Chapter 4</span> IPTW</h1>
-<p>In this chapter, we are not only interested in outcome modelling, but also <strong>exposure modelling</strong>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="iptw.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
-<span id="cb1-2"><a href="iptw.html#cb1-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span>
-<span id="cb1-3"><a href="iptw.html#cb1-3" aria-hidden="true" tabindex="-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y)))</span></code></pre></div>
-<div id="iptw-from-parametric-models" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> IPTW from parametric models</h2>
+<div id="iptw-using-ml" class="section level1" number="5">
+<h1><span class="header-section-number">Chapter 5</span> IPTW using ML</h1>
+<p>Similar to G-computation, we will try to use machine learning methods, particularly Superlearner in estimating IPW estimates</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="iptw-using-ml.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
+<span id="cb1-2"><a href="iptw-using-ml.html#cb1-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span>
+<span id="cb1-3"><a href="iptw-using-ml.html#cb1-3" aria-hidden="true" tabindex="-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y)))</span>
+<span id="cb1-4"><a href="iptw-using-ml.html#cb1-4" aria-hidden="true" tabindex="-1"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;A ~&quot;</span>,</span>
+<span id="cb1-5"><a href="iptw-using-ml.html#cb1-5" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">paste</span>(baselinevars,</span>
+<span id="cb1-6"><a href="iptw-using-ml.html#cb1-6" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span></code></pre></div>
+<div id="iptw-from-superlearner" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> IPTW from Superlearner</h2>
 <p><strong>Modelling Steps</strong>:</p>
-<p>According to <span class="citation"><a href="#ref-austin2011tutorial" role="doc-biblioref">Austin</a> (<a href="#ref-austin2011tutorial" role="doc-biblioref">2011</a>)</span>, we need to follow 4 steps:</p>
-<table>
-<colgroup>
-<col width="50%" />
-<col width="50%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td>Step 1</td>
-<td>exposure modelling: <span class="math inline">\(PS = Prob(A=1|L)\)</span></td>
-</tr>
-<tr class="even">
-<td>Step 2</td>
-<td>Convert <span class="math inline">\(PS\)</span> to <span class="math inline">\(IPW\)</span> = <span class="math inline">\(\frac{A}{PS} + \frac{1-A}{1-PS}\)</span></td>
-</tr>
-<tr class="odd">
-<td>Step 3</td>
-<td>Assess balance in weighted sample and overlap (<span class="math inline">\(PS\)</span> and <span class="math inline">\(L\)</span>)</td>
-</tr>
-<tr class="even">
-<td>Step 4</td>
-<td>outcome modelling: <span class="math inline">\(Prob(Y=1|A=1)\)</span> to obtain treatment effect estimate</td>
-</tr>
-</tbody>
-</table>
-<div id="step-1-exposure-modelling" class="section level3" number="4.1.1">
-<h3><span class="header-section-number">4.1.1</span> Step 1: exposure modelling</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="iptw.html#cb2-1" aria-hidden="true" tabindex="-1"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;A ~&quot;</span>,</span>
-<span id="cb2-2"><a href="iptw.html#cb2-2" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">paste</span>(baselinevars,</span>
-<span id="cb2-3"><a href="iptw.html#cb2-3" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span>
-<span id="cb2-4"><a href="iptw.html#cb2-4" aria-hidden="true" tabindex="-1"></a>ps.formula</span></code></pre></div>
+<p>We will still follow the same steps
+| | |
+|-|-|
+|Step 1| exposure modelling: <span class="math inline">\(PS = Prob(A=1|L)\)</span>|
+|Step 2| Convert <span class="math inline">\(PS\)</span> to <span class="math inline">\(IPW\)</span> = <span class="math inline">\(\frac{A}{PS} + \frac{1-A}{1-PS}\)</span>|
+|Step 3| Assess balance in weighted sample and overlap (<span class="math inline">\(PS\)</span> and <span class="math inline">\(L\)</span>)|
+|Step 4| outcome modelling: <span class="math inline">\(Prob(Y=1|A=1)\)</span> to obtain treatment effect estimate |</p>
+<div id="step-1-exposure-modelling-1" class="section level3" number="5.1.1">
+<h3><span class="header-section-number">5.1.1</span> Step 1: exposure modelling</h3>
+<p>This is the exposure model that we decided on:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="iptw-using-ml.html#cb2-1" aria-hidden="true" tabindex="-1"></a>ps.formula</span></code></pre></div>
 <pre><code>## A ~ Disease.category + Cancer + Cardiovascular + Congestive.HF + 
 ##     Dementia + Psychiatric + Pulmonary + Renal + Hepatic + GI.Bleed + 
 ##     Tumor + Immunosupperssion + Transfer.hx + MI + age + sex + 
@@ -394,293 +377,282 @@ div.csl-indent {
 ##     Respiratory.Diag + Cardiovascular.Diag + Neurological.Diag + 
 ##     Gastrointestinal.Diag + Renal.Diag + Metabolic.Diag + Hematologic.Diag + 
 ##     Sepsis.Diag + Trauma.Diag + Orthopedic.Diag + race + income</code></pre>
+<p>Fit SuperLearner to estimate propensity scores. We again use the same candidate learners:</p>
 <ul>
-<li>Other than main effect terms, what other model specifications are possible?
-<ul>
-<li>Common terms to add (indeed based on biological plausibility; requiring subject area knowledge)</li>
-<li>Interactions</li>
-<li>polynomials or splines</li>
-<li>transformations</li>
-</ul></li>
+<li>linear model</li>
+<li>LASSO</li>
+<li>gradient boosting</li>
 </ul>
-<p>Fit logistic regression to estimate propensity scores</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="iptw.html#cb4-1" aria-hidden="true" tabindex="-1"></a>PS.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(ps.formula,<span class="at">family=</span><span class="st">&quot;binomial&quot;</span>, <span class="at">data=</span>ObsData)</span>
-<span id="cb4-2"><a href="iptw.html#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(Publish)</span>
-<span id="cb4-3"><a href="iptw.html#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">publish</span>(PS.fit,  <span class="at">format =</span> <span class="st">&quot;[u;l]&quot;</span>)</span></code></pre></div>
-<pre><code>##               Variable               Units OddsRatio        CI.95     p-value 
-##       Disease.category                 ARF       Ref                          
-##                                        CHF      1.79  [1.32;2.43]   0.0002047 
-##                                      Other      0.54  [0.43;0.68]     &lt; 1e-04 
-##                                       MOSF      1.58  [1.34;1.87]     &lt; 1e-04 
-##                 Cancer                None       Ref                          
-##                            Localized (Yes)      0.46  [0.22;0.96]   0.0389310 
-##                                 Metastatic      0.37  [0.17;0.81]   0.0131229 
-##         Cardiovascular                   0       Ref                          
-##                                          1      1.04  [0.86;1.25]   0.7036980 
-##          Congestive.HF                   0       Ref                          
-##                                          1      1.10  [0.90;1.35]   0.3461245 
-##               Dementia                   0       Ref                          
-##                                          1      0.67  [0.53;0.85]   0.0011382 
-##            Psychiatric                   0       Ref                          
-##                                          1      0.65  [0.50;0.85]   0.0018616 
-##              Pulmonary                   0       Ref                          
-##                                          1      0.97  [0.81;1.18]   0.7814947 
-##                  Renal                   0       Ref                          
-##                                          1      0.70  [0.49;1.00]   0.0523978 
-##                Hepatic                   0       Ref                          
-##                                          1      0.79  [0.57;1.11]   0.1817681 
-##               GI.Bleed                   0       Ref                          
-##                                          1      0.76  [0.49;1.17]   0.2148665 
-##                  Tumor                   0       Ref                          
-##                                          1      1.48  [0.71;3.12]   0.2987694 
-##      Immunosupperssion                   0       Ref                          
-##                                          1      1.00  [0.86;1.15]   0.9778387 
-##            Transfer.hx                   0       Ref                          
-##                                          1      1.46  [1.20;1.77]   0.0001356 
-##                     MI                   0       Ref                          
-##                                          1      1.12  [0.80;1.59]   0.5031463 
-##                    age           [-Inf,50)       Ref                          
-##                                    [50,60)      1.04  [0.85;1.27]   0.7327200 
-##                                    [60,70)      1.22  [1.00;1.49]   0.0559205 
-##                                    [70,80)      1.15  [0.91;1.45]   0.2414163 
-##                                  [80, Inf)      0.66  [0.49;0.89]   0.0054612 
-##                    sex                Male       Ref                          
-##                                     Female      0.98  [0.86;1.12]   0.7661356 
-##                    edu                          1.03  [1.01;1.05]   0.0101741 
-##               DASIndex                          1.00  [0.98;1.01]   0.6635060 
-##           APACHE.score                          1.01  [1.01;1.02]     &lt; 1e-04 
-##     Glasgow.Coma.Score                          1.00  [1.00;1.00]   0.2853053 
-##         blood.pressure                          0.99  [0.99;0.99]     &lt; 1e-04 
-##                    WBC                          1.00  [0.99;1.00]   0.7368619 
-##             Heart.rate                          1.00  [1.00;1.01]     &lt; 1e-04 
-##       Respiratory.rate                          0.98  [0.97;0.98]     &lt; 1e-04 
-##            Temperature                          0.97  [0.93;1.01]   0.1255016 
-##            PaO2vs.FIO2                          0.99  [0.99;1.00]     &lt; 1e-04 
-##                Albumin                          0.93  [0.85;1.02]   0.1032557 
-##             Hematocrit                          0.99  [0.98;1.00]   0.0103236 
-##              Bilirubin                          1.01  [1.00;1.02]   0.1719966 
-##             Creatinine                          1.04  [1.00;1.09]   0.0576310 
-##                 Sodium                          0.99  [0.98;1.00]   0.0049192 
-##              Potassium                          0.85  [0.79;0.91]     &lt; 1e-04 
-##                  PaCo2                          0.98  [0.97;0.98]     &lt; 1e-04 
-##                     PH                          0.22  [0.11;0.47]     &lt; 1e-04 
-##                 Weight                          1.01  [1.00;1.01]     &lt; 1e-04 
-##             DNR.status                  No       Ref                          
-##                                        Yes      0.58  [0.46;0.73]     &lt; 1e-04 
-##      Medical.insurance            Medicaid       Ref                          
-##                                   Medicare      1.34  [1.03;1.74]   0.0315228 
-##                        Medicare &amp; Medicaid      1.49  [1.07;2.07]   0.0184712 
-##                               No insurance      1.66  [1.20;2.30]   0.0023684 
-##                                    Private      1.55  [1.21;1.97]   0.0004402 
-##                         Private &amp; Medicare      1.46  [1.11;1.92]   0.0071028 
-##       Respiratory.Diag                  No       Ref                          
-##                                        Yes      0.76  [0.65;0.90]   0.0010144 
-##    Cardiovascular.Diag                  No       Ref                          
-##                                        Yes      1.80  [1.52;2.13]     &lt; 1e-04 
-##      Neurological.Diag                  No       Ref                          
-##                                        Yes      0.62  [0.47;0.80]   0.0002731 
-##  Gastrointestinal.Diag                  No       Ref                          
-##                                        Yes      1.41  [1.15;1.73]   0.0010690 
-##             Renal.Diag                  No       Ref                          
-##                                        Yes      1.35  [1.01;1.80]   0.0461405 
-##         Metabolic.Diag                  No       Ref                          
-##                                        Yes      0.85  [0.63;1.15]   0.2953120 
-##       Hematologic.Diag                  No       Ref                          
-##                                        Yes      0.59  [0.45;0.78]   0.0002225 
-##            Sepsis.Diag                  No       Ref                          
-##                                        Yes      1.31  [1.10;1.57]   0.0029968 
-##            Trauma.Diag                  No       Ref                          
-##                                        Yes      3.45  [1.80;6.64]   0.0002014 
-##        Orthopedic.Diag                  No       Ref                          
-##                                        Yes      3.74 [0.53;26.25]   0.1843027 
-##                   race               white       Ref                          
-##                                      black      1.05  [0.87;1.26]   0.6250189 
-##                                      other      1.09  [0.84;1.41]   0.5272282 
-##                 income            $11-$25k       Ref                          
-##                                   $25-$50k      1.08  [0.87;1.34]   0.4644703 
-##                                     &gt; $50k      1.02  [0.78;1.34]   0.8810245 
-##                                 Under $11k      1.06  [0.90;1.26]   0.4797051</code></pre>
-<ul>
-<li>Coef of PS model fit is not of concern</li>
-<li>Model can be rich: to the extent that prediction is better</li>
-<li>But look for multi-collinearity issues
-<ul>
-<li>SE too high?</li>
-</ul></li>
-</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="iptw-using-ml.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(SuperLearner)</span>
+<span id="cb4-2"><a href="iptw-using-ml.html#cb4-2" aria-hidden="true" tabindex="-1"></a>ObsData.noYA <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(Y,A))</span>
+<span id="cb4-3"><a href="iptw-using-ml.html#cb4-3" aria-hidden="true" tabindex="-1"></a>PS.fit.SL <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>A, </span>
+<span id="cb4-4"><a href="iptw-using-ml.html#cb4-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noYA, </span>
+<span id="cb4-5"><a href="iptw-using-ml.html#cb4-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>),</span>
+<span id="cb4-6"><a href="iptw-using-ml.html#cb4-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, <span class="st">&quot;SL.glmnet&quot;</span>, <span class="st">&quot;SL.xgboost&quot;</span>), </span>
+<span id="cb4-7"><a href="iptw-using-ml.html#cb4-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span><span class="st">&quot;method.NNLS&quot;</span>,</span>
+<span id="cb4-8"><a href="iptw-using-ml.html#cb4-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
 <p>Obtain the propesnity score (PS) values from the fit</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="iptw.html#cb6-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>PS <span class="ot">&lt;-</span> <span class="fu">predict</span>(PS.fit, <span class="at">type=</span><span class="st">&quot;response&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="iptw-using-ml.html#cb5-1" aria-hidden="true" tabindex="-1"></a>all.pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(PS.fit.SL, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb5-2"><a href="iptw-using-ml.html#cb5-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>PS.SL <span class="ot">&lt;-</span> all.pred<span class="sc">$</span>pred</span></code></pre></div>
 <p>Check summaries:</p>
-<ul>
-<li>enough overlap?</li>
-<li>PS values very close to 0 or 1?</li>
-</ul>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="iptw.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>PS)</span></code></pre></div>
-<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## 0.002478 0.161446 0.358300 0.380819 0.574319 0.968425</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="iptw.html#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>PS, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="iptw-using-ml.html#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>PS.SL)</span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :0.002562  
+##  1st Qu.:0.147542  
+##  Median :0.347337  
+##  Mean   :0.380833  
+##  3rd Qu.:0.592671  
+##  Max.   :0.973126</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="iptw-using-ml.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>PS.SL, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
 <pre><code>## $`0`
 ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## 0.002478 0.106718 0.241301 0.283816 0.427138 0.951927 
+## 0.002562 0.087977 0.188885 0.222297 0.330681 0.792066 
 ## 
 ## $`1`
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.01575 0.37205 0.55243 0.53854 0.70999 0.96842</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="iptw.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">0</span>]), </span>
-<span id="cb11-2"><a href="iptw.html#cb11-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">main =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb11-3"><a href="iptw.html#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">1</span>]), </span>
-<span id="cb11-4"><a href="iptw.html#cb11-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb11-5"><a href="iptw.html#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;No RHC&quot;</span>,<span class="st">&quot;RHC&quot;</span>), </span>
-<span id="cb11-6"><a href="iptw.html#cb11-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;blue&quot;</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span></code></pre></div>
-<p><img src="TMLEw_files/figure-html/psx2b-1.png" width="672" /></p>
+## 0.08028 0.51212 0.65434 0.63860 0.77233 0.97313</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="iptw-using-ml.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">0</span>]), </span>
+<span id="cb10-2"><a href="iptw-using-ml.html#cb10-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">main =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb10-3"><a href="iptw-using-ml.html#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">1</span>]), </span>
+<span id="cb10-4"><a href="iptw-using-ml.html#cb10-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb10-5"><a href="iptw-using-ml.html#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;No RHC&quot;</span>,<span class="st">&quot;RHC&quot;</span>), </span>
+<span id="cb10-6"><a href="iptw-using-ml.html#cb10-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;blue&quot;</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span></code></pre></div>
+<p><img src="TMLEw_files/figure-html/ipw2psx2b-1.png" width="672" /></p>
 </div>
-<div id="step-2-convert-ps-to-ipw" class="section level3" number="4.1.2">
-<h3><span class="header-section-number">4.1.2</span> Step 2: Convert PS to IPW</h3>
+<div id="step-2-convert-ps-to-ipw-1" class="section level3" number="5.1.2">
+<h3><span class="header-section-number">5.1.2</span> Step 2: Convert PS to IPW</h3>
 <ul>
-<li>Convert PS to IPW using the formula. We are using the formula for average treatment effect (ATE).</li>
-<li>It is possible to use alternative formulas, but we are using ATE formula for our illustration.</li>
+<li>Convert PS from SL to IPW using the formula (again, ATE formula).</li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="iptw.html#cb12-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>IPW <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>A<span class="sc">/</span>ObsData<span class="sc">$</span>PS <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>A)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>PS)</span>
-<span id="cb12-2"><a href="iptw.html#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>IPW)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="iptw-using-ml.html#cb11-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>IPW.SL <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>A<span class="sc">/</span>ObsData<span class="sc">$</span>PS.SL <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>A)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>PS.SL)</span>
+<span id="cb11-2"><a href="iptw-using-ml.html#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>IPW.SL)</span></code></pre></div>
+<pre><code>##        V1        
+##  Min.   : 1.003  
+##  1st Qu.: 1.144  
+##  Median : 1.332  
+##  Mean   : 1.502  
+##  3rd Qu.: 1.659  
+##  Max.   :12.457</code></pre>
+<p>Output from pre-packged software packages to do the same (very similar estimates):</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="iptw-using-ml.html#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(WeightIt)</span>
+<span id="cb13-2"><a href="iptw-using-ml.html#cb13-2" aria-hidden="true" tabindex="-1"></a>W.out <span class="ot">&lt;-</span> <span class="fu">weightit</span>(ps.formula, </span>
+<span id="cb13-3"><a href="iptw-using-ml.html#cb13-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> ObsData, </span>
+<span id="cb13-4"><a href="iptw-using-ml.html#cb13-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>,</span>
+<span id="cb13-5"><a href="iptw-using-ml.html#cb13-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> <span class="st">&quot;super&quot;</span>,</span>
+<span id="cb13-6"><a href="iptw-using-ml.html#cb13-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">SL.library =</span> <span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
+<span id="cb13-7"><a href="iptw-using-ml.html#cb13-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;SL.glmnet&quot;</span>, </span>
+<span id="cb13-8"><a href="iptw-using-ml.html#cb13-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;SL.xgboost&quot;</span>))</span>
+<span id="cb13-9"><a href="iptw-using-ml.html#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(W.out<span class="sc">$</span>weights)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##   1.002   1.183   1.472   1.986   2.064  63.509</code></pre>
-<p>Also possible to use pre-packged software packages to do the same:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="iptw.html#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(WeightIt)</span>
-<span id="cb14-2"><a href="iptw.html#cb14-2" aria-hidden="true" tabindex="-1"></a>W.out <span class="ot">&lt;-</span> <span class="fu">weightit</span>(ps.formula, </span>
-<span id="cb14-3"><a href="iptw.html#cb14-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> ObsData, </span>
-<span id="cb14-4"><a href="iptw.html#cb14-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>,</span>
-<span id="cb14-5"><a href="iptw.html#cb14-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> <span class="st">&quot;ps&quot;</span>)</span>
-<span id="cb14-6"><a href="iptw.html#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(W.out<span class="sc">$</span>weights)</span></code></pre></div>
+##   1.002   1.137   1.312   1.459   1.613  12.293</code></pre>
+<p>Alternatively, you can use the previously estimated PS</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="iptw-using-ml.html#cb15-1" aria-hidden="true" tabindex="-1"></a>W.out2 <span class="ot">&lt;-</span> <span class="fu">weightit</span>(ps.formula, </span>
+<span id="cb15-2"><a href="iptw-using-ml.html#cb15-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> ObsData, </span>
+<span id="cb15-3"><a href="iptw-using-ml.html#cb15-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>,</span>
+<span id="cb15-4"><a href="iptw-using-ml.html#cb15-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ps =</span> ObsData<span class="sc">$</span>PS.SL)</span>
+<span id="cb15-5"><a href="iptw-using-ml.html#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(W.out2<span class="sc">$</span>weights)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##   1.002   1.183   1.472   1.986   2.064  63.509</code></pre>
+##   1.003   1.144   1.332   1.502   1.659  12.457</code></pre>
 </div>
-<div id="step-3-balance-checking" class="section level3" number="4.1.3">
-<h3><span class="header-section-number">4.1.3</span> Step 3: Balance checking</h3>
-<p>We can check balance numerically.</p>
+<div id="step-3-balance-checking-1" class="section level3" number="5.1.3">
+<h3><span class="header-section-number">5.1.3</span> Step 3: Balance checking</h3>
 <ul>
-<li>We set SMD = 0.1 as threshold for balance.</li>
-<li><span class="math inline">\(SMD \gt 0.1\)</span> means we do not have balance</li>
+<li>We first check balance numerically for SMD = 0.1 as threshold for balance.</li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="iptw.html#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bal.tab</span>(W.out, <span class="at">un =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb16-2"><a href="iptw.html#cb16-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> .<span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="iptw-using-ml.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bal.tab</span>(W.out, <span class="at">un =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb17-2"><a href="iptw-using-ml.html#cb17-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> .<span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## Call
-##  weightit(formula = ps.formula, data = ObsData, method = &quot;ps&quot;)
+##  weightit(formula = ps.formula, data = ObsData, method = &quot;super&quot;, 
+##     estimand = &quot;ATE&quot;, SL.library = c(&quot;SL.glm&quot;, &quot;SL.glmnet&quot;, &quot;SL.xgboost&quot;))
 ## 
 ## Balance Measures
-##                                           Type Diff.Un Diff.Adj    M.Threshold
-## prop.score                            Distance  1.1926   0.0224 Balanced, &lt;0.1
-## Disease.category_ARF                    Binary -0.0290   0.0025 Balanced, &lt;0.1
-## Disease.category_CHF                    Binary  0.0261   0.0008 Balanced, &lt;0.1
-## Disease.category_Other                  Binary -0.1737  -0.0080 Balanced, &lt;0.1
-## Disease.category_MOSF                   Binary  0.1766   0.0047 Balanced, &lt;0.1
-## Cancer_None                             Binary  0.0439   0.0017 Balanced, &lt;0.1
-## Cancer_Localized (Yes)                  Binary -0.0267   0.0017 Balanced, &lt;0.1
-## Cancer_Metastatic                       Binary -0.0172  -0.0034 Balanced, &lt;0.1
-## Cardiovascular                          Binary  0.0445   0.0051 Balanced, &lt;0.1
-## Congestive.HF                           Binary  0.0268   0.0013 Balanced, &lt;0.1
-## Dementia                                Binary -0.0472  -0.0138 Balanced, &lt;0.1
-## Psychiatric                             Binary -0.0348  -0.0050 Balanced, &lt;0.1
-## Pulmonary                               Binary -0.0737  -0.0058 Balanced, &lt;0.1
-## Renal                                   Binary  0.0066   0.0027 Balanced, &lt;0.1
-## Hepatic                                 Binary -0.0124  -0.0012 Balanced, &lt;0.1
-## GI.Bleed                                Binary -0.0122  -0.0026 Balanced, &lt;0.1
-## Tumor                                   Binary -0.0423  -0.0016 Balanced, &lt;0.1
-## Immunosupperssion                       Binary  0.0358  -0.0027 Balanced, &lt;0.1
-## Transfer.hx                             Binary  0.0554   0.0047 Balanced, &lt;0.1
-## MI                                      Binary  0.0139   0.0005 Balanced, &lt;0.1
-## age_[-Inf,50)                           Binary -0.0017  -0.0098 Balanced, &lt;0.1
-## age_[50,60)                             Binary  0.0161   0.0149 Balanced, &lt;0.1
-## age_[60,70)                             Binary  0.0355  -0.0108 Balanced, &lt;0.1
-## age_[70,80)                             Binary  0.0144   0.0047 Balanced, &lt;0.1
-## age_[80, Inf)                           Binary -0.0643   0.0010 Balanced, &lt;0.1
-## sex_Female                              Binary -0.0462  -0.0143 Balanced, &lt;0.1
-## edu                                    Contin.  0.0914  -0.0000 Balanced, &lt;0.1
-## DASIndex                               Contin.  0.0626   0.0435 Balanced, &lt;0.1
-## APACHE.score                           Contin.  0.5014   0.0109 Balanced, &lt;0.1
-## Glasgow.Coma.Score                     Contin. -0.1098   0.0034 Balanced, &lt;0.1
-## blood.pressure                         Contin. -0.4551   0.0057 Balanced, &lt;0.1
-## WBC                                    Contin.  0.0836   0.0470 Balanced, &lt;0.1
-## Heart.rate                             Contin.  0.1469   0.0210 Balanced, &lt;0.1
-## Respiratory.rate                       Contin. -0.1655   0.0037 Balanced, &lt;0.1
-## Temperature                            Contin. -0.0214   0.0090 Balanced, &lt;0.1
-## PaO2vs.FIO2                            Contin. -0.4332  -0.0016 Balanced, &lt;0.1
-## Albumin                                Contin. -0.2299  -0.0279 Balanced, &lt;0.1
-## Hematocrit                             Contin. -0.2693  -0.0247 Balanced, &lt;0.1
-## Bilirubin                              Contin.  0.1446  -0.0069 Balanced, &lt;0.1
-## Creatinine                             Contin.  0.2696   0.0148 Balanced, &lt;0.1
-## Sodium                                 Contin. -0.0922  -0.0059 Balanced, &lt;0.1
-## Potassium                              Contin. -0.0271  -0.0264 Balanced, &lt;0.1
-## PaCo2                                  Contin. -0.2486  -0.0201 Balanced, &lt;0.1
-## PH                                     Contin. -0.1198   0.0095 Balanced, &lt;0.1
-## Weight                                 Contin.  0.2557   0.0209 Balanced, &lt;0.1
-## DNR.status_Yes                          Binary -0.0696  -0.0112 Balanced, &lt;0.1
-## Medical.insurance_Medicaid              Binary -0.0395   0.0058 Balanced, &lt;0.1
-## Medical.insurance_Medicare              Binary -0.0327  -0.0119 Balanced, &lt;0.1
-## Medical.insurance_Medicare &amp; Medicaid   Binary -0.0144  -0.0001 Balanced, &lt;0.1
-## Medical.insurance_No insurance          Binary  0.0099  -0.0002 Balanced, &lt;0.1
-## Medical.insurance_Private               Binary  0.0624   0.0013 Balanced, &lt;0.1
-## Medical.insurance_Private &amp; Medicare    Binary  0.0143   0.0052 Balanced, &lt;0.1
-## Respiratory.Diag_Yes                    Binary -0.1277  -0.0056 Balanced, &lt;0.1
-## Cardiovascular.Diag_Yes                 Binary  0.1395   0.0034 Balanced, &lt;0.1
-## Neurological.Diag_Yes                   Binary -0.1079  -0.0038 Balanced, &lt;0.1
-## Gastrointestinal.Diag_Yes               Binary  0.0453  -0.0028 Balanced, &lt;0.1
-## Renal.Diag_Yes                          Binary  0.0264   0.0021 Balanced, &lt;0.1
-## Metabolic.Diag_Yes                      Binary -0.0059   0.0002 Balanced, &lt;0.1
-## Hematologic.Diag_Yes                    Binary -0.0146  -0.0000 Balanced, &lt;0.1
-## Sepsis.Diag_Yes                         Binary  0.0912   0.0035 Balanced, &lt;0.1
-## Trauma.Diag_Yes                         Binary  0.0105   0.0011 Balanced, &lt;0.1
-## Orthopedic.Diag_Yes                     Binary  0.0010   0.0002 Balanced, &lt;0.1
-## race_white                              Binary  0.0063  -0.0030 Balanced, &lt;0.1
-## race_black                              Binary -0.0114   0.0067 Balanced, &lt;0.1
-## race_other                              Binary  0.0050  -0.0036 Balanced, &lt;0.1
-## income_$11-$25k                         Binary  0.0062  -0.0096 Balanced, &lt;0.1
-## income_$25-$50k                         Binary  0.0391   0.0032 Balanced, &lt;0.1
-## income_&gt; $50k                           Binary  0.0165  -0.0001 Balanced, &lt;0.1
-## income_Under $11k                       Binary -0.0618   0.0065 Balanced, &lt;0.1
+##                                           Type Diff.Un Diff.Adj
+## prop.score                            Distance  2.7815   2.1988
+## Disease.category_ARF                    Binary -0.0290  -0.0094
+## Disease.category_CHF                    Binary  0.0261   0.0153
+## Disease.category_Other                  Binary -0.1737  -0.1027
+## Disease.category_MOSF                   Binary  0.1766   0.0969
+## Cancer_None                             Binary  0.0439   0.0251
+## Cancer_Localized (Yes)                  Binary -0.0267  -0.0128
+## Cancer_Metastatic                       Binary -0.0172  -0.0124
+## Cardiovascular                          Binary  0.0445   0.0285
+## Congestive.HF                           Binary  0.0268   0.0160
+## Dementia                                Binary -0.0472  -0.0299
+## Psychiatric                             Binary -0.0348  -0.0205
+## Pulmonary                               Binary -0.0737  -0.0434
+## Renal                                   Binary  0.0066   0.0048
+## Hepatic                                 Binary -0.0124  -0.0082
+## GI.Bleed                                Binary -0.0122  -0.0081
+## Tumor                                   Binary -0.0423  -0.0236
+## Immunosupperssion                       Binary  0.0358   0.0201
+## Transfer.hx                             Binary  0.0554   0.0284
+## MI                                      Binary  0.0139   0.0075
+## age_[-Inf,50)                           Binary -0.0017  -0.0017
+## age_[50,60)                             Binary  0.0161   0.0128
+## age_[60,70)                             Binary  0.0355   0.0168
+## age_[70,80)                             Binary  0.0144   0.0110
+## age_[80, Inf)                           Binary -0.0643  -0.0389
+## sex_Female                              Binary -0.0462  -0.0284
+## edu                                    Contin.  0.0914   0.0513
+## DASIndex                               Contin.  0.0626   0.0394
+## APACHE.score                           Contin.  0.5014   0.2687
+## Glasgow.Coma.Score                     Contin. -0.1098  -0.0622
+## blood.pressure                         Contin. -0.4551  -0.2447
+## WBC                                    Contin.  0.0836   0.0517
+## Heart.rate                             Contin.  0.1469   0.0827
+## Respiratory.rate                       Contin. -0.1655  -0.0840
+## Temperature                            Contin. -0.0214  -0.0052
+## PaO2vs.FIO2                            Contin. -0.4332  -0.2379
+## Albumin                                Contin. -0.2299  -0.1308
+## Hematocrit                             Contin. -0.2693  -0.1608
+## Bilirubin                              Contin.  0.1446   0.0779
+## Creatinine                             Contin.  0.2696   0.1446
+## Sodium                                 Contin. -0.0922  -0.0513
+## Potassium                              Contin. -0.0271  -0.0277
+## PaCo2                                  Contin. -0.2486  -0.1501
+## PH                                     Contin. -0.1198  -0.0539
+## Weight                                 Contin.  0.2557   0.1435
+## DNR.status_Yes                          Binary -0.0696  -0.0431
+## Medical.insurance_Medicaid              Binary -0.0395  -0.0226
+## Medical.insurance_Medicare              Binary -0.0327  -0.0183
+## Medical.insurance_Medicare &amp; Medicaid   Binary -0.0144  -0.0069
+## Medical.insurance_No insurance          Binary  0.0099   0.0061
+## Medical.insurance_Private               Binary  0.0624   0.0337
+## Medical.insurance_Private &amp; Medicare    Binary  0.0143   0.0081
+## Respiratory.Diag_Yes                    Binary -0.1277  -0.0683
+## Cardiovascular.Diag_Yes                 Binary  0.1395   0.0771
+## Neurological.Diag_Yes                   Binary -0.1079  -0.0601
+## Gastrointestinal.Diag_Yes               Binary  0.0453   0.0251
+## Renal.Diag_Yes                          Binary  0.0264   0.0148
+## Metabolic.Diag_Yes                      Binary -0.0059  -0.0026
+## Hematologic.Diag_Yes                    Binary -0.0146  -0.0084
+## Sepsis.Diag_Yes                         Binary  0.0912   0.0491
+## Trauma.Diag_Yes                         Binary  0.0105   0.0064
+## Orthopedic.Diag_Yes                     Binary  0.0010   0.0007
+## race_white                              Binary  0.0063   0.0039
+## race_black                              Binary -0.0114  -0.0044
+## race_other                              Binary  0.0050   0.0005
+## income_$11-$25k                         Binary  0.0062   0.0011
+## income_$25-$50k                         Binary  0.0391   0.0212
+## income_&gt; $50k                           Binary  0.0165   0.0081
+## income_Under $11k                       Binary -0.0618  -0.0304
+##                                              M.Threshold
+## prop.score                                              
+## Disease.category_ARF                      Balanced, &lt;0.1
+## Disease.category_CHF                      Balanced, &lt;0.1
+## Disease.category_Other                Not Balanced, &gt;0.1
+## Disease.category_MOSF                     Balanced, &lt;0.1
+## Cancer_None                               Balanced, &lt;0.1
+## Cancer_Localized (Yes)                    Balanced, &lt;0.1
+## Cancer_Metastatic                         Balanced, &lt;0.1
+## Cardiovascular                            Balanced, &lt;0.1
+## Congestive.HF                             Balanced, &lt;0.1
+## Dementia                                  Balanced, &lt;0.1
+## Psychiatric                               Balanced, &lt;0.1
+## Pulmonary                                 Balanced, &lt;0.1
+## Renal                                     Balanced, &lt;0.1
+## Hepatic                                   Balanced, &lt;0.1
+## GI.Bleed                                  Balanced, &lt;0.1
+## Tumor                                     Balanced, &lt;0.1
+## Immunosupperssion                         Balanced, &lt;0.1
+## Transfer.hx                               Balanced, &lt;0.1
+## MI                                        Balanced, &lt;0.1
+## age_[-Inf,50)                             Balanced, &lt;0.1
+## age_[50,60)                               Balanced, &lt;0.1
+## age_[60,70)                               Balanced, &lt;0.1
+## age_[70,80)                               Balanced, &lt;0.1
+## age_[80, Inf)                             Balanced, &lt;0.1
+## sex_Female                                Balanced, &lt;0.1
+## edu                                       Balanced, &lt;0.1
+## DASIndex                                  Balanced, &lt;0.1
+## APACHE.score                          Not Balanced, &gt;0.1
+## Glasgow.Coma.Score                        Balanced, &lt;0.1
+## blood.pressure                        Not Balanced, &gt;0.1
+## WBC                                       Balanced, &lt;0.1
+## Heart.rate                                Balanced, &lt;0.1
+## Respiratory.rate                          Balanced, &lt;0.1
+## Temperature                               Balanced, &lt;0.1
+## PaO2vs.FIO2                           Not Balanced, &gt;0.1
+## Albumin                               Not Balanced, &gt;0.1
+## Hematocrit                            Not Balanced, &gt;0.1
+## Bilirubin                                 Balanced, &lt;0.1
+## Creatinine                            Not Balanced, &gt;0.1
+## Sodium                                    Balanced, &lt;0.1
+## Potassium                                 Balanced, &lt;0.1
+## PaCo2                                 Not Balanced, &gt;0.1
+## PH                                        Balanced, &lt;0.1
+## Weight                                Not Balanced, &gt;0.1
+## DNR.status_Yes                            Balanced, &lt;0.1
+## Medical.insurance_Medicaid                Balanced, &lt;0.1
+## Medical.insurance_Medicare                Balanced, &lt;0.1
+## Medical.insurance_Medicare &amp; Medicaid     Balanced, &lt;0.1
+## Medical.insurance_No insurance            Balanced, &lt;0.1
+## Medical.insurance_Private                 Balanced, &lt;0.1
+## Medical.insurance_Private &amp; Medicare      Balanced, &lt;0.1
+## Respiratory.Diag_Yes                      Balanced, &lt;0.1
+## Cardiovascular.Diag_Yes                   Balanced, &lt;0.1
+## Neurological.Diag_Yes                     Balanced, &lt;0.1
+## Gastrointestinal.Diag_Yes                 Balanced, &lt;0.1
+## Renal.Diag_Yes                            Balanced, &lt;0.1
+## Metabolic.Diag_Yes                        Balanced, &lt;0.1
+## Hematologic.Diag_Yes                      Balanced, &lt;0.1
+## Sepsis.Diag_Yes                           Balanced, &lt;0.1
+## Trauma.Diag_Yes                           Balanced, &lt;0.1
+## Orthopedic.Diag_Yes                       Balanced, &lt;0.1
+## race_white                                Balanced, &lt;0.1
+## race_black                                Balanced, &lt;0.1
+## race_other                                Balanced, &lt;0.1
+## income_$11-$25k                           Balanced, &lt;0.1
+## income_$25-$50k                           Balanced, &lt;0.1
+## income_&gt; $50k                             Balanced, &lt;0.1
+## income_Under $11k                         Balanced, &lt;0.1
 ## 
 ## Balance tally for mean differences
 ##                    count
-## Balanced, &lt;0.1        69
-## Not Balanced, &gt;0.1     0
+## Balanced, &lt;0.1        59
+## Not Balanced, &gt;0.1     9
 ## 
 ## Variable with the greatest mean difference
-##  Variable Diff.Adj    M.Threshold
-##       WBC    0.047 Balanced, &lt;0.1
+##      Variable Diff.Adj        M.Threshold
+##  APACHE.score   0.2687 Not Balanced, &gt;0.1
 ## 
 ## Effective sample sizes
 ##            Control Treated
 ## Unadjusted 3551.   2184.  
-## Adjusted   2532.46 1039.44</code></pre>
+## Adjusted   3320.68 1901.95</code></pre>
 <ul>
-<li>We can also check this in a plot</li>
+<li>And also via plot</li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="iptw.html#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(cobalt)</span>
-<span id="cb18-2"><a href="iptw.html#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">love.plot</span>(W.out, <span class="at">binary =</span> <span class="st">&quot;std&quot;</span>,</span>
-<span id="cb18-3"><a href="iptw.html#cb18-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> .<span class="dv">1</span>),</span>
-<span id="cb18-4"><a href="iptw.html#cb18-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">abs =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb18-5"><a href="iptw.html#cb18-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">var.order =</span> <span class="st">&quot;unadjusted&quot;</span>, </span>
-<span id="cb18-6"><a href="iptw.html#cb18-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">line =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="TMLEw_files/figure-html/balp2-1.png" width="480" /></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="iptw-using-ml.html#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(cobalt)</span>
+<span id="cb19-2"><a href="iptw-using-ml.html#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">love.plot</span>(W.out, <span class="at">binary =</span> <span class="st">&quot;std&quot;</span>,</span>
+<span id="cb19-3"><a href="iptw-using-ml.html#cb19-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> .<span class="dv">1</span>),</span>
+<span id="cb19-4"><a href="iptw-using-ml.html#cb19-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">abs =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb19-5"><a href="iptw-using-ml.html#cb19-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">var.order =</span> <span class="st">&quot;unadjusted&quot;</span>, </span>
+<span id="cb19-6"><a href="iptw-using-ml.html#cb19-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">line =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="TMLEw_files/figure-html/ipw2balp2-1.png" width="480" /></p>
 </div>
-<div id="step-4-outcome-modelling" class="section level3" number="4.1.4">
-<h3><span class="header-section-number">4.1.4</span> Step 4: outcome modelling</h3>
+<div id="step-4-outcome-modelling-1" class="section level3" number="5.1.4">
+<h3><span class="header-section-number">5.1.4</span> Step 4: outcome modelling</h3>
 <p>Estimate the effect of treatment on outcomes</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="iptw.html#cb19-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(Y <span class="sc">~</span> A)</span>
-<span id="cb19-2"><a href="iptw.html#cb19-2" aria-hidden="true" tabindex="-1"></a>out.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(out.formula,</span>
-<span id="cb19-3"><a href="iptw.html#cb19-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData,</span>
-<span id="cb19-4"><a href="iptw.html#cb19-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">weights =</span> IPW)</span>
-<span id="cb19-5"><a href="iptw.html#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">publish</span>(out.fit)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="iptw-using-ml.html#cb20-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(Y <span class="sc">~</span> A)</span>
+<span id="cb20-2"><a href="iptw-using-ml.html#cb20-2" aria-hidden="true" tabindex="-1"></a>out.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(out.formula,</span>
+<span id="cb20-3"><a href="iptw-using-ml.html#cb20-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData,</span>
+<span id="cb20-4"><a href="iptw-using-ml.html#cb20-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">weights =</span> IPW.SL)</span>
+<span id="cb20-5"><a href="iptw-using-ml.html#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">publish</span>(out.fit)</span></code></pre></div>
 <pre><code>##     Variable Units Coefficient         CI.95 p-value 
-##  (Intercept)             20.68 [19.73;21.64] &lt; 1e-04 
-##            A              3.24   [1.88;4.60] &lt; 1e-04</code></pre>
+##  (Intercept)             20.22 [19.31;21.12] &lt; 1e-04 
+##            A              4.24   [2.87;5.61] &lt; 1e-04</code></pre>
+<p>Also check the output when we used the weights from the package</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="iptw-using-ml.html#cb22-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(Y <span class="sc">~</span> A)</span>
+<span id="cb22-2"><a href="iptw-using-ml.html#cb22-2" aria-hidden="true" tabindex="-1"></a>out.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(out.formula,</span>
+<span id="cb22-3"><a href="iptw-using-ml.html#cb22-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData,</span>
+<span id="cb22-4"><a href="iptw-using-ml.html#cb22-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">weights =</span> W.out<span class="sc">$</span>weights)</span>
+<span id="cb22-5"><a href="iptw-using-ml.html#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">publish</span>(out.fit)</span></code></pre></div>
+<pre><code>##     Variable Units Coefficient         CI.95 p-value 
+##  (Intercept)             20.15 [19.25;21.05] &lt; 1e-04 
+##            A              4.35   [2.98;5.72] &lt; 1e-04</code></pre>
 
 </div>
-</div>
-</div>
-<h3>References</h3>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-austin2011tutorial" class="csl-entry">
-Austin, Peter C. 2011. <span>“A Tutorial and Case Study in Propensity Score Analysis: An Application to Estimating the Effect of in-Hospital Smoking Cessation Counseling on Mortality.”</span> <em>Multivariate Behavioral Research</em> 46 (1): 119–51.
 </div>
 </div>
             </section>
@@ -688,8 +660,8 @@ Austin, Peter C. 2011. <span>“A Tutorial and Case Study in Propensity Score An
           </div>
         </div>
       </div>
-<a href="g-computation-using-ml.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="iptw-using-ml.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="iptw.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="tmle.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -721,7 +693,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ehsanx/TMLEworkshop/edit/master/3ipw.Rmd",
+"link": "https://github.com/ehsanx/TMLEworkshop/edit/master/3ipw2.Rmd",
 "text": "Edit"
 },
 "history": {

@@ -1,11 +1,147 @@
 # IPTW
 
+In this chapter, we are not only interested in outcome modelling, but also **exposure modelling**.
+
+```{r setup01, include=FALSE}
+require(knitr)
+require(glmnet)
+require(kableExtra)
+require(dplyr)
+require(xgboost)
+require(SuperLearner)
+require(Publish)
+require(tableone)
+require(survey)
+require(WeightIt)
+options(knitr.kable.NA = '')
+cachex=TRUE
+```
+
+```{r reg2ps, cache=cachex, echo = TRUE}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+baselinevars <- names(dplyr::select(ObsData, !c(A,Y)))
+```
+
 ## IPTW from parametric models
 
-### Steps
+**Modelling Steps**:
 
-### Treatment effect estimate
+According to @austin2011tutorial, we need to follow 4 steps:
 
-## IPTW from ML
+|  |  |
+|-|-|
+|Step 1| exposure modelling: $PS = Prob(A=1|L)$|
+|Step 2| Convert $PS$ to $IPW$  = $\frac{A}{PS} + \frac{1-A}{1-PS}$|
+|Step 3| Assess balance in weighted sample and overlap ($PS$ and $L$)|
+|Step 4| outcome modelling: $Prob(Y=1|A=1)$ to obtain treatment effect estimate  |
 
-## IPTW from SuperLearner
+### Step 1: exposure modelling
+
+```{r ps1, cache=cachex, echo = TRUE}
+ps.formula <- as.formula(paste("A ~",
+                               paste(baselinevars,
+                                     collapse = "+")))
+ps.formula
+```
+
+- Other than main effect terms, what other model specifications are possible?
+  - Common terms to add (indeed based on biological plausibility; requiring subject area knowledge)
+  - Interactions
+  - polynomials or splines
+  - transformations
+
+Fit logistic regression to estimate propensity scores
+
+```{r ps321xxx, cache=TRUE, echo = TRUE}
+PS.fit <- glm(ps.formula,family="binomial", data=ObsData)
+require(Publish)
+publish(PS.fit,  format = "[u;l]")
+```
+
+- Coef of PS model fit is not of concern 
+- Model can be rich: to the extent that prediction is better
+- But look for multi-collinearity issues
+  - SE too high?
+
+Obtain the propesnity score (PS) values from the fit
+
+```{r psx2, cache=TRUE, echo = TRUE}
+ObsData$PS <- predict(PS.fit, type="response")
+```
+
+Check summaries: 
+
+- enough overlap?
+- PS values very close to 0 or 1?
+
+```{r psx2b, cache=TRUE, echo = TRUE}
+summary(ObsData$PS)
+tapply(ObsData$PS, ObsData$A, summary)
+plot(density(ObsData$PS[ObsData$A==0]), 
+     col = "red", main = "")
+lines(density(ObsData$PS[ObsData$A==1]), 
+      col = "blue", lty = 2)
+legend("topright", c("No RHC","RHC"), 
+       col = c("red", "blue"), lty=1:2)
+```
+
+
+### Step 2: Convert PS to IPW 
+
+- Convert PS to IPW using the formula. We are using the formula for average treatment effect (ATE). 
+- It is possible to use alternative formulas, but we are using ATE formula for our illustration.
+
+```{r psx2c, cache=TRUE, echo = TRUE}
+ObsData$IPW <- ObsData$A/ObsData$PS + (1-ObsData$A)/(1-ObsData$PS)
+summary(ObsData$IPW)
+```
+
+Also possible to use pre-packged software packages to do the same:
+
+```{r psx2c2, cache=TRUE, echo = TRUE}
+require(WeightIt)
+W.out <- weightit(ps.formula, 
+                    data = ObsData, 
+                    estimand = "ATE",
+                    method = "ps")
+summary(W.out$weights)
+```
+
+
+### Step 3: Balance checking
+
+We can check balance numerically. 
+
+- We set SMD = 0.1 as threshold for balance.
+- $SMD \gt 0.1$ means we do not have balance
+
+```{r balp, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+bal.tab(W.out, un = TRUE, 
+        thresholds = c(m = .1))
+```
+
+- We can also check this in a plot
+
+```{r balp2, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+require(cobalt)
+love.plot(W.out, binary = "std",
+          thresholds = c(m = .1),
+          abs = TRUE, 
+          var.order = "unadjusted", 
+          line = TRUE)
+```
+
+### Step 4: outcome modelling 
+
+Estimate the effect of treatment on outcomes 
+
+```{r psx4, cache=TRUE, echo = TRUE}
+out.formula <- as.formula(Y ~ A)
+out.fit <- glm(out.formula,
+               data = ObsData,
+               weights = IPW)
+publish(out.fit)
+```
+
+

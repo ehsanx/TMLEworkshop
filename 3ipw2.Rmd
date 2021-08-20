@@ -1,0 +1,163 @@
+# IPTW using ML
+
+Similar to G-computation, we will try to use machine learning methods, particularly Superlearner in estimating IPW estimates
+
+```{r ipw2setup01, include=FALSE}
+require(knitr)
+require(glmnet)
+require(kableExtra)
+require(dplyr)
+require(xgboost)
+require(SuperLearner)
+require(Publish)
+require(tableone)
+require(survey)
+require(WeightIt)
+require(SuperLearner)
+options(knitr.kable.NA = '')
+cachex=TRUE
+```
+
+```{r ipw2reg2ps, cache=cachex, echo = TRUE}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+baselinevars <- names(dplyr::select(ObsData, !c(A,Y)))
+ps.formula <- as.formula(paste("A ~",
+                               paste(baselinevars,
+                                     collapse = "+")))
+```
+
+## IPTW from Superlearner
+
+**Modelling Steps**:
+
+We will still follow the same steps
+|  |  |
+|-|-|
+|Step 1| exposure modelling: $PS = Prob(A=1|L)$|
+|Step 2| Convert $PS$ to $IPW$  = $\frac{A}{PS} + \frac{1-A}{1-PS}$|
+|Step 3| Assess balance in weighted sample and overlap ($PS$ and $L$)|
+|Step 4| outcome modelling: $Prob(Y=1|A=1)$ to obtain treatment effect estimate  |
+
+### Step 1: exposure modelling
+
+This is the exposure model that we decided on:
+
+```{r ipw2ps1, cache=cachex, echo = TRUE}
+ps.formula
+```
+
+Fit SuperLearner to estimate propensity scores. We again use the same candidate learners:
+
+- linear model
+- LASSO
+- gradient boosting
+
+```{r ipw2ps321xxx, cache=TRUE, echo = TRUE}
+require(SuperLearner)
+ObsData.noYA <- dplyr::select(ObsData, !c(Y,A))
+PS.fit.SL <- SuperLearner(Y=ObsData$A, 
+                       X=ObsData.noYA, 
+                       cvControl = list(V = 3),
+                       SL.library=c("SL.glm", "SL.glmnet", "SL.xgboost"), 
+                       method="method.NNLS",
+                       family="binomial")
+```
+
+Obtain the propesnity score (PS) values from the fit
+
+```{r ipw2psx2, cache=TRUE, echo = TRUE}
+all.pred <- predict(PS.fit.SL, type = "response")
+ObsData$PS.SL <- all.pred$pred
+```
+
+Check summaries: 
+
+```{r ipw2psx2b, cache=TRUE, echo = TRUE}
+summary(ObsData$PS.SL)
+tapply(ObsData$PS.SL, ObsData$A, summary)
+plot(density(ObsData$PS.SL[ObsData$A==0]), 
+     col = "red", main = "")
+lines(density(ObsData$PS.SL[ObsData$A==1]), 
+      col = "blue", lty = 2)
+legend("topright", c("No RHC","RHC"), 
+       col = c("red", "blue"), lty=1:2)
+```
+
+
+### Step 2: Convert PS to IPW 
+
+- Convert PS from SL to IPW using the formula (again, ATE formula). 
+
+```{r ipw2psx2c, cache=TRUE, echo = TRUE}
+ObsData$IPW.SL <- ObsData$A/ObsData$PS.SL + (1-ObsData$A)/(1-ObsData$PS.SL)
+summary(ObsData$IPW.SL)
+```
+
+Output from pre-packged software packages to do the same (very similar estimates):
+
+```{r ipw2psx2c2, cache=TRUE, echo = TRUE}
+require(WeightIt)
+W.out <- weightit(ps.formula, 
+                    data = ObsData, 
+                    estimand = "ATE",
+                    method = "super",
+                    SL.library = c("SL.glm", 
+                                   "SL.glmnet", 
+                                   "SL.xgboost"))
+summary(W.out$weights)
+```
+
+Alternatively, you can use the previously estimated PS
+
+```{r ipw2psx2c2clone, cache=TRUE, echo = TRUE}
+W.out2 <- weightit(ps.formula, 
+                    data = ObsData, 
+                    estimand = "ATE",
+                    ps = ObsData$PS.SL)
+summary(W.out2$weights)
+```
+
+### Step 3: Balance checking
+
+- We first check balance numerically for SMD = 0.1 as threshold for balance.
+
+
+```{r ipw2balp, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+bal.tab(W.out, un = TRUE, 
+        thresholds = c(m = .1))
+```
+
+- And also via plot
+
+```{r ipw2balp2, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+require(cobalt)
+love.plot(W.out, binary = "std",
+          thresholds = c(m = .1),
+          abs = TRUE, 
+          var.order = "unadjusted", 
+          line = TRUE)
+```
+
+### Step 4: outcome modelling 
+
+Estimate the effect of treatment on outcomes 
+
+```{r ipw2psx4, cache=TRUE, echo = TRUE}
+out.formula <- as.formula(Y ~ A)
+out.fit <- glm(out.formula,
+               data = ObsData,
+               weights = IPW.SL)
+publish(out.fit)
+```
+
+Also check the output when we used the weights from the package
+
+```{r ipw2psx4b, cache=TRUE, echo = TRUE}
+out.formula <- as.formula(Y ~ A)
+out.fit <- glm(out.formula,
+               data = ObsData,
+               weights = W.out$weights)
+publish(out.fit)
+```
+

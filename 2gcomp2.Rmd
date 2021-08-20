@@ -20,6 +20,10 @@ cachex=TRUE
 ```{r reg2sl, cache=cachex, echo = TRUE}
 # Read the data saved at the last chapter
 ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+baselinevars <- names(dplyr::select(ObsData, !c(A,Y)))
+out.formula <- as.formula(paste("Y~ A +",
+                               paste(baselinevars,
+                                     collapse = "+")))
 ```
 
 ### A tree based algorithm
@@ -141,25 +145,9 @@ Notice that the mean is very similar to the parametric G-computation method.
   - Regularized regression (lasso)
   - gradient boosting (tree based)
   
-## Steps  
+### Steps  
 
-1. Screen variables
-
-
-```{r role, echo = FALSE, out.width = "650px", fig.cap="Variable roles"}
-knitr::include_graphics("images/role.png")
-```
-
-- Think about the role of variables first
-  - ideally include confounders to reduce bias
-  - consider including risk factor for outcome for greater accuracy
-  - IV, collider, mediators should be avoided
-  - if something is unmeasured, consider adding proxy (with causion)
-- do pre-screening
-    - sparse binary variables
-    - highly collinear variables
-
-2. Identify candidate learners
+1. **Identify candidate learners**
 
 - Choose variety of candidate learners 
    - parametric (linear or logistic regression)
@@ -183,10 +171,16 @@ fit.sl <- SuperLearner(Y=ObsData$Y,
                        X=ObsData.noY, 
                        cvControl = list(V = 3),
                        SL.library=c("SL.glm", "SL.glmnet", "SL.xgboost"), 
+                       method="method.NNLS",
                        family="gaussian")
 ```
 
-3. SuperLearner first **splits** the data according to chosen $K$ fold for the cross-validation
+2. **Cross-validation**:
+
+To combat against optimism, we use cross-validation. SuperLearner first **splits** the data according to chosen $K$ fold for the cross-validation. That means
+
+- fitting models in training data
+- obtaining prediction in test data
 
 ```{r cvpic, echo = FALSE, out.width = "650px", fig.cap="Cross validation from [wiki](https://en.wikipedia.org/wiki/Cross-validation_(statistics)); training data = used for building model; test data = used for prediction from the model that was built using training data; each iteration = fold"}
 knitr::include_graphics("images/CV.png")
@@ -200,37 +194,56 @@ knitr::include_graphics("images/CV.png")
     - smaller sample size means larger $K$ may be necessary
       - for $n \lt 30$ consider leave 1 out 
 
-4. for each fold, it estimates a **measure of performance** (could be RMSE) in test sets based on models that was built using training sets
+3. **Estimate risk**:
+
+The goal is to minimize the estimated risk (i.e., minimize the difference of $Y$ and $\hat{Y}$) that comes out of a model. For each fold, estimate a **measure of performance** (could be RMSE) in test sets based on models that was built using training sets
 
 $RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^n (Y - \hat{Y})^2}$ for continuous $Y$
 
-Performance measures
-
-5. Once we have the performance measures and predictions from candidate learners, we could go one of **two routes** here
-
-  a. **Discrete SL**: measure of performance from all folds are averaged, and choose the **best** one. The prediction from the chosen learners are then used.
+- we obtain risk estimate in each fold (from test data)
+- we average all the estimates risks
 
 ```{r ML12stestrisk, cache=cachex, echo = TRUE}
 fit.sl$cvRisk
 ```
 
+4. **Find SL prediction**
+
+Once we have the performance measures and predictions from candidate learners, we could go one of **two routes** here
+
+  a. **Discrete SL**: measure of performance from all folds are averaged, and choose the **best** one. The prediction from the chosen learners are then used.
+
 `glmnet` has the lowest cross-validated risk
 
 ```{r ML12stest, cache=cachex, echo = TRUE}
 all.pred <- predict(fit.sl, type = "response")
-head(all.pred$library.predict)
-head(all.pred$library.predict[,"SL.glmnet_All"])
+Yhat <- all.pred$library.predict
+head(Yhat)
+as.matrix(head(Yhat[,"SL.glmnet_All"]), 
+          ncol=1)
 ```  
 
-  b. **Ensamble SL**: Alternatively, we fit a meta regression (can be a linear regression) of the following equation: $Y_{obs}$ $\sim$ $\hat{Y}_{SL.glm_{All}}$ + $\hat{Y}_{SL.glm_{All}}$ + $\hat{Y}_{SL.xgboost_{All}}$. 
+  b. **Ensamble SL**: 
+
+Here are the first 6 rows from the candidate learner predictions:
 
 ```{r ML12stestx, cache=cachex, echo = TRUE}
-head(all.pred$library.predict)
+head(Yhat)
 ``` 
   
-We estimate the regression coefs, scale them to 1, and the scaled coefficients represents the **value of the corresponding candidate learner**. A new prediction column is produced based on the fitted values from this meta regression.
+- fit a meta learner
+  - linear regression (without intercept, but could produce -ve coefs) or 
+  - preferably non-negative least squares for 
+  
+  $Y_{obs}$ $\sim$ $\hat{Y}_{SL.glm}$ + $\hat{Y}_{SL.glmnet}$ + $\hat{Y}_{SL.xgboost}$. 
 
-scaled coefs
+- Obtain the regression coefs $\mathbf{\beta}$ = ($\beta_{SL.glm}$, $\beta_{SL.glmnet}$, $\beta_{SL.xgboost}$) for each $\hat{Y}$, 
+- scale them to 1 
+  - $\mathbf{\beta_{scaled}}$ = $\mathbf{\beta}$ / $\sum_{i=1}^3{\mathbf{\beta}}$; 
+  - so that the  sum of scaled coefs =  1 
+- Scaled coefficients $\mathbf{\beta_{scaled}}$ represents the **value / importance of the corresponding candidate learner**. 
+
+Scaled coefs
 
 ```{r ML12stestcoef, cache=cachex, echo = TRUE}
 fit.sl$coef
@@ -238,19 +251,31 @@ fit.sl$coef
 
 Hence, in creating superlearner prediction column,
 
-- Linear regression has no contribution
-- lasso has majority contribution
-- gradient boosting of tree has some minimal contribution
+a. Linear regression has no contribution
+b. lasso has majority contribution
+c. gradient boosting of tree has some minimal contribution
 
-```{r ML12stestb, cache=cachex, echo = TRUE}
-all.pred <- predict(fit.sl, type = "response")
-pred.SL<-as.data.frame(cbind(all.pred$library.predict,
-                             all.pred$pred))
-names(pred.SL) <- c(names(pred.SL)[-4],"SL")
-head(pred.SL)
+- A new prediction column is produced based on the fitted values from this meta regression.
+
+You can simply multiply these coefs to the predictions from candidate learners, and them sum them to get ensable SL. Here are the first 6 values:
+
+```{r ML12stestb0, cache=cachex, echo = TRUE}
+SL.ens <- t(t(Yhat)*fit.sl$coef)
+head(SL.ens)
+as.matrix(head(rowSums(SL.ens)), ncol = 1)
 ```  
 
+Alternatively, you can get them directly from the package: here are the first 6 values
+
+```{r ML12stestb, cache=cachex, echo = TRUE}
+head(all.pred$pred)
+```  
+
+The last column is coming from Ensamble SL.
+
 ### Extract outcome prediction as if everyone is treated
+
+We are going to use **Ensamble SL** predictions in the following calculations. If you wanted to use discrete SL predictions instead, that would be fine too.
 
 ```{r ML12s, cache=cachex, echo = TRUE}
 ObsData.noY$A <- 1
@@ -286,6 +311,6 @@ summary(ObsData$Pred.TE)
 
 ### Additional details for SL
 
-- other similar algorithms such as cross-fitting had been shown to have better performances
-- for rare outcomes, consider using stratification to attempt to maintain training and test sample ratios the same
-- if data is clustered and not independent and identically distributed, use ID for the cluster
+- other similar algorithms such as **cross-fitting** had been shown to have better performances
+- for rare outcomes, consider using **stratification** to attempt to maintain training and test sample ratios the same
+- if data is clustered and not independent and identically distributed, use ID for the **cluster**

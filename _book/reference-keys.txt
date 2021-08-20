@@ -87,3 +87,16 @@ additional-details
 additional-details-for-sl
 fig:role
 fig:cvpic
+screen-variables
+select-variables-judiciously
+step-1-exposure-modelling
+step-2-convert-ps-to-ipw
+step-3
+step-4
+step-3-balance-checking
+step-4-outcome-modelling
+iptw-using-ml
+step-1-exposure-modelling-1
+step-2-convert-ps-to-ipw-1
+step-3-balance-checking-1
+step-4-outcome-modelling-1
