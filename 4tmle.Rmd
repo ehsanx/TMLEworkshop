@@ -1,10 +1,115 @@
 # TMLE
 
 ## Transformation of continuous outcome variable
+```{r}
+a <- min(na.omit(ObsData$Y))
+b <- max(na.omit(ObsData$Y))
+
+ObsData$Y <- (ObsData$Y-a)/(b-a)
+
+# check the range of our transformed outcome data is what we expect
+summary(ObsData$Y)
+```
 
 ## Initial estimate
+```{r SL_out, cache=TRUE, message=FALSE, warning=FALSE}
+library(SuperLearner)
+library(tmle)
+
+# set the seed since we will predict for multiple different datasets and will need the SuperLearner set to stay the same
+set.seed(123) 
+
+# specify the library of machine learning algorithms our SuperLearner should use
+# we will use the same set that is the default set in the tmle package
+Q.SL.library = c("SL.glm", "tmle.SL.dbarts2", "SL.glmnet")
+# check number of missing values, and omit rows with missing values if there are not too many
+sapply(ObsData, function(x) sum(is.na(x))) 
+ObsData <- na.omit(ObsData) 
+# fit our SuperLearner
+X <- dplyr::select(ObsData, !Y)
+QbarSL <- SuperLearner(Y=ObsData$Y, X=X, SL.library=Q.SL.library, family="gaussian", method="method.CC_nloglik")
+# make predictions with our fitted model
+QbarAW <- QbarSL$SL.predict
+
+# predict the counterfactual outcomes under treatment/no treatment for each observation
+X1 <- X
+X1$A <- 1
+X0 <- X
+X0$A <- 0
+# predicted outcome under treatment
+Qbar1W<- SuperLearner(Y=ObsData$Y, X=X, SL.library=Q.SL.library, family="gaussian", method="method.CC_nloglik", newX=X1)$SL.predict  
+# predicted outcome under no treatment
+Qbar0W<- SuperLearner(Y=ObsData$Y, X=X, SL.library=Q.SL.library, family="gaussian", method="method.CC_nloglik", newX=X0)$SL.predict   
+
+# initial estimate of the effect of A on Y:
+PsiHat.SS <- mean(Qbar1W - Qbar0W)
+cat("/n Our initial estimate of the effect of RHC on length of stay is: ", PsiHat.SS)
+```
 
 ## Update
 
-## Treatment effect estimate
+### Estimate the propensity scores
+```{r SL_ps, cache=TRUE, message=FALSE, warning=FALSE}
+library(SuperLearner)
+set.seed(123) 
 
+# specify the library of machine learning algorithms our SuperLearner should use
+# we will use the same set that is the default set in the tmle package
+G.SL.library = c("SL.glm", "SL.gam", "tmle.SL.dbarts.k.5")
+# construct the propensity score model using SuperLearner
+gHatSL <- SuperLearner(Y=ObsData$A, X=subset(ObsData, select= -c(A,Y)), 
+                       SL.library=G.SL.library, family="binomial")
+# get the probability of receiving each treatment for each observation
+gHat1W <- gHatSL$SL.predict # predicted probabilities of A=1 given baseline chars
+gHat0W <- 1 - gHat1W
+# get the probability of receiving the treatment they did receive for each observation
+gHatAW <- rep(NA, nrow(ObsData))
+gHatAW[ObsData$A==1] <- gHat1W[ObsData$A==1]
+gHatAW[ObsData$A==0] <- gHat0W[ObsData$A==0]
+```
+
+### Use the propensity scores to update the initial estimate
+```{r, warning=FALSE}
+# clever covariates
+H1W <- ObsData$A / gHat1W
+H0W <- (1-ObsData$A) / gHat0W
+
+# fluctuation parameter
+eps_mod <- glm(ObsData$Y ~ -1 + H0W + H1W + offset(qlogis(QbarAW)), family = "binomial")
+epsilon <- coef(eps_mod)
+cat("Epsilon:", epsilon)
+
+# updated estimates
+Q0W_1 <- plogis(qlogis(Qbar0W) + epsilon[1]*H0W)
+Q1W_1 <- plogis(qlogis(Qbar1W) + epsilon[2]*H1W)
+```
+
+## Treatment effect estimate
+```{r}
+# transformed ATE
+ATE_TMLE1_tr <- mean(Q1W_1 - Q0W_1)
+# ATE on original scale
+ATE_TMLE1 <- (b-a)*ATE_TMLE1_tr
+cat("Updated ATE estimate: ", ATE_TMLE1, "\n")
+```
+
+## Statistical inference
+```{r}
+# transform predicted outcomes back to original scale
+Q1W_1_sc <- (b-a)*Q1W_1
+Q0W_1_sc <- (b-a)*Q0W_1
+
+EY1_TMLE1 <- mean(Q1W_1_sc)
+EY0_TMLE1 <- mean(Q0W_1_sc)
+
+# ATE efficient influence curve
+D1 <- ObsData$A/gHat1W*(ObsData$Y - Q1W_1_sc) + Q1W_1_sc - EY1_TMLE1
+D0 <- (1 - ObsData$A)/(1 - gHat1W)*(ObsData$Y - Q0W_1_sc) + Q0W_1_sc - EY0_TMLE1
+EIC <- D1 - D0
+#ATE variance
+n <- nrow(ObsData)
+varHat.IC <- var(EIC)/n
+#ATE 95%CI
+ATE_TMLE1_CI <- c(ATE_TMLE1 - 1.96*sqrt(varHat.IC), ATE_TMLE1 + 1.96*sqrt(varHat.IC))
+cat("ATE: ", ATE_TMLE1, "  (", ATE_TMLE1_CI[1], ", ", ATE_TMLE1_CI[2], ")", sep = "")
+```
