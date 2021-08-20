@@ -82,3 +82,8 @@ estimating-the-confidence-intervals
 fig:gcomppic
 guideline-for-superlearner
 steps-2
+fig:unnamed-chunk-1
+additional-details
+additional-details-for-sl
+fig:role
+fig:cvpic

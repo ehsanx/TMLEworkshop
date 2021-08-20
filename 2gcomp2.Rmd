@@ -143,18 +143,38 @@ Notice that the mean is very similar to the parametric G-computation method.
   
 ## Steps  
 
-- SuperLearner first **splits** the data according to chosen $K$ fold for the cross-validation
-- for each fold, it estimates a **measure of performance** (could be RMSE) in test sets based on models that was built using training sets
-- we could go one of **two routes** here
-  - measure of performance from all folds are averaged, and choose the **best** one. The prediction from the chosen learners are then used.
-  - we fit a meta regression of the following equation: $Y_{obs}$ $\sim$ $\hat{Y}_{lin.reg}$ + $\hat{Y}_{lasso}$ + $\hat{Y}_{tree}$, estimate the regression coefs, scale them to 1, and the scaled coefficients represents the **value of the corresponding candidate learner**. A new prediction column is produced based on the fitted values from this meta regression.
+1. Screen variables
 
 
+```{r role, echo = FALSE, out.width = "650px", fig.cap="Variable roles"}
+knitr::include_graphics("images/role.png")
+```
 
+- Think about the role of variables first
+  - ideally include confounders to reduce bias
+  - consider including risk factor for outcome for greater accuracy
+  - IV, collider, mediators should be avoided
+  - if something is unmeasured, consider adding proxy (with causion)
+- do pre-screening
+    - sparse binary variables
+    - highly collinear variables
 
-### SuperLearner
+2. Identify candidate learners
 
-SuperLearner is an ensemble learning method. Let us use this one to fit the data first.
+- Choose variety of candidate learners 
+   - parametric (linear or logistic regression)
+    - regularized (LASSO, ridge, elasticnet)
+    - stepwise
+   - non-parametric 
+    - transformation (SVM, NN)
+    - tree based (bagging, boosting)
+   - smoothing or spline (gam)
+- tune the candidate learners for better performance
+  - tree depth
+  - tune regularization parameters
+  - variable selection
+  
+**SuperLearner** is an ensemble learning method. Let us use this one to fit the data first.
 
 ```{r ML1s, cache=cachex, echo = TRUE, results='hide', warning = FALSE}
 require(SuperLearner)
@@ -166,11 +186,49 @@ fit.sl <- SuperLearner(Y=ObsData$Y,
                        family="gaussian")
 ```
 
+3. SuperLearner first **splits** the data according to chosen $K$ fold for the cross-validation
+
+```{r cvpic, echo = FALSE, out.width = "650px", fig.cap="Cross validation from [wiki](https://en.wikipedia.org/wiki/Cross-validation_(statistics)); training data = used for building model; test data = used for prediction from the model that was built using training data; each iteration = fold"}
+knitr::include_graphics("images/CV.png")
+```
+
+- cross-validation is a core part of superlearner
+  - select $K$ judiciously
+    - large sample size means small $K$ may be adequate
+      - for $n \lt 10,000$ consider $K=3$
+      - for $n \lt 500$ consider $K=20$
+    - smaller sample size means larger $K$ may be necessary
+      - for $n \lt 30$ consider leave 1 out 
+
+4. for each fold, it estimates a **measure of performance** (could be RMSE) in test sets based on models that was built using training sets
+
+$RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^n (Y - \hat{Y})^2}$ for continuous $Y$
+
 Performance measures
+
+5. Once we have the performance measures and predictions from candidate learners, we could go one of **two routes** here
+
+  a. **Discrete SL**: measure of performance from all folds are averaged, and choose the **best** one. The prediction from the chosen learners are then used.
 
 ```{r ML12stestrisk, cache=cachex, echo = TRUE}
 fit.sl$cvRisk
 ```
+
+`glmnet` has the lowest cross-validated risk
+
+```{r ML12stest, cache=cachex, echo = TRUE}
+all.pred <- predict(fit.sl, type = "response")
+head(all.pred$library.predict)
+head(all.pred$library.predict[,"SL.glmnet_All"])
+```  
+
+  b. **Ensamble SL**: Alternatively, we fit a meta regression (can be a linear regression) of the following equation: $Y_{obs}$ $\sim$ $\hat{Y}_{SL.glm_{All}}$ + $\hat{Y}_{SL.glm_{All}}$ + $\hat{Y}_{SL.xgboost_{All}}$. 
+
+```{r ML12stestx, cache=cachex, echo = TRUE}
+head(all.pred$library.predict)
+``` 
+  
+We estimate the regression coefs, scale them to 1, and the scaled coefficients represents the **value of the corresponding candidate learner**. A new prediction column is produced based on the fitted values from this meta regression.
 
 scaled coefs
 
@@ -184,12 +242,13 @@ Hence, in creating superlearner prediction column,
 - lasso has majority contribution
 - gradient boosting of tree has some minimal contribution
 
-```{r ML12stest, cache=cachex, echo = TRUE}
+```{r ML12stestb, cache=cachex, echo = TRUE}
 all.pred <- predict(fit.sl, type = "response")
-head(all.pred$library.predict)
-round(all.pred$pred[1:6,],1)
-```
-
+pred.SL<-as.data.frame(cbind(all.pred$library.predict,
+                             all.pred$pred))
+names(pred.SL) <- c(names(pred.SL)[-4],"SL")
+head(pred.SL)
+```  
 
 ### Extract outcome prediction as if everyone is treated
 
@@ -225,25 +284,8 @@ Mean value of predicted treatment effect
 summary(ObsData$Pred.TE)
 ```
 
-### Guideline for SuperLearner
+### Additional details for SL
 
-- Think about the role of variables first
-  - ideally include confounders to reduce bias
-  - consider including risk factor for outcome for greater accuracy
-  - IV, collider, mediators should be avoided
-  - if something is unmeasured, consider adding proxy (with causion)
-- Choose variety of candidate learners 
-   - parametric
-   - non-parametric
-   - tree based
-   - regularized
-   - smoothing
-- tune the candidate learners for better performance
-  - tree depth
-  - tune regularization parameters
-- cross-validation is a core part of superlearner
-  - select $K$ judiciously
-  - large sample size means small $K$ may be adequate
-  - smaller sample size means larger $K$ may be necessary
-  - other similar algorithms such as cross-fitting had been shown to have better performances
-  - for rare outcomes, consider using stratification to attempt to maintain training and test sample ratios the same
+- other similar algorithms such as cross-fitting had been shown to have better performances
+- for rare outcomes, consider using stratification to attempt to maintain training and test sample ratios the same
+- if data is clustered and not independent and identically distributed, use ID for the cluster
