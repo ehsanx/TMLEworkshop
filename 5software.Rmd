@@ -45,7 +45,7 @@ sl3_list_learners("continuous")
 ```
 
 The chosen candidate algorithms can be created and collected in a Stack.
-```{r sl3_03}
+```{r sl3_03, results='hide', message=FALSE, warning=FALSE}
 # initialize candidate learners
 lrn_glm <- make_learner(Lrnr_glm)
 lrn_lasso <- make_learner(Lrnr_glmnet) # alpha default is 1
@@ -58,9 +58,12 @@ stack <- make_learner(
 ```
 
 The stack is then given to the SuperLearner.
-```{r sl3_04}
+```{r sl3_04, results='hide', message=FALSE, warning=FALSE}
 # to make an ensemble SuperLearner
-sl <- make_learner(Lrnr_sl, learners = stack)
+sl_meta <- Lrnr_nnls$new()
+sl <- Lrnr_sl$new(
+  learners = stack,
+  metalearner = sl_meta)
 
 # or a discrete SuperLearner
 sl_disc_meta <- Lrnr_cv_selector$new()
@@ -71,7 +74,7 @@ sl_disc <- Lrnr_sl$new(
 ```
 
 The SuperLearner is then trained on the sl3 task we created at the start and then it can be used to make predictions.
-```{r sl3_05}
+```{r sl3_05, results='hide', message=FALSE, warning=FALSE}
 set.seed(1444)
 
 # train SL
@@ -83,18 +86,34 @@ sl_fit <- sl$train(rhc_task)
 sl3_data <- ObsData
 sl3_data$sl_preds <- sl_fit$predict()
 
-sl3_est <- mean(sl3_data$Y[sl3_data$A == 1]) - mean(sl3_data$Y[sl3_data$A == 0])
+sl3_est <- mean(sl3_data$sl_preds[sl3_data$A == 1]) - mean(sl3_data$sl_preds[sl3_data$A == 0])
+```
+
+```{r, echo=FALSE}
 print(sl3_est)
 
 # TODO
 sl3_ci <- paste("(", NA, ", ", NA, ")", sep = "")
 ```
+Notes about the _sl3_ package: 
 
+* fairly easy to implement & understand structure
+* large selection of candidate algorithms provided
+* unsure why result is so different
+* very different structure from _SuperLearner_ library, but very customizable
+* could use more explanations of when to use what metalearner and what exactly the structure of the metalearner construction means 
+
+Most helpful resources: 
+
+* [tlverse sl3 page](https://tlverse.org/sl3/)
+* [sl3 GitHub repository](https://github.com/tlverse/sl3/)
+* [tlverse handbook chapter 6](https://tlverse.org/tlverse-handbook/tmle3.html)
+* Vignettes in R
 
 ## tmle
 The _tmle_ package can handle both binary and continuous outcomes, and uses the _SuperLearner_ package to construct both models just like we did in the steps above. The default SuperLearner library for estimating the outcome includes generalized linear models (GLMs), GLM with elastic net regularization, and Bayesian additive regression trees. The default library for estimating the propensity scores also includes GLMs and Bayesian additive regression trees (though specified slightly differently), and replaces the GLM with regularization with generalized additive models (GAMs) (@tmlePkgDocs). More methods can be added by specifying lists of models in the _Q.SL.library_ (for the outcome model) and _g.SL.library_ (for the propensity score model) arguments. Note also that the outcome $Y$ is required to be within the range of $[0,1]$ for this method as well, so we need to pass in the transformed data, then transform back the estimate.
 
-```{r tmle_pkg, cache=TRUE}
+```{r tmle_pkg, cache=TRUE, results='hide', message=FALSE, warning=FALSE}
 set.seed(1444) 
 
 # transform the outcome to fall within the range [0,1]
@@ -111,14 +130,33 @@ tmle_est_tr <- tmle$estimates$ATE$psi
 tmle_est <- (b-a)*tmle_est_tr
 
 tmle_ci <- paste("(", round((b-a)*tmle$estimates$ATE$CI[1], 3), ", ", round((b-a)*tmle$estimates$ATE$CI[2], 3), ")", sep = "")
+```
 
+```{r, echo=FALSE}
 cat("ATE from tmle package: ", tmle_est, tmle_ci, sep = "")
 ```
+Notes about the _tmle_ package: 
+
+* does not scale the outcome for you
+* can give some confusing error messages when dealing with variable types it is not expecting
+* practically all steps are nicely packed up in one function, very easy to use but need to dig a little to truly understand what it does
+* at first was a bit difficult to figure out how to use with a continous outcome and log-likelihood loss function as the difference between several parameters relating to variable type and loss function was unclear
+
+Most helpful resources: 
+
+* [CRAN docs](https://cran.r-project.org/web/packages/tmle/tmle.pdf)
+* [tmle package paper](https://www.jstatsoft.org/article/view/v051i13)
+* Vignettes in R
 
 ## ltmle
 Similarly to the _tmle_ package, the _ltmle_ package gives the direct TMLE result with the call of one function. 
 
-```{r ltmle_pkg, cache=TRUE}
+```{r ltmle_pkg, cache=TRUE, message=FALSE, warning=FALSE}
+
+# ltmle(data=data, Anodes=' A' , Ynodes=' Y' , abar=list(1,0),
+# SL.library=SL.library, estimate.time=F)
+
+
 # exclude Y_transf since ltmle scales automatically
 ltmle_data <- dplyr::select(ObsData, !Y_transf) 
 
@@ -131,74 +169,11 @@ cat("ATE from ltmle package: ", ltmle_est$estimates[["tmle"]], ltmle_ci, sep = "
 ```
 The main difference between the _tmle_ and the _ltmle_ package is that the _ltmle_ package is designed to handle longitudinal data, with measurements data recorded for each subject at multiple timepoints. More information on the use of the _ltmle_ package in these settings can be found [here](https://cran.r-project.org/web/packages/ltmle/vignettes/ltmle-intro.html).
 
-## tmle3
-The _tmle3_ package uses the _sl3_ package rather than the _SuperLearner_ library, and is implemented to be more generalizable than the _tmle_ package. It is important to note that this package is still in the early stages of development.
-
-```{r tmle3_pkg}
-# create the node list, specifying outcome, exposure, and covariates
-node_list <- list(
-  W = colnames(ObsData)[-which(names(ObsData) %in% c("Y", "A", "Y_transf"))],
-  A = "A", 
-  Y = "Y"
-)
-
-# create a spec object, denoting treatment variable and control level
-rhc_spec <- tmle_ATE(
-  treatment_level = "A",
-  control_level = 1
-)
-
-# choose sl3 learners to be used (we will use same stack we created in sl3 section) and make an ensemble learner for the outcome and the exposure
-# 
-# sl_A <- make_learner(Lrnr_sl, learners = stack)
-# sl_Y <- make_learner(Lrnr_sl, learners = stack)
-# 
-# learner_list <- list(A=sl_A, Y=sl_Y)
-
-# choose base learners
-require(ranger)
-lrnr_mean <- make_learner(Lrnr_mean)
-lrnr_rf <- make_learner(Lrnr_ranger)
-
-# define metalearners appropriate to data types
-ls_metalearner <- make_learner(Lrnr_nnls)
-mn_metalearner <- make_learner(
-  Lrnr_solnp, metalearner_linear_multinomial,
-  loss_loglik_multinomial
-)
-sl_Y <- Lrnr_sl$new(
-  learners = list(lrnr_mean, lrnr_rf),
-  metalearner = ls_metalearner
-)
-sl_A <- Lrnr_sl$new(
-  learners = list(lrnr_mean, lrnr_rf),
-  metalearner = mn_metalearner
-)
-learner_list <- list(A = sl_A, Y = sl_Y)
-
-processed <- process_missing(ObsData, node_list)
-ObsData_p <- processed$data
-node_list <- processed$node_list
-
-# fit TMLE
-# tmle3_fit <- tmle3(rhc_spec, subset(ObsData_p, select = -Y_transf), node_list, learner_list)
-
-# TODO
-# tmle3_fit <- tmle3(rhc_spec, ObsData_p, node_list, learner_list)
-# print(tmle3_fit)
-
-# TODO
-tmle3_ci <- paste("(", NA, ", ", NA, ")", sep = "")
-
-```
-
-
 ## AIPW
 The _aipw_ package implements augmented inverse probability weighting. It has similar parameters as the _tmle_ package. It is typically used with the _SuperLearner_ library. 
 
-```{r aipw_pkg, cache=TRUE}
+```{r aipw_pkg, cache=TRUE, results='hide', message=FALSE, warning=FALSE}
 set.seed(1444) 
-
 # construct AIPW estimator
 aipw <- AIPW$new(Y=ObsData$Y, 
                  A=ObsData$A, 
@@ -209,7 +184,6 @@ aipw <- AIPW$new(Y=ObsData$Y,
                  verbose=FALSE)
 # fit AIPW object
 aipw$fit()
-
 # calculate ATE
 aipw$summary()
 print(aipw$estimates)
@@ -217,19 +191,28 @@ aipw_est <- aipw$estimates$RD[["Estimate"]]
 
 # 95% CI
 aipw_ci <- paste(" (", round(aipw$estimates$RD["95% LCL"], 3), ", ", round(aipw$estimates$RD["95% UCL"], 3), ")", sep = "")
+```
 
+```{r, echo=FALSE}
 cat("ATE from aipw package: ", aipw_est, aipw_ci, sep = "")
 ```
 
-
 ## RHC results
-```{r summary table, cache=TRUE}
-methods <- c("sl3", "tmle", "ltmle", "tmle3", "aipw")
-estimates <- round(c(sl3_est, tmle_est, ltmle_est$estimates[["tmle"]], NA, aipw_est), 3)
+```{r summary table, cache=TRUE, echo=FALSE}
+methods <- c("sl3", "tmle", "ltmle", "aipw")
+estimates <- round(c(sl3_est, tmle_est, ltmle_est$estimates[["tmle"]], aipw_est), 3)
 
-CIs <- c(sl3_ci, tmle_ci, ltmle_ci, tmle3_ci, aipw_ci)
+CIs <- c(sl3_ci, tmle_ci, ltmle_ci, aipw_ci)
 
 results <- data.frame(methods, estimates, CIs)
 results
 ```
+
+## Other packages
+Other packages that may be useful: 
+
+| Package | Resources | Notes |
+|---|---|---|
+| tmle3 | [GitHub](https://github.com/tlverse/tmle3), [framework overview](https://tlverse.org/tmle3/articles/framework.html), [tlverse handbook](https://tlverse.org/tlverse-handbook/tmle3.html) | tmle3 is still under development | 
+| aipw | [GitHub](https://github.com/yqzhong7/AIPW), [CRAN vignette](https://cran.r-project.org/web/packages/AIPW/vignettes/AIPW.html) | |
 
