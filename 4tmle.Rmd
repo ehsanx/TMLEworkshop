@@ -1,6 +1,39 @@
 # TMLE
 
+## Doubly robust estimators
+Doubly robust estimators have several important properties: 
+
+* They use information from both the exposure and the outcome models. 
+* They provide a **consistent estimator** if either the exposure or the outcome model is correctly specified.
+* They provide an **efficient estimator** if both the exposure and the outcome model are correctly specified. 
+
+## Targeted Maximum Likelihood Estimation (TMLE)
+TMLE is a doubly robust method, using the propensity score (exposure) model to improve an initial estimate from the outcome model. 
+
+In addition to being doubly robust, TMLE has several other desirable properties:
+
+* It allows the use of **data-adaptive algorithms** like machine learning without sacrificing interpretability.
+  * ML is only used in intermediary steps to develop the estimator, so the optimization and interpretation of the estimator as a whole remains intact.
+  * The use of machine learning can help mitigate model misspecification. 
+* It has been shown to outperform other methods, particularly in **sparse data settings**. 
+
+TMLE has two main parts: 
+
+1. The construction of the outcome model and using it to make initial predictions.
+2. The *targeted* adjustment of the initial predictions using the propensity score model. 
+
+We will go through the steps of TMLE one-by-one, using the RHC dataset presented in previous chapters. As a reminder, the exposure we are considering is RHC (right heart catheterization) and the outcome of interest is length of stay in the hospital. 
+
+```{r dataload_02, cache=TRUE, echo = TRUE}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+dim(ObsData)
+```
+
 ## Transformation of continuous outcome variable
+In our example, the outcome is continuous. However, it is recommended that even with continuous outcomes we use a log-likelihood loss function for the maximum likelihood estimation, as we would with a binary outcome.  
+To handle this, we **transform** our outcome to be within the range [0,1].
+
 ```{r}
 a <- min(na.omit(ObsData$Y))
 b <- max(na.omit(ObsData$Y))
@@ -12,6 +45,10 @@ summary(ObsData$Y)
 ```
 
 ## Initial estimate
+The next step is to construct our outcome model and make our initial predictions. 
+
+For this step as well as the estimation of the propensity scores, we will use **SuperLearner**. This requires no a priori assumptions about the structure of our dataset. 
+
 ```{r SL_out, cache=TRUE, message=FALSE, warning=FALSE}
 library(SuperLearner)
 library(tmle)
@@ -46,10 +83,10 @@ PsiHat.SS <- mean(Qbar1W - Qbar0W)
 cat("/n Our initial estimate of the effect of RHC on length of stay is: ", PsiHat.SS)
 ```
 
-## Update
+## Estimate the propensity scores
+At this point, we have our initial estimate and now want to perform our targeted improvement. 
 
-### Estimate the propensity scores
-```{r SL_ps, cache=TRUE, message=FALSE, warning=FALSE}
+```{r SL_ps, cache=TRUE, message=FALSE, error = FALSE, warning=FALSE}
 library(SuperLearner)
 set.seed(123) 
 
@@ -69,6 +106,18 @@ gHatAW[ObsData$A==0] <- gHat0W[ObsData$A==0]
 ```
 
 ### Use the propensity scores to update the initial estimate
+For this step, we need to do two things:
+
+1. Calculate **clever covariates**: essentially, the inverse probability of treatment weights.  
+For individual $i$, for example: 
+$$H(A_i, W_i) = \frac{I(A_i=1)}{g(A_i=1|W_i)} - \frac{I(A_i=0)}{g(A_i=0|W_i)}$$ 
+where $g(A,W)$ is the propensity score model (@Luque_TMLE_binary_2018).
+
+2. Estimate the **fluctuation parameter**: this denotes how large of an adjustment we will make to the initial estimate.  
+The fluctuation parameter $\hat\epsilon = (\hat\epsilon_0,\hat\epsilon_1)$ is estimated through MLE, using a model with an offset based on the initial estiamte, and clever covariates as independent variables (@Gruber_TMLE_gentle_intro_2009): 
+$$E(Y=1|A,W)(\epsilon) = \frac{1}{1+\exp(-\log\frac{\bar Q^0(A,W)}{(1-\bar Q^0(A,W))}-\epsilon_0H(0,W)-\epsilon_1H(1,W))}$$  
+We will not go into detail on the statistical theory behind this. 
+
 ```{r, warning=FALSE}
 # clever covariates
 H1W <- ObsData$A / gHat1W
@@ -85,6 +134,7 @@ Q1W_1 <- plogis(qlogis(Qbar1W) + epsilon[2]*H1W)
 ```
 
 ## Treatment effect estimate
+Now that the updated estimates of our outcome are calculated, we can calculate the ATE, making sure to transform back to our original scale. 
 ```{r}
 # transformed ATE
 ATE_TMLE1_tr <- mean(Q1W_1 - Q0W_1)
@@ -94,10 +144,11 @@ cat("Updated ATE estimate: ", ATE_TMLE1, "\n")
 ```
 
 ## Statistical inference
+Since the machine learning algorithms were used only in intermediary steps, rather than estimating our parameter of interest directly, 95% confidence intervals can be calculated directly (@luque2018targeted). We will not go into the theory behind extracting the variance. 
 ```{r}
 # transform predicted outcomes back to original scale
-Q1W_1_sc <- (b-a)*Q1W_1
-Q0W_1_sc <- (b-a)*Q0W_1
+Q1W_1_sc <- (b-a)*Q1W_1+a
+Q0W_1_sc <- (b-a)*Q0W_1+a
 
 EY1_TMLE1 <- mean(Q1W_1_sc)
 EY0_TMLE1 <- mean(Q0W_1_sc)
@@ -109,7 +160,7 @@ EIC <- D1 - D0
 #ATE variance
 n <- nrow(ObsData)
 varHat.IC <- var(EIC)/n
-#ATE 95%CI
+#ATE 95% CI
 ATE_TMLE1_CI <- c(ATE_TMLE1 - 1.96*sqrt(varHat.IC), ATE_TMLE1 + 1.96*sqrt(varHat.IC))
 cat("ATE: ", ATE_TMLE1, "  (", ATE_TMLE1_CI[1], ", ", ATE_TMLE1_CI[2], ")", sep = "")
 ```
