@@ -2,7 +2,7 @@
 
 In this chapter, we are not only interested in outcome modelling, but also **exposure modelling**.
 
-```{r setup01, include=FALSE}
+```{r setup01i, include=FALSE}
 require(knitr)
 require(glmnet)
 require(kableExtra)
@@ -147,3 +147,6 @@ publish(out.fit)
 ```
 
 
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(out.fit, file = "data/ipw.RDS")
+```

@@ -168,7 +168,7 @@ We also conduct propensity score pair matching analysis, as follows.
 
 **Note**: In this workshop, we will not cover Propensity Score Matching (PSM) in this workshop. If you want to learn more about this, feel free to check out this other workshop: [Understanding Propensity Score Matching](https://ehsanx.github.io/psw/).
 
-```{r ps1, cache=TRUE, echo = TRUE}
+```{r ps16854, cache=TRUE, echo = TRUE}
 set.seed(123)
 require(MatchIt)
 ps.formula <- as.formula(paste("A~", 
@@ -216,11 +216,23 @@ tab1y <- CreateTableOne(vars = c("Y"),
                data = matched.data, strata = "A", 
                test = TRUE)
 print(tab1y, showAllLevels = FALSE, 
-      test = TRUE) 
+      test = TRUE)
 ```
 
-We also find the same conclusion based on propensity score pair matched data.
+- Hence, we also find the same conclusion based on propensity score pair matched data.
+- We can also estimate the effect of `RHC` on `length of stay` using propensity score-matched sample:
+
+```{r ps12ryy, cache=TRUE, echo = TRUE}
+fit.matched <- glm(Y~A,
+            family=gaussian, 
+            data = matched.data)
+publish(fit.matched)
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(fit.matched, file = "data/match.RDS")
+```
 
 ### TMLE in RHC data
 
-There are other papers that have used RHC data [@keele2021comparing;@keele2018pre]. Particularly, @keele2021comparing used TMLE method in estimating the impact of RHC on length of stay, and found point estimate $2.01 (95\% CI: 0.6-3.41)$. In today's workshop, we will learn about TMLE method.
+There are other papers that have used RHC data [@keele2021comparing;@keele2018pre]. Particularly, @keele2021comparing used TMLE (with super learner) method in estimating the impact of RHC on length of stay, and found point estimate $2.01 (95\% CI: 0.6-3.41)$. In today's workshop, we will learn about TMLE method.

@@ -1,6 +1,6 @@
 # TMLE
 
-```{r tmlesetup01, include=FALSE}
+```{r tmlesetup01t, include=FALSE}
 require(knitr)
 require(glmnet)
 require(kableExtra)
@@ -449,13 +449,15 @@ ci.estimate <- function(data = ObsData, H.AL.components = 1){
 ### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
 
 ```{r tmleinf2b, cache=TRUE}
-ci.estimate(data = ObsData, H.AL.components = 2)
+CI2 <- ci.estimate(data = ObsData, H.AL.components = 2)
+CI2
 ```
 
 ### Only 1 $\hat\epsilon$
 
 ```{r tmleinf2c, cache=TRUE}
-ci.estimate(data = ObsData, H.AL.components = 1)
+CI1 <- ci.estimate(data = ObsData, H.AL.components = 1)
+CI1
 ```
 
 ```{r tmleinf, cache=TRUE, include = FALSE}
@@ -476,4 +478,9 @@ ci.estimate(data = ObsData, H.AL.components = 1)
 # #ATE 95% CI
 # ATE_TMLE1_CI <- c(ATE_TMLE1 - 1.96*sqrt(varHat.IC), ATE_TMLE1 + 1.96*sqrt(varHat.IC))
 # cat("ATE: ", ATE_TMLE1, "  (", ATE_TMLE1_CI[1], ", ", ATE_TMLE1_CI[2], ")", sep = "")
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(ATE.TMLE1, file = "data/tmlepointh.RDS")
+saveRDS(CI2, file = "data/tmlecih.RDS")
 ```

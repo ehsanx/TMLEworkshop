@@ -1,6 +1,6 @@
 # G-computation
 
-```{r setup01, include=FALSE}
+```{r setup01g, include=FALSE}
 require(boot)
 require(knitr)
 require(glmnet)
@@ -277,7 +277,8 @@ ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0
 Mean value of predicted treatment effect 
 
 ```{r reg2acnx1, cache=cachex, echo = TRUE}
-mean(ObsData$Pred.TE)
+TE <- mean(ObsData$Pred.TE)
+TE
 ```
 
 SD of treatment effect
@@ -341,8 +342,14 @@ Below are two versions of confidence interval.
 - Another is based on percentiles
 
 ```{r bootx3, cache=cachex, echo = TRUE}
-boot.ci(gcomp.res, type="norm") 
-boot.ci(gcomp.res, type="perc")
+CI1 <- boot.ci(gcomp.res, type="norm") 
+CI1
+CI2 <- boot.ci(gcomp.res, type="perc")
+CI2
 ```
 
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(TE, file = "data/gcomp.RDS")
+saveRDS(CI2, file = "data/gcompci.RDS")
+```
 

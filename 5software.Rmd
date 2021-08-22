@@ -1,5 +1,5 @@
 
-```{r setup04, include=FALSE}
+```{r setup01ss, include=FALSE}
 require(knitr)
 require(glmnet)
 require(kableExtra)
@@ -25,19 +25,107 @@ dim(ObsData)
 
 # Pre-packaged software
 
-## sl3
+## tmle
+
+- The _tmle_ package can handle 
+  - both binary and 
+  - continuous outcomes, and 
+  - uses the _SuperLearner_ package to construct both models just like we did in the steps above.
+- The default SuperLearner library for estimating the outcome includes [@tmlePkgDocs] 
+  - generalized linear models (GLMs), 
+  - GLM with lasso regularization, and 
+  - gradient boosting. 
+- The default library for estimating the propensity scores also include the same 
+- It is certainly possible to use different set of learners
+  - More methods can be added by 
+    - specifying lists of models in the _Q.SL.library_ (for the outcome model) and 
+    - _g.SL.library_ (for the propensity score model) arguments. 
+- Note also that the outcome $Y$ is required to be within the range of $[0,1]$ for this method as well, 
+  - so we need to pass in the transformed data, then transform back the estimate.
+
+```{r tmlepkg, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+set.seed(1444) 
+
+# transform the outcome to fall within the range [0,1]
+min.Y <- min(ObsData$Y)
+max.Y <- max(ObsData$Y)
+ObsData$Y_transf <- (ObsData$Y-min.Y)/(max.Y-min.Y)
+
+# run tmle from the tmle package 
+ObsData.noYA <- dplyr::select(ObsData, 
+                              !c(Y_transf, Y, A))
+SL.library = c("SL.glm", 
+               "SL.glmnet", 
+               "SL.xgboost")
+```
+
+
+```{r tmlepkg33, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+tmle.fit <- tmle::tmle(Y = ObsData$Y_transf, 
+                   A = ObsData$A, 
+                   W = ObsData.noYA, 
+                   family = "gaussian", 
+                   V = 3,
+                   Q.SL.library = SL.library, 
+                   g.SL.library = SL.library)
+tmle.fit
+```
+
+
+```{r tmlepkgtr2, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+summary(tmle.fit)
+```
+
+
+```{r tmlepkgtr, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+tmle_est_tr <- tmle.fit$estimates$ATE$psi
+# transform back the ATE estimate
+tmle_est <- (max.Y-min.Y)*tmle_est_tr
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(tmle_est, file = "data/tmle.RDS")
+```
+
+```{r tmlepkg2, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+tmle_ci <- paste("(", 
+                 round((max.Y-min.Y)*tmle.fit$estimates$ATE$CI[1], 3), ", ", 
+                 round((max.Y-min.Y)*tmle.fit$estimates$ATE$CI[2], 3), ")", sep = "")
+```
+
+```{r, cache=TRUE, echo = TRUE}
+tmle.ci <- (max.Y-min.Y)*tmle.fit$estimates$ATE$CI
+saveRDS(tmle.ci, file = "data/tmleci.RDS")
+```
+
+```{r, cache=cachex, echo=FALSE}
+cat("ATE from tmle package: ", tmle_est, tmle_ci, sep = "")
+```
+
+Notes about the _tmle_ package: 
+
+* does not scale the outcome for you
+* can give some error messages when dealing with variable types it is not expecting
+* practically all steps are nicely packed up in one function, very easy to use but need to dig a little to truly understand what it does
+* at first was not straightforward to figure out how to use with a continuous outcome and log-likelihood loss function as the difference between several parameters relating to variable type and loss function was unclear
+
+Most helpful resources: 
+
+* [CRAN docs](https://cran.r-project.org/web/packages/tmle/tmle.pdf)
+* [tmle package paper](https://www.jstatsoft.org/article/view/v051i13)
+* Vignettes in R
+
+## sl3 (optional)
 
 ```{r}
 # install sl3 if not done so
 # remotes::install_github("tlverse/sl3")
 ```
+The _sl3_ package is a newer package, that implements two types of Super Learning: 
 
-
-The _sl3_ package implements two types of Super Learning: 
-
-- discrete Super Learning, 
+- **discrete Super Learning**, 
   - in which the best prediction algorithm (based on cross-validation) from a specified library is returned, and 
-- ensemble Super Learning, 
+- **ensemble Super Learning**, 
   - in which the best linear combination of the specified algorithms is returned (@coyle2021sl3).
 
 The first step is to create a sl3 task which keeps track of the roles of the variables in our problem (@coyle2021tlverse). 
@@ -116,16 +204,8 @@ sl3_est <- mean(sl3_data$sl_preds[sl3_data$A == 1]) -
   mean(sl3_data$sl_preds[sl3_data$A == 0])
 ```
 
-```{r}
-saveRDS(sl_fit, file = "data/sl3.RData")
-```
-
-
-```{r sl305b, cache=cachexy, echo=FALSE}
-print(sl3_est)
-
-# TODO
-sl3_ci <- paste("(", NA, ", ", NA, ")", sep = "")
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(sl3_est, file = "data/sl3.RDS")
 ```
 
 Notes about the _sl3_ package: 
@@ -143,91 +223,7 @@ Most helpful resources:
 * [tlverse handbook chapter 6](https://tlverse.org/tlverse-handbook/tmle3.html)
 * Vignettes in R
 
-## tmle
-
-- The _tmle_ package can handle 
-  - both binary and 
-  - continuous outcomes, and 
-  - uses the _SuperLearner_ package to construct both models just like we did in the steps above.
-- The default SuperLearner library for estimating the outcome includes [@tmlePkgDocs] 
-  - generalized linear models (GLMs), 
-  - GLM with lasso regularization, and 
-  - gradient boosting. 
-- The default library for estimating the propensity scores also include the same 
-- It is certainly possible to use different set of learners
-  - More methods can be added by 
-    - specifying lists of models in the _Q.SL.library_ (for the outcome model) and 
-    - _g.SL.library_ (for the propensity score model) arguments. 
-- Note also that the outcome $Y$ is required to be within the range of $[0,1]$ for this method as well, 
-  - so we need to pass in the transformed data, then transform back the estimate.
-
-```{r tmlepkg, cache=cachex, results='hide', message=FALSE, warning=FALSE}
-set.seed(1444) 
-
-# transform the outcome to fall within the range [0,1]
-min.Y <- min(ObsData$Y)
-max.Y <- max(ObsData$Y)
-ObsData$Y_transf <- (ObsData$Y-min.Y)/(max.Y-min.Y)
-
-# run tmle from the tmle package 
-ObsData.noYA <- dplyr::select(ObsData, 
-                              !c(Y_transf, Y, A))
-SL.library = c("SL.glm", 
-               "SL.glmnet", 
-               "SL.xgboost")
-```
-
-
-```{r tmlepkg33, cache=cachex, results='hide', message=FALSE, warning=FALSE}
-tmle.fit <- tmle::tmle(Y = ObsData$Y_transf, 
-                   A = ObsData$A, 
-                   W = ObsData.noYA, 
-                   family = "gaussian", 
-                   V = 3,
-                   Q.SL.library = SL.library, 
-                   g.SL.library = SL.library)
-tmle.fit
-```
-
-
-```{r tmlepkgtr2, cache=cachex, results='hide', message=FALSE, warning=FALSE}
-summary(tmle.fit)
-```
-
-
-```{r tmlepkgtr, cache=cachex, results='hide', message=FALSE, warning=FALSE}
-tmle_est_tr <- tmle.fit$estimates$ATE$psi
-# transform back the ATE estimate
-tmle_est <- (max.Y-min.Y)*tmle_est_tr
-```
-
-```{r}
-saveRDS(tmle.fit, file = "data/tmle.RData")
-```
-
-```{r tmlepkg2, cache=cachex, results='hide', message=FALSE, warning=FALSE}
-tmle_ci <- paste("(", 
-                 round((max.Y-min.Y)*tmle.fit$estimates$ATE$CI[1], 3), ", ", 
-                 round((max.Y-min.Y)*tmle.fit$estimates$ATE$CI[2], 3), ")", sep = "")
-```
-
-```{r, cache=cachex, echo=FALSE}
-cat("ATE from tmle package: ", tmle_est, tmle_ci, sep = "")
-```
-
-Notes about the _tmle_ package: 
-
-* does not scale the outcome for you
-* can give some error messages when dealing with variable types it is not expecting
-* practically all steps are nicely packed up in one function, very easy to use but need to dig a little to truly understand what it does
-* at first was not straightforward to figure out how to use with a continuous outcome and log-likelihood loss function as the difference between several parameters relating to variable type and loss function was unclear
-
-Most helpful resources: 
-
-* [CRAN docs](https://cran.r-project.org/web/packages/tmle/tmle.pdf)
-* [tmle package paper](https://www.jstatsoft.org/article/view/v051i13)
-* Vignettes in R
-
+<!---
 ## ltmle
 
 Similarly to the _tmle_ package, the _ltmle_ package gives the direct TMLE result with the call of one function. 
@@ -254,8 +250,8 @@ ltmle_est <- ltmle(ltmle_data,
 summary(ltmle_est)
 ```
 
-```{r}
-saveRDS(ltmle_est, file = "data/ltmle.RData")
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(ltmle_est, file = "data/ltmle.RDS")
 ```
 
 
@@ -278,7 +274,7 @@ saveRDS(ltmle_est, file = "data/ltmle.RData")
 - It has similar parameters as the _tmle_ package. 
 - It is typically used with the _SuperLearner_ library. 
 
-```{r aipwpkg, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+```{r aipwpkg, cache=cachex, results='hide', message=FALSE, warning=FALSE, include = FALSE}
 set.seed(1444) 
 # construct AIPW estimator
 aipw <- AIPW$new(Y=ObsData$Y, 
@@ -295,13 +291,13 @@ aipw <- AIPW$new(Y=ObsData$Y,
 ```
 
 
-```{r aipwpkg2, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+```{r aipwpkg2, cache=cachex, results='hide', message=FALSE, warning=FALSE, include = FALSE}
 # fit AIPW object
 aipw$fit()
 ```
 
 
-```{r aipwpkg3, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+```{r aipwpkg3, cache=cachex, results='hide', message=FALSE, warning=FALSE, include = FALSE}
 # calculate ATE
 aipw$summary()
 print(aipw$estimates)
@@ -313,32 +309,54 @@ aipw_ci <- paste(" (",
                  round(aipw$estimates$RD["95% UCL"], 3), ")", sep = "")
 ```
 
-```{r}
-saveRDS(aipw, file = "data/aipw.RData")
+```{r, cache=TRUE, echo = TRUE, include = FALSE}
+saveRDS(aipw, file = "data/aipw.RDS")
 ```
 
-```{r asg, echo=FALSE}
+```{r asg, echo=FALSE, include = FALSE}
 cat("ATE from aipw package: ", aipw_est, aipw_ci, sep = "") 
 ```
+--->
 
 ## RHC results
+
+Gathering previously saved results:
+```{r summarytable0, cache=cachex, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+fit.matched <- readRDS(file = "data/match.RDS")
+TEm <- fit.matched$coefficients[2]
+CIm <- as.numeric(confint(fit.matched, 'A'))
+TEg <- readRDS(file = "data/gcomp.RDS")
+CIg <- readRDS(file = "data/gcompci.RDS")
+CIgc <- CIg$percent[4:5]
+TE1g <- readRDS(file = "data/gcompxg.RDS")
+TE2g <- readRDS(file = "data/gcompls.RDS")
+TE3g <- readRDS(file = "data/gcompsl.RDS")
+ipw <- readRDS(file = "data/ipw.RDS")
+TEi <- ipw$coefficients[2]
+CIi <- as.numeric(confint(ipw, 'A'))
+ipwsl <- readRDS(file = "data/ipwsl.RDS")
+TEsli <- ipwsl$coefficients[2]
+CIsli <- as.numeric(confint(ipwsl, 'A'))
+tmleh <- readRDS(file = "data/tmlepointh.RDS")
+tmlecih <- readRDS(file = "data/tmlecih.RDS")
+tmlesl <- readRDS(file = "data/tmle.RDS")
+tmlecisl <- readRDS(file = "data/tmleci.RDS")
+slp <- readRDS(file = "data/sl3.RDS")
+ci.b <- rep(NA,2)
+point <- as.numeric(c(TEm, TEg, TE1g, TE2g, TE3g, TEi, TEsli, tmleh, tmlesl, slp))
+CIs <- cbind(CIm, CIgc, ci.b, ci.b, ci.b, CIi, CIsli, tmlecih, tmlecisl, ci.b) 
+```
+
+
 ```{r summarytable, cache=cachex, echo=FALSE}
-methods <- c("sl3", 
-             "tmle", 
-             #"ltmle", 
-             "aipw") 
-estimates <- round(c(sl3_est, 
-                     tmle_est, 
-                     #ltmle_est$estimates[["tmle"]], 
-                     aipw_est), 3)
-
-CIs <- c(sl3_ci, 
-         tmle_ci, 
-         #ltmle_ci, 
-         aipw_ci)
-
-results <- data.frame(methods, estimates, CIs)
-results
+method.list <- c("PS.match", "G-comp","G-comp-xgboost",
+             "G-comp-lasso", "G-comp-SL","IPW", 
+             "IPW-SL", "TMLE.step", "tmle (package)", "sl3") 
+results <- data.frame(method.list) 
+results$Estimate <- round(point,2)
+results$`2.5 %` <- CIs[1,]
+results$`97.5 %` <- CIs[2,]
+kable(results,digits = 2)
 ```
 
 ## Other packages
@@ -347,6 +365,9 @@ Other packages that may be useful:
 
 | Package | Resources | Notes |
 |---|---|---|
+| ltmle | [CRAN vignette](https://cran.r-project.org/web/packages/ltmle/vignettes/ltmle-intro.html) | Longitudinal |
 | tmle3 | [GitHub](https://github.com/tlverse/tmle3), [framework overview](https://tlverse.org/tmle3/articles/framework.html), [tlverse handbook](https://tlverse.org/tlverse-handbook/tmle3.html) | tmle3 is still under development | 
-| aipw | [GitHub](https://github.com/yqzhong7/AIPW), [CRAN vignette](https://cran.r-project.org/web/packages/AIPW/vignettes/AIPW.html) | |
+| aipw | [GitHub](https://github.com/yqzhong7/AIPW), [CRAN vignette](https://cran.r-project.org/web/packages/AIPW/vignettes/AIPW.html) | Newer package for AIPW (another DR method) |
+| Others | [van der Laan research group](https://www.stat.berkeley.edu/users/laan/Software/) |  |
 
+You can find many other related packages on [CRAN](https://cran.r-project.org/search.html) or GitHub.

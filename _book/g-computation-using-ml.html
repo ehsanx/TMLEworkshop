@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-08-21" />
+<meta name="date" content="2021-08-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,6 +52,8 @@
 
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script type="text/javascript">
 
 // toggle visibility of R source blocks in R Markdown output
@@ -206,9 +208,8 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="1.7" data-path="rhc-data-description.html"><a href="rhc-data-description.html#comparison-with-literature"><i class="fa fa-check"></i><b>1.7</b> Comparison with literature</a>
 <ul>
-<li class="chapter" data-level="1.7.1" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm"><i class="fa fa-check"></i><b>1.7.1</b> PSM</a></li>
-<li class="chapter" data-level="1.7.2" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm-diagnostics"><i class="fa fa-check"></i><b>1.7.2</b> PSM diagnostics</a></li>
-<li class="chapter" data-level="1.7.3" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm-results"><i class="fa fa-check"></i><b>1.7.3</b> PSM results</a></li>
+<li class="chapter" data-level="1.7.1" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm-in-rhc-data"><i class="fa fa-check"></i><b>1.7.1</b> PSM in RHC data</a></li>
+<li class="chapter" data-level="1.7.2" data-path="rhc-data-description.html"><a href="rhc-data-description.html#tmle-in-rhc-data"><i class="fa fa-check"></i><b>1.7.2</b> TMLE in RHC data</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path="g-computation.html"><a href="g-computation.html"><i class="fa fa-check"></i><b>2</b> G-computation</a>
@@ -263,45 +264,65 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="4" data-path="iptw.html"><a href="iptw.html"><i class="fa fa-check"></i><b>4</b> IPTW</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="iptw.html"><a href="iptw.html#iptw-from-parametric-models"><i class="fa fa-check"></i><b>4.1</b> IPTW from parametric models</a>
-<ul>
-<li class="chapter" data-level="4.1.1" data-path="iptw.html"><a href="iptw.html#step-1-exposure-modelling"><i class="fa fa-check"></i><b>4.1.1</b> Step 1: exposure modelling</a></li>
-<li class="chapter" data-level="4.1.2" data-path="iptw.html"><a href="iptw.html#step-2-convert-ps-to-ipw"><i class="fa fa-check"></i><b>4.1.2</b> Step 2: Convert PS to IPW</a></li>
-<li class="chapter" data-level="4.1.3" data-path="iptw.html"><a href="iptw.html#step-3-balance-checking"><i class="fa fa-check"></i><b>4.1.3</b> Step 3: Balance checking</a></li>
-<li class="chapter" data-level="4.1.4" data-path="iptw.html"><a href="iptw.html#step-4-outcome-modelling"><i class="fa fa-check"></i><b>4.1.4</b> Step 4: outcome modelling</a></li>
-</ul></li>
+<li class="chapter" data-level="4.1" data-path="iptw.html"><a href="iptw.html#iptw-steps"><i class="fa fa-check"></i><b>4.1</b> IPTW steps</a></li>
+<li class="chapter" data-level="4.2" data-path="iptw.html"><a href="iptw.html#step-1-exposure-modelling"><i class="fa fa-check"></i><b>4.2</b> Step 1: exposure modelling</a></li>
+<li class="chapter" data-level="4.3" data-path="iptw.html"><a href="iptw.html#step-2-convert-ps-to-ipw"><i class="fa fa-check"></i><b>4.3</b> Step 2: Convert PS to IPW</a></li>
+<li class="chapter" data-level="4.4" data-path="iptw.html"><a href="iptw.html#step-3-balance-checking"><i class="fa fa-check"></i><b>4.4</b> Step 3: Balance checking</a></li>
+<li class="chapter" data-level="4.5" data-path="iptw.html"><a href="iptw.html#step-4-outcome-modelling"><i class="fa fa-check"></i><b>4.5</b> Step 4: outcome modelling</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html"><i class="fa fa-check"></i><b>5</b> IPTW using ML</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#iptw-from-superlearner"><i class="fa fa-check"></i><b>5.1</b> IPTW from Superlearner</a>
-<ul>
-<li class="chapter" data-level="5.1.1" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-1-exposure-modelling-1"><i class="fa fa-check"></i><b>5.1.1</b> Step 1: exposure modelling</a></li>
-<li class="chapter" data-level="5.1.2" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-2-convert-ps-to-ipw-1"><i class="fa fa-check"></i><b>5.1.2</b> Step 2: Convert PS to IPW</a></li>
-<li class="chapter" data-level="5.1.3" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-3-balance-checking-1"><i class="fa fa-check"></i><b>5.1.3</b> Step 3: Balance checking</a></li>
-<li class="chapter" data-level="5.1.4" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-4-outcome-modelling-1"><i class="fa fa-check"></i><b>5.1.4</b> Step 4: outcome modelling</a></li>
-</ul></li>
+<li class="chapter" data-level="5.1" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#iptw-steps-from-sl"><i class="fa fa-check"></i><b>5.1</b> IPTW Steps from SL</a></li>
+<li class="chapter" data-level="5.2" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-1-exposure-modelling-1"><i class="fa fa-check"></i><b>5.2</b> Step 1: exposure modelling</a></li>
+<li class="chapter" data-level="5.3" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-2-convert-ps-to-ipw-1"><i class="fa fa-check"></i><b>5.3</b> Step 2: Convert PS to IPW</a></li>
+<li class="chapter" data-level="5.4" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-3-balance-checking-1"><i class="fa fa-check"></i><b>5.4</b> Step 3: Balance checking</a></li>
+<li class="chapter" data-level="5.5" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-4-outcome-modelling-1"><i class="fa fa-check"></i><b>5.5</b> Step 4: outcome modelling</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="tmle.html"><a href="tmle.html"><i class="fa fa-check"></i><b>6</b> TMLE</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="tmle.html"><a href="tmle.html#doubly-robust-estimators"><i class="fa fa-check"></i><b>6.1</b> Doubly robust estimators</a></li>
-<li class="chapter" data-level="6.2" data-path="tmle.html"><a href="tmle.html#targeted-maximum-likelihood-estimation-tmle"><i class="fa fa-check"></i><b>6.2</b> Targeted Maximum Likelihood Estimation (TMLE)</a></li>
-<li class="chapter" data-level="6.3" data-path="tmle.html"><a href="tmle.html#transformation-of-continuous-outcome-variable"><i class="fa fa-check"></i><b>6.3</b> Transformation of continuous outcome variable</a></li>
-<li class="chapter" data-level="6.4" data-path="tmle.html"><a href="tmle.html#initial-estimate"><i class="fa fa-check"></i><b>6.4</b> Initial estimate</a></li>
-<li class="chapter" data-level="6.5" data-path="tmle.html"><a href="tmle.html#estimate-the-propensity-scores"><i class="fa fa-check"></i><b>6.5</b> Estimate the propensity scores</a>
+<li class="chapter" data-level="6.2" data-path="tmle.html"><a href="tmle.html#tmle-1"><i class="fa fa-check"></i><b>6.2</b> TMLE</a></li>
+<li class="chapter" data-level="6.3" data-path="tmle.html"><a href="tmle.html#tmle-steps"><i class="fa fa-check"></i><b>6.3</b> TMLE Steps</a></li>
+<li class="chapter" data-level="6.4" data-path="tmle.html"><a href="tmle.html#step-1-transformation-of-y"><i class="fa fa-check"></i><b>6.4</b> Step 1: Transformation of Y</a></li>
+<li class="chapter" data-level="6.5" data-path="tmle.html"><a href="tmle.html#step-2-initial-g-comp-estimate"><i class="fa fa-check"></i><b>6.5</b> Step 2: Initial G-comp estimate</a>
 <ul>
-<li class="chapter" data-level="6.5.1" data-path="tmle.html"><a href="tmle.html#use-the-propensity-scores-to-update-the-initial-estimate"><i class="fa fa-check"></i><b>6.5.1</b> Use the propensity scores to update the initial estimate</a></li>
+<li class="chapter" data-level="6.5.1" data-path="tmle.html"><a href="tmle.html#get-predictions-under-both-treatments-a-0-and-1"><i class="fa fa-check"></i><b>6.5.1</b> Get predictions under both treatments <span class="math inline">\(A = 0\)</span> and <span class="math inline">\(1\)</span></a></li>
+<li class="chapter" data-level="6.5.2" data-path="tmle.html"><a href="tmle.html#get-initial-treatment-effect-estimate"><i class="fa fa-check"></i><b>6.5.2</b> Get initial treatment effect estimate</a></li>
 </ul></li>
-<li class="chapter" data-level="6.6" data-path="tmle.html"><a href="tmle.html#treatment-effect-estimate-4"><i class="fa fa-check"></i><b>6.6</b> Treatment effect estimate</a></li>
-<li class="chapter" data-level="6.7" data-path="tmle.html"><a href="tmle.html#statistical-inference"><i class="fa fa-check"></i><b>6.7</b> Statistical inference</a></li>
+<li class="chapter" data-level="6.6" data-path="tmle.html"><a href="tmle.html#step-3-ps-model"><i class="fa fa-check"></i><b>6.6</b> Step 3: PS model</a></li>
+<li class="chapter" data-level="6.7" data-path="tmle.html"><a href="tmle.html#step-4-estimate-h"><i class="fa fa-check"></i><b>6.7</b> Step 4: Estimate <span class="math inline">\(H\)</span></a></li>
+<li class="chapter" data-level="6.8" data-path="tmle.html"><a href="tmle.html#step-5-estimate-epsilon"><i class="fa fa-check"></i><b>6.8</b> Step 5: Estimate <span class="math inline">\(\epsilon\)</span></a>
+<ul>
+<li class="chapter" data-level="6.8.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1"><i class="fa fa-check"></i><b>6.8.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.8.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon"><i class="fa fa-check"></i><b>6.8.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.9" data-path="tmle.html"><a href="tmle.html#step-6-update"><i class="fa fa-check"></i><b>6.9</b> Step 6: Update</a>
+<ul>
+<li class="chapter" data-level="6.9.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-1"><i class="fa fa-check"></i><b>6.9.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.9.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-1"><i class="fa fa-check"></i><b>6.9.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.10" data-path="tmle.html"><a href="tmle.html#step-7-effect-estimate"><i class="fa fa-check"></i><b>6.10</b> Step 7: Effect estimate</a>
+<ul>
+<li class="chapter" data-level="6.10.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-2"><i class="fa fa-check"></i><b>6.10.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.10.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-2"><i class="fa fa-check"></i><b>6.10.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.11" data-path="tmle.html"><a href="tmle.html#step-8-rescale-effect-estimate"><i class="fa fa-check"></i><b>6.11</b> Step 8: Rescale effect estimate</a>
+<ul>
+<li class="chapter" data-level="6.11.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-3"><i class="fa fa-check"></i><b>6.11.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.11.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-3"><i class="fa fa-check"></i><b>6.11.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.12" data-path="tmle.html"><a href="tmle.html#step-9-confidence-interval-estimation"><i class="fa fa-check"></i><b>6.12</b> Step 9: Confidence interval estimation</a>
+<ul>
+<li class="chapter" data-level="6.12.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-4"><i class="fa fa-check"></i><b>6.12.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.12.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-4"><i class="fa fa-check"></i><b>6.12.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>7</b> Pre-packaged software</a>
 <ul>
-<li class="chapter" data-level="7.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3"><i class="fa fa-check"></i><b>7.1</b> sl3</a></li>
-<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-1"><i class="fa fa-check"></i><b>7.2</b> tmle</a></li>
-<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#ltmle"><i class="fa fa-check"></i><b>7.3</b> ltmle</a></li>
-<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>7.4</b> AIPW</a></li>
-<li class="chapter" data-level="7.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.5</b> RHC results</a></li>
-<li class="chapter" data-level="7.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.6</b> Other packages</a></li>
+<li class="chapter" data-level="7.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-2"><i class="fa fa-check"></i><b>7.1</b> tmle</a></li>
+<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3-optional"><i class="fa fa-check"></i><b>7.2</b> sl3 (optional)</a></li>
+<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.3</b> RHC results</a></li>
+<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.4</b> Other packages</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>8</b> Final Words</a>
 <ul>
@@ -321,16 +342,6 @@ div.csl-indent {
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html"><i class="fa fa-check"></i>Preface</a>
-<ul>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#background-1"><i class="fa fa-check"></i>Background</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#goal-1"><i class="fa fa-check"></i>Goal</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#philosophy-1"><i class="fa fa-check"></i>Philosophy</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#pre-requisites-1"><i class="fa fa-check"></i>Pre-requisites</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#version-history-1"><i class="fa fa-check"></i>Version history</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#contributor-list-1"><i class="fa fa-check"></i>Contributor list</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#license-1"><i class="fa fa-check"></i>License</a></li>
-</ul></li>
 <li class="divider"></li>
 <li><a href="https://ehsank.com/" target="blank">Contact</a></li>
 
@@ -360,39 +371,39 @@ div.csl-indent {
 </ul>
 <div id="g-comp-using-regression-tree" class="section level2" number="3.1">
 <h2><span class="header-section-number">3.1</span> G-comp using Regression tree</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="g-computation-using-ml.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
-<span id="cb1-2"><a href="g-computation-using-ml.html#cb1-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span>
-<span id="cb1-3"><a href="g-computation-using-ml.html#cb1-3" aria-hidden="true" tabindex="-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span>A))</span>
-<span id="cb1-4"><a href="g-computation-using-ml.html#cb1-4" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;Y~ A +&quot;</span>,</span>
-<span id="cb1-5"><a href="g-computation-using-ml.html#cb1-5" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">paste</span>(baselinevars,</span>
-<span id="cb1-6"><a href="g-computation-using-ml.html#cb1-6" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="g-computation-using-ml.html#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
+<span id="cb66-2"><a href="g-computation-using-ml.html#cb66-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span>
+<span id="cb66-3"><a href="g-computation-using-ml.html#cb66-3" aria-hidden="true" tabindex="-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span>A))</span>
+<span id="cb66-4"><a href="g-computation-using-ml.html#cb66-4" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;Y~ A +&quot;</span>,</span>
+<span id="cb66-5"><a href="g-computation-using-ml.html#cb66-5" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">paste</span>(baselinevars,</span>
+<span id="cb66-6"><a href="g-computation-using-ml.html#cb66-6" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span></code></pre></div>
 <div id="a-tree-based-algorithm" class="section level3" number="3.1.1">
 <h3><span class="header-section-number">3.1.1</span> A tree based algorithm</h3>
 <p>XGBoost is a fast version of gradient boosting algorithm. Let us use this one to fit the data first. We follow the exact same procedure that we followed in the parametric G-computation setting.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="g-computation-using-ml.html#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(xgboost)</span>
-<span id="cb2-2"><a href="g-computation-using-ml.html#cb2-2" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span>ObsData<span class="sc">$</span>Y </span>
-<span id="cb2-3"><a href="g-computation-using-ml.html#cb2-3" aria-hidden="true" tabindex="-1"></a>ObsData.matrix <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(out.formula, <span class="at">data =</span> ObsData)</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="g-computation-using-ml.html#cb3-1" aria-hidden="true" tabindex="-1"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">xgboost</span>(<span class="at">data =</span> ObsData.matrix, </span>
-<span id="cb3-2"><a href="g-computation-using-ml.html#cb3-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">label =</span> Y,</span>
-<span id="cb3-3"><a href="g-computation-using-ml.html#cb3-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">max.depth =</span> <span class="dv">10</span>, </span>
-<span id="cb3-4"><a href="g-computation-using-ml.html#cb3-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">eta =</span> <span class="dv">1</span>, </span>
-<span id="cb3-5"><a href="g-computation-using-ml.html#cb3-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">nthread =</span> <span class="dv">15</span>, </span>
-<span id="cb3-6"><a href="g-computation-using-ml.html#cb3-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">nrounds =</span> <span class="dv">100</span>, </span>
-<span id="cb3-7"><a href="g-computation-using-ml.html#cb3-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
-<span id="cb3-8"><a href="g-computation-using-ml.html#cb3-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">objective =</span> <span class="st">&quot;reg:squarederror&quot;</span>, </span>
-<span id="cb3-9"><a href="g-computation-using-ml.html#cb3-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">verbose =</span> <span class="dv">0</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="g-computation-using-ml.html#cb4-1" aria-hidden="true" tabindex="-1"></a>predY <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit3, <span class="at">newdata =</span> ObsData.matrix)</span>
-<span id="cb4-2"><a href="g-computation-using-ml.html#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(Y), </span>
-<span id="cb4-3"><a href="g-computation-using-ml.html#cb4-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, </span>
-<span id="cb4-4"><a href="g-computation-using-ml.html#cb4-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Predicted and observed Y&quot;</span>,</span>
-<span id="cb4-5"><a href="g-computation-using-ml.html#cb4-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">100</span>))  </span>
-<span id="cb4-6"><a href="g-computation-using-ml.html#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, </span>
-<span id="cb4-7"><a href="g-computation-using-ml.html#cb4-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>,<span class="st">&quot;Predicted Y&quot;</span>), </span>
-<span id="cb4-8"><a href="g-computation-using-ml.html#cb4-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), </span>
-<span id="cb4-9"><a href="g-computation-using-ml.html#cb4-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>,<span class="st">&quot;blue&quot;</span>))</span>
-<span id="cb4-10"><a href="g-computation-using-ml.html#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(predY), <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="g-computation-using-ml.html#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(xgboost)</span>
+<span id="cb67-2"><a href="g-computation-using-ml.html#cb67-2" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span>ObsData<span class="sc">$</span>Y </span>
+<span id="cb67-3"><a href="g-computation-using-ml.html#cb67-3" aria-hidden="true" tabindex="-1"></a>ObsData.matrix <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(out.formula, <span class="at">data =</span> ObsData)</span></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="g-computation-using-ml.html#cb68-1" aria-hidden="true" tabindex="-1"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">xgboost</span>(<span class="at">data =</span> ObsData.matrix, </span>
+<span id="cb68-2"><a href="g-computation-using-ml.html#cb68-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">label =</span> Y,</span>
+<span id="cb68-3"><a href="g-computation-using-ml.html#cb68-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">max.depth =</span> <span class="dv">10</span>, </span>
+<span id="cb68-4"><a href="g-computation-using-ml.html#cb68-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">eta =</span> <span class="dv">1</span>, </span>
+<span id="cb68-5"><a href="g-computation-using-ml.html#cb68-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">nthread =</span> <span class="dv">15</span>, </span>
+<span id="cb68-6"><a href="g-computation-using-ml.html#cb68-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">nrounds =</span> <span class="dv">100</span>, </span>
+<span id="cb68-7"><a href="g-computation-using-ml.html#cb68-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
+<span id="cb68-8"><a href="g-computation-using-ml.html#cb68-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">objective =</span> <span class="st">&quot;reg:squarederror&quot;</span>, </span>
+<span id="cb68-9"><a href="g-computation-using-ml.html#cb68-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">verbose =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="g-computation-using-ml.html#cb69-1" aria-hidden="true" tabindex="-1"></a>predY <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit3, <span class="at">newdata =</span> ObsData.matrix)</span>
+<span id="cb69-2"><a href="g-computation-using-ml.html#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(Y), </span>
+<span id="cb69-3"><a href="g-computation-using-ml.html#cb69-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, </span>
+<span id="cb69-4"><a href="g-computation-using-ml.html#cb69-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Predicted and observed Y&quot;</span>,</span>
+<span id="cb69-5"><a href="g-computation-using-ml.html#cb69-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">100</span>))  </span>
+<span id="cb69-6"><a href="g-computation-using-ml.html#cb69-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, </span>
+<span id="cb69-7"><a href="g-computation-using-ml.html#cb69-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>,<span class="st">&quot;Predicted Y&quot;</span>), </span>
+<span id="cb69-8"><a href="g-computation-using-ml.html#cb69-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), </span>
+<span id="cb69-9"><a href="g-computation-using-ml.html#cb69-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>,<span class="st">&quot;blue&quot;</span>))</span>
+<span id="cb69-10"><a href="g-computation-using-ml.html#cb69-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(predY), <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><img src="TMLEw_files/figure-html/ML1fit2-1.png" width="672" /></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="g-computation-using-ml.html#cb5-1" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">RMSE</span>(predY,Y)</span></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="g-computation-using-ml.html#cb70-1" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">RMSE</span>(predY,Y)</span></code></pre></div>
 <pre><code>## [1] 0.01255211</code></pre>
 <ul>
 <li>What we have done here is we have used the <code>ObsData.matrix</code> data to train our model, and we have used <code>newdata = ObsData.matrix</code> to obtain prediction.</li>
@@ -436,46 +447,46 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 </ul></li>
 </ul>
 <p>We use <code>caret</code> package to do cross-validation. This is a general framework package for machine learning that can also incorporate other ML approaches such as <code>xgboost</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="g-computation-using-ml.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(caret)</span>
-<span id="cb7-2"><a href="g-computation-using-ml.html#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb7-3"><a href="g-computation-using-ml.html#cb7-3" aria-hidden="true" tabindex="-1"></a>X_ObsData.matrix <span class="ot">&lt;-</span> <span class="fu">xgb.DMatrix</span>(ObsData.matrix)</span>
-<span id="cb7-4"><a href="g-computation-using-ml.html#cb7-4" aria-hidden="true" tabindex="-1"></a>Y_ObsData <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Y</span></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="g-computation-using-ml.html#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(caret)</span>
+<span id="cb72-2"><a href="g-computation-using-ml.html#cb72-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb72-3"><a href="g-computation-using-ml.html#cb72-3" aria-hidden="true" tabindex="-1"></a>X_ObsData.matrix <span class="ot">&lt;-</span> <span class="fu">xgb.DMatrix</span>(ObsData.matrix)</span>
+<span id="cb72-4"><a href="g-computation-using-ml.html#cb72-4" aria-hidden="true" tabindex="-1"></a>Y_ObsData <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Y</span></code></pre></div>
 <p>Below we define <span class="math inline">\(K = 3\)</span> for cross-valudation. Ideally for a sample size close to <span class="math inline">\(n=5,000\)</span>, we would select <span class="math inline">\(K=10\)</span>, but for learning / demonstration / computational time-saving purposes, we just use <span class="math inline">\(K = 3\)</span>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="g-computation-using-ml.html#cb8-1" aria-hidden="true" tabindex="-1"></a>xgb_trcontrol <span class="ot">=</span> <span class="fu">trainControl</span>(</span>
-<span id="cb8-2"><a href="g-computation-using-ml.html#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;cv&quot;</span>,</span>
-<span id="cb8-3"><a href="g-computation-using-ml.html#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">number =</span> <span class="dv">3</span>,  </span>
-<span id="cb8-4"><a href="g-computation-using-ml.html#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">allowParallel =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb8-5"><a href="g-computation-using-ml.html#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">verboseIter =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb8-6"><a href="g-computation-using-ml.html#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">returnData =</span> <span class="cn">FALSE</span></span>
-<span id="cb8-7"><a href="g-computation-using-ml.html#cb8-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="g-computation-using-ml.html#cb73-1" aria-hidden="true" tabindex="-1"></a>xgb_trcontrol <span class="ot">=</span> <span class="fu">trainControl</span>(</span>
+<span id="cb73-2"><a href="g-computation-using-ml.html#cb73-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;cv&quot;</span>,</span>
+<span id="cb73-3"><a href="g-computation-using-ml.html#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">number =</span> <span class="dv">3</span>,  </span>
+<span id="cb73-4"><a href="g-computation-using-ml.html#cb73-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">allowParallel =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb73-5"><a href="g-computation-using-ml.html#cb73-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">verboseIter =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb73-6"><a href="g-computation-using-ml.html#cb73-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">returnData =</span> <span class="cn">FALSE</span></span>
+<span id="cb73-7"><a href="g-computation-using-ml.html#cb73-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>One of the advantages of <code>caret</code> framework is that, it also allows checking the impact of various parameters. For example,</p>
 <ul>
 <li>for interaction dept, we previously use <code>max.depth = 10</code>. That means <span class="math inline">\(covariate^{10}\)</span> polynomial.</li>
 <li>We could also check if other interaction dept choices (such as <span class="math inline">\(covariate^{2}\)</span> or <span class="math inline">\(covariate^{4}\)</span>) would be better in terms of honest predictions.</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="g-computation-using-ml.html#cb9-1" aria-hidden="true" tabindex="-1"></a>xgbGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
-<span id="cb9-2"><a href="g-computation-using-ml.html#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">nrounds =</span> <span class="dv">100</span>, </span>
-<span id="cb9-3"><a href="g-computation-using-ml.html#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_depth =</span> <span class="fu">seq</span>(<span class="dv">2</span>,<span class="dv">10</span>,<span class="dv">2</span>),</span>
-<span id="cb9-4"><a href="g-computation-using-ml.html#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">eta =</span> <span class="dv">1</span>,</span>
-<span id="cb9-5"><a href="g-computation-using-ml.html#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">gamma =</span> <span class="dv">0</span>,</span>
-<span id="cb9-6"><a href="g-computation-using-ml.html#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">colsample_bytree =</span> <span class="fl">0.1</span>,</span>
-<span id="cb9-7"><a href="g-computation-using-ml.html#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">min_child_weight =</span> <span class="dv">2</span>,</span>
-<span id="cb9-8"><a href="g-computation-using-ml.html#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">subsample =</span> <span class="fl">0.5</span> </span>
-<span id="cb9-9"><a href="g-computation-using-ml.html#cb9-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="g-computation-using-ml.html#cb74-1" aria-hidden="true" tabindex="-1"></a>xgbGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb74-2"><a href="g-computation-using-ml.html#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">nrounds =</span> <span class="dv">100</span>, </span>
+<span id="cb74-3"><a href="g-computation-using-ml.html#cb74-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_depth =</span> <span class="fu">seq</span>(<span class="dv">2</span>,<span class="dv">10</span>,<span class="dv">2</span>),</span>
+<span id="cb74-4"><a href="g-computation-using-ml.html#cb74-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">eta =</span> <span class="dv">1</span>,</span>
+<span id="cb74-5"><a href="g-computation-using-ml.html#cb74-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">gamma =</span> <span class="dv">0</span>,</span>
+<span id="cb74-6"><a href="g-computation-using-ml.html#cb74-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">colsample_bytree =</span> <span class="fl">0.1</span>,</span>
+<span id="cb74-7"><a href="g-computation-using-ml.html#cb74-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">min_child_weight =</span> <span class="dv">2</span>,</span>
+<span id="cb74-8"><a href="g-computation-using-ml.html#cb74-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">subsample =</span> <span class="fl">0.5</span> </span>
+<span id="cb74-9"><a href="g-computation-using-ml.html#cb74-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>one we set</p>
 <ul>
 <li>resampling or cross-validation settings</li>
 <li>parameter grid</li>
 </ul>
 <p>we can fit the model:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="g-computation-using-ml.html#cb10-1" aria-hidden="true" tabindex="-1"></a>fit.xgb <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb10-2"><a href="g-computation-using-ml.html#cb10-2" aria-hidden="true" tabindex="-1"></a>  X_ObsData.matrix, Y_ObsData,  </span>
-<span id="cb10-3"><a href="g-computation-using-ml.html#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> xgb_trcontrol,</span>
-<span id="cb10-4"><a href="g-computation-using-ml.html#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;xgbTree&quot;</span>,</span>
-<span id="cb10-5"><a href="g-computation-using-ml.html#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> xgbGrid,</span>
-<span id="cb10-6"><a href="g-computation-using-ml.html#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb10-7"><a href="g-computation-using-ml.html#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-8"><a href="g-computation-using-ml.html#cb10-8" aria-hidden="true" tabindex="-1"></a>fit.xgb</span></code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="g-computation-using-ml.html#cb75-1" aria-hidden="true" tabindex="-1"></a>fit.xgb <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb75-2"><a href="g-computation-using-ml.html#cb75-2" aria-hidden="true" tabindex="-1"></a>  X_ObsData.matrix, Y_ObsData,  </span>
+<span id="cb75-3"><a href="g-computation-using-ml.html#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> xgb_trcontrol,</span>
+<span id="cb75-4"><a href="g-computation-using-ml.html#cb75-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;xgbTree&quot;</span>,</span>
+<span id="cb75-5"><a href="g-computation-using-ml.html#cb75-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> xgbGrid,</span>
+<span id="cb75-6"><a href="g-computation-using-ml.html#cb75-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb75-7"><a href="g-computation-using-ml.html#cb75-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb75-8"><a href="g-computation-using-ml.html#cb75-8" aria-hidden="true" tabindex="-1"></a>fit.xgb</span></code></pre></div>
 <pre><code>## eXtreme Gradient Boosting 
 ## 
 ## No pre-processing
@@ -499,45 +510,48 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 ## The final values used for the model were nrounds = 100, max_depth = 2, eta =
 ##  1, gamma = 0, colsample_bytree = 0.1, min_child_weight = 2 and subsample = 0.5.</code></pre>
 <p>Based on the loss function (say, RMSE) it automatically chose the best tuning parameter set:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="g-computation-using-ml.html#cb12-1" aria-hidden="true" tabindex="-1"></a>fit.xgb<span class="sc">$</span>bestTune<span class="sc">$</span>max_depth</span></code></pre></div>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="g-computation-using-ml.html#cb77-1" aria-hidden="true" tabindex="-1"></a>fit.xgb<span class="sc">$</span>bestTune<span class="sc">$</span>max_depth</span></code></pre></div>
 <pre><code>## [1] 2</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="g-computation-using-ml.html#cb14-1" aria-hidden="true" tabindex="-1"></a>predY <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.xgb, <span class="at">newdata =</span> ObsData.matrix)</span>
-<span id="cb14-2"><a href="g-computation-using-ml.html#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(Y), </span>
-<span id="cb14-3"><a href="g-computation-using-ml.html#cb14-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, </span>
-<span id="cb14-4"><a href="g-computation-using-ml.html#cb14-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Predicted and observed Y&quot;</span>,</span>
-<span id="cb14-5"><a href="g-computation-using-ml.html#cb14-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">100</span>))  </span>
-<span id="cb14-6"><a href="g-computation-using-ml.html#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, </span>
-<span id="cb14-7"><a href="g-computation-using-ml.html#cb14-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>,<span class="st">&quot;Predicted Y&quot;</span>), </span>
-<span id="cb14-8"><a href="g-computation-using-ml.html#cb14-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), </span>
-<span id="cb14-9"><a href="g-computation-using-ml.html#cb14-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>,<span class="st">&quot;blue&quot;</span>))</span>
-<span id="cb14-10"><a href="g-computation-using-ml.html#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(predY), <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code></pre></div>
-<p><img src="TMLEw_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="g-computation-using-ml.html#cb15-1" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">RMSE</span>(predY,Y)</span></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="g-computation-using-ml.html#cb79-1" aria-hidden="true" tabindex="-1"></a>predY <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.xgb, <span class="at">newdata =</span> ObsData.matrix)</span>
+<span id="cb79-2"><a href="g-computation-using-ml.html#cb79-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(Y), </span>
+<span id="cb79-3"><a href="g-computation-using-ml.html#cb79-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, </span>
+<span id="cb79-4"><a href="g-computation-using-ml.html#cb79-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;Predicted and observed Y&quot;</span>,</span>
+<span id="cb79-5"><a href="g-computation-using-ml.html#cb79-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">100</span>))  </span>
+<span id="cb79-6"><a href="g-computation-using-ml.html#cb79-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, </span>
+<span id="cb79-7"><a href="g-computation-using-ml.html#cb79-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>,<span class="st">&quot;Predicted Y&quot;</span>), </span>
+<span id="cb79-8"><a href="g-computation-using-ml.html#cb79-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), </span>
+<span id="cb79-9"><a href="g-computation-using-ml.html#cb79-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>,<span class="st">&quot;blue&quot;</span>))</span>
+<span id="cb79-10"><a href="g-computation-using-ml.html#cb79-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(predY), <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="TMLEw_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="g-computation-using-ml.html#cb80-1" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">RMSE</span>(predY,Y)</span></code></pre></div>
 <pre><code>## [1] 24.35099</code></pre>
 </div>
 <div id="extract-outcome-prediction-as-if-everyone-is-treated" class="section level3" number="3.1.3">
 <h3><span class="header-section-number">3.1.3</span> Extract outcome prediction as if everyone is treated</h3>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="g-computation-using-ml.html#cb17-1" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A1 <span class="ot">&lt;-</span> ObsData.matrix </span>
-<span id="cb17-2"><a href="g-computation-using-ml.html#cb17-2" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A1[,<span class="st">&quot;A&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb17-3"><a href="g-computation-using-ml.html#cb17-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.xgb, <span class="at">newdata =</span> ObsData.matrix.A1)</span>
-<span id="cb17-4"><a href="g-computation-using-ml.html#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="g-computation-using-ml.html#cb82-1" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A1 <span class="ot">&lt;-</span> ObsData.matrix </span>
+<span id="cb82-2"><a href="g-computation-using-ml.html#cb82-2" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A1[,<span class="st">&quot;A&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb82-3"><a href="g-computation-using-ml.html#cb82-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.xgb, <span class="at">newdata =</span> ObsData.matrix.A1)</span>
+<span id="cb82-4"><a href="g-computation-using-ml.html#cb82-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  -33.15   14.87   23.09   23.89   31.78  131.48</code></pre>
 </div>
 <div id="extract-outcome-prediction-as-if-everyone-is-untreated" class="section level3" number="3.1.4">
 <h3><span class="header-section-number">3.1.4</span> Extract outcome prediction as if everyone is untreated</h3>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="g-computation-using-ml.html#cb19-1" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A0 <span class="ot">&lt;-</span> ObsData.matrix</span>
-<span id="cb19-2"><a href="g-computation-using-ml.html#cb19-2" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A0[,<span class="st">&quot;A&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb19-3"><a href="g-computation-using-ml.html#cb19-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.xgb, <span class="at">newdata =</span> ObsData.matrix.A0)</span>
-<span id="cb19-4"><a href="g-computation-using-ml.html#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="g-computation-using-ml.html#cb84-1" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A0 <span class="ot">&lt;-</span> ObsData.matrix</span>
+<span id="cb84-2"><a href="g-computation-using-ml.html#cb84-2" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A0[,<span class="st">&quot;A&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb84-3"><a href="g-computation-using-ml.html#cb84-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.xgb, <span class="at">newdata =</span> ObsData.matrix.A0)</span>
+<span id="cb84-4"><a href="g-computation-using-ml.html#cb84-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  -37.31   10.72   18.96   19.78   27.69  127.31</code></pre>
 </div>
 <div id="treatment-effect-estimate-1" class="section level3" number="3.1.5">
 <h3><span class="header-section-number">3.1.5</span> Treatment effect estimate</h3>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="g-computation-using-ml.html#cb21-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="g-computation-using-ml.html#cb86-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
 <p>Mean value of predicted treatment effect</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="g-computation-using-ml.html#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="g-computation-using-ml.html#cb87-1" aria-hidden="true" tabindex="-1"></a>TE1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE)</span>
+<span id="cb87-2"><a href="g-computation-using-ml.html#cb87-2" aria-hidden="true" tabindex="-1"></a>TE1</span></code></pre></div>
+<pre><code>## [1] 4.110383</code></pre>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="g-computation-using-ml.html#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  -5.494   4.165   4.165   4.110   4.165   9.339</code></pre>
 <p>Notice that the mean is slightly different than the parametric G-computation method.</p>
@@ -551,22 +565,22 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 <ul>
 <li>We are again using cross-validation here, and we chose <span class="math inline">\(K=3\)</span>.</li>
 </ul>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="g-computation-using-ml.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(glmnet)</span>
-<span id="cb24-2"><a href="g-computation-using-ml.html#cb24-2" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span>ObsData<span class="sc">$</span>Y</span>
-<span id="cb24-3"><a href="g-computation-using-ml.html#cb24-3" aria-hidden="true" tabindex="-1"></a>ObsData.matrix <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(out.formula, <span class="at">data =</span> ObsData)</span>
-<span id="cb24-4"><a href="g-computation-using-ml.html#cb24-4" aria-hidden="true" tabindex="-1"></a>fit4 <span class="ot">&lt;-</span>  <span class="fu">cv.glmnet</span>(<span class="at">x =</span> ObsData.matrix, </span>
-<span id="cb24-5"><a href="g-computation-using-ml.html#cb24-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">y =</span> Y,</span>
-<span id="cb24-6"><a href="g-computation-using-ml.html#cb24-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">alpha =</span> <span class="dv">1</span>,</span>
-<span id="cb24-7"><a href="g-computation-using-ml.html#cb24-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">nfolds =</span> <span class="dv">3</span>,</span>
-<span id="cb24-8"><a href="g-computation-using-ml.html#cb24-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">relax=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="g-computation-using-ml.html#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(glmnet)</span>
+<span id="cb91-2"><a href="g-computation-using-ml.html#cb91-2" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span>ObsData<span class="sc">$</span>Y</span>
+<span id="cb91-3"><a href="g-computation-using-ml.html#cb91-3" aria-hidden="true" tabindex="-1"></a>ObsData.matrix <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(out.formula, <span class="at">data =</span> ObsData)</span>
+<span id="cb91-4"><a href="g-computation-using-ml.html#cb91-4" aria-hidden="true" tabindex="-1"></a>fit4 <span class="ot">&lt;-</span>  <span class="fu">cv.glmnet</span>(<span class="at">x =</span> ObsData.matrix, </span>
+<span id="cb91-5"><a href="g-computation-using-ml.html#cb91-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">y =</span> Y,</span>
+<span id="cb91-6"><a href="g-computation-using-ml.html#cb91-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">alpha =</span> <span class="dv">1</span>,</span>
+<span id="cb91-7"><a href="g-computation-using-ml.html#cb91-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">nfolds =</span> <span class="dv">3</span>,</span>
+<span id="cb91-8"><a href="g-computation-using-ml.html#cb91-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">relax=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="extract-outcome-prediction-as-if-everyone-is-treated-1" class="section level3" number="3.2.2">
 <h3><span class="header-section-number">3.2.2</span> Extract outcome prediction as if everyone is treated</h3>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="g-computation-using-ml.html#cb25-1" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A1 <span class="ot">&lt;-</span> ObsData.matrix </span>
-<span id="cb25-2"><a href="g-computation-using-ml.html#cb25-2" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A1[,<span class="st">&quot;A&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb25-3"><a href="g-computation-using-ml.html#cb25-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit4, <span class="at">newx =</span> ObsData.matrix.A1,</span>
-<span id="cb25-4"><a href="g-computation-using-ml.html#cb25-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">s =</span> <span class="st">&quot;lambda.min&quot;</span>)</span>
-<span id="cb25-5"><a href="g-computation-using-ml.html#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="g-computation-using-ml.html#cb92-1" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A1 <span class="ot">&lt;-</span> ObsData.matrix </span>
+<span id="cb92-2"><a href="g-computation-using-ml.html#cb92-2" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A1[,<span class="st">&quot;A&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb92-3"><a href="g-computation-using-ml.html#cb92-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit4, <span class="at">newx =</span> ObsData.matrix.A1,</span>
+<span id="cb92-4"><a href="g-computation-using-ml.html#cb92-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">s =</span> <span class="st">&quot;lambda.min&quot;</span>)</span>
+<span id="cb92-5"><a href="g-computation-using-ml.html#cb92-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
 <pre><code>##    lambda.min    
 ##  Min.   :-30.41  
 ##  1st Qu.: 19.53  
@@ -577,11 +591,11 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 </div>
 <div id="extract-outcome-prediction-as-if-everyone-is-untreated-1" class="section level3" number="3.2.3">
 <h3><span class="header-section-number">3.2.3</span> Extract outcome prediction as if everyone is untreated</h3>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="g-computation-using-ml.html#cb27-1" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A0 <span class="ot">&lt;-</span> ObsData.matrix</span>
-<span id="cb27-2"><a href="g-computation-using-ml.html#cb27-2" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A0[,<span class="st">&quot;A&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb27-3"><a href="g-computation-using-ml.html#cb27-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit4, <span class="at">newx =</span> ObsData.matrix.A0,</span>
-<span id="cb27-4"><a href="g-computation-using-ml.html#cb27-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">s =</span> <span class="st">&quot;lambda.min&quot;</span>)</span>
-<span id="cb27-5"><a href="g-computation-using-ml.html#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="g-computation-using-ml.html#cb94-1" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A0 <span class="ot">&lt;-</span> ObsData.matrix</span>
+<span id="cb94-2"><a href="g-computation-using-ml.html#cb94-2" aria-hidden="true" tabindex="-1"></a>ObsData.matrix.A0[,<span class="st">&quot;A&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb94-3"><a href="g-computation-using-ml.html#cb94-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit4, <span class="at">newx =</span> ObsData.matrix.A0,</span>
+<span id="cb94-4"><a href="g-computation-using-ml.html#cb94-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">s =</span> <span class="st">&quot;lambda.min&quot;</span>)</span>
+<span id="cb94-5"><a href="g-computation-using-ml.html#cb94-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
 <pre><code>##    lambda.min    
 ##  Min.   :-33.13  
 ##  1st Qu.: 16.81  
@@ -592,9 +606,12 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 </div>
 <div id="treatment-effect-estimate-2" class="section level3" number="3.2.4">
 <h3><span class="header-section-number">3.2.4</span> Treatment effect estimate</h3>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="g-computation-using-ml.html#cb29-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="g-computation-using-ml.html#cb96-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
 <p>Mean value of predicted treatment effect</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="g-computation-using-ml.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="g-computation-using-ml.html#cb97-1" aria-hidden="true" tabindex="-1"></a>TE2 <span class="ot">&lt;-</span> <span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE)</span>
+<span id="cb97-2"><a href="g-computation-using-ml.html#cb97-2" aria-hidden="true" tabindex="-1"></a>TE2</span></code></pre></div>
+<pre><code>## [1] 2.719739</code></pre>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="g-computation-using-ml.html#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
 <pre><code>##    lambda.min  
 ##  Min.   :2.72  
 ##  1st Qu.:2.72  
@@ -639,13 +656,13 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 <li>variable selection</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="g-computation-using-ml.html#cb32-1" aria-hidden="true" tabindex="-1"></a>SL.library.chosen<span class="ot">=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, <span class="st">&quot;SL.glmnet&quot;</span>, <span class="st">&quot;SL.xgboost&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="g-computation-using-ml.html#cb101-1" aria-hidden="true" tabindex="-1"></a>SL.library.chosen<span class="ot">=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, <span class="st">&quot;SL.glmnet&quot;</span>, <span class="st">&quot;SL.xgboost&quot;</span>)</span></code></pre></div>
 <p><strong>SuperLearner</strong> is an ensemble learning method. Let us use this one to fit the data first.</p>
 <ol start="2" style="list-style-type: decimal">
 <li><strong>Cross-validation</strong>:</li>
 </ol>
 <p>To combat against optimism, we use cross-validation. SuperLearner first <strong>splits</strong> the data according to chosen <span class="math inline">\(K\)</span> fold for the cross-validation.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="g-computation-using-ml.html#cb33-1" aria-hidden="true" tabindex="-1"></a>cvControl.chosen <span class="ot">=</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="g-computation-using-ml.html#cb102-1" aria-hidden="true" tabindex="-1"></a>cvControl.chosen <span class="ot">=</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>)</span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li><strong>Estimate risk</strong>:</li>
 </ol>
@@ -656,27 +673,27 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 <li>we average all the estimates risks</li>
 </ul>
 <p>We also chose a (non-negative) least squares loss function for the meta learner (explained below):</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="g-computation-using-ml.html#cb34-1" aria-hidden="true" tabindex="-1"></a>loss.chosen <span class="ot">=</span> <span class="st">&quot;method.NNLS&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="g-computation-using-ml.html#cb103-1" aria-hidden="true" tabindex="-1"></a>loss.chosen <span class="ot">=</span> <span class="st">&quot;method.NNLS&quot;</span></span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li><strong>Find SL prediction</strong></li>
 </ol>
 <p>We first fit the super learner:</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="g-computation-using-ml.html#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(SuperLearner)</span>
-<span id="cb35-2"><a href="g-computation-using-ml.html#cb35-2" aria-hidden="true" tabindex="-1"></a>ObsData.noY <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span>Y)</span>
-<span id="cb35-3"><a href="g-computation-using-ml.html#cb35-3" aria-hidden="true" tabindex="-1"></a>fit.sl <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>Y, </span>
-<span id="cb35-4"><a href="g-computation-using-ml.html#cb35-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noY, </span>
-<span id="cb35-5"><a href="g-computation-using-ml.html#cb35-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> cvControl.chosen,</span>
-<span id="cb35-6"><a href="g-computation-using-ml.html#cb35-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span>SL.library.chosen,</span>
-<span id="cb35-7"><a href="g-computation-using-ml.html#cb35-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span>loss.chosen,</span>
-<span id="cb35-8"><a href="g-computation-using-ml.html#cb35-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;gaussian&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="g-computation-using-ml.html#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(SuperLearner)</span>
+<span id="cb104-2"><a href="g-computation-using-ml.html#cb104-2" aria-hidden="true" tabindex="-1"></a>ObsData.noY <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span>Y)</span>
+<span id="cb104-3"><a href="g-computation-using-ml.html#cb104-3" aria-hidden="true" tabindex="-1"></a>fit.sl <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>Y, </span>
+<span id="cb104-4"><a href="g-computation-using-ml.html#cb104-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noY, </span>
+<span id="cb104-5"><a href="g-computation-using-ml.html#cb104-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> cvControl.chosen,</span>
+<span id="cb104-6"><a href="g-computation-using-ml.html#cb104-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span>SL.library.chosen,</span>
+<span id="cb104-7"><a href="g-computation-using-ml.html#cb104-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span>loss.chosen,</span>
+<span id="cb104-8"><a href="g-computation-using-ml.html#cb104-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;gaussian&quot;</span>)</span></code></pre></div>
 <p>We can obtain the <span class="math inline">\(K\)</span>-fold cross-validated risk estimates for each candidate learners.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="g-computation-using-ml.html#cb36-1" aria-hidden="true" tabindex="-1"></a>fit.sl<span class="sc">$</span>cvRisk</span></code></pre></div>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="g-computation-using-ml.html#cb105-1" aria-hidden="true" tabindex="-1"></a>fit.sl<span class="sc">$</span>cvRisk</span></code></pre></div>
 <pre><code>##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
 ##       634.4393       622.8681       737.5505</code></pre>
 <p>We can also obtain the predictions from each candidate learners.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="g-computation-using-ml.html#cb38-1" aria-hidden="true" tabindex="-1"></a>all.pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.sl, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
-<span id="cb38-2"><a href="g-computation-using-ml.html#cb38-2" aria-hidden="true" tabindex="-1"></a>Yhat <span class="ot">&lt;-</span> all.pred<span class="sc">$</span>library.predict</span>
-<span id="cb38-3"><a href="g-computation-using-ml.html#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(Yhat)</span></code></pre></div>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="g-computation-using-ml.html#cb107-1" aria-hidden="true" tabindex="-1"></a>all.pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.sl, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb107-2"><a href="g-computation-using-ml.html#cb107-2" aria-hidden="true" tabindex="-1"></a>Yhat <span class="ot">&lt;-</span> all.pred<span class="sc">$</span>library.predict</span>
+<span id="cb107-3"><a href="g-computation-using-ml.html#cb107-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(Yhat)</span></code></pre></div>
 <pre><code>##   SL.glm_All SL.glmnet_All SL.xgboost_All
 ## 1   14.61647      14.57121      14.890952
 ## 2   28.66305      28.96897      42.775368
@@ -689,12 +706,12 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 <li><strong>Discrete SL</strong>: measure of performance from all folds are averaged, and choose the <strong>best</strong> one. The prediction from the chosen learners are then used.</li>
 </ol>
 <p><code>glmnet</code> has the lowest cross-validated risk</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="g-computation-using-ml.html#cb40-1" aria-hidden="true" tabindex="-1"></a>lowest.risk.learner <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">which</span>(</span>
-<span id="cb40-2"><a href="g-computation-using-ml.html#cb40-2" aria-hidden="true" tabindex="-1"></a>  fit.sl<span class="sc">$</span>cvRisk <span class="sc">==</span> <span class="fu">min</span>(fit.sl<span class="sc">$</span>cvRisk)))</span>
-<span id="cb40-3"><a href="g-computation-using-ml.html#cb40-3" aria-hidden="true" tabindex="-1"></a>lowest.risk.learner</span></code></pre></div>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="g-computation-using-ml.html#cb109-1" aria-hidden="true" tabindex="-1"></a>lowest.risk.learner <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">which</span>(</span>
+<span id="cb109-2"><a href="g-computation-using-ml.html#cb109-2" aria-hidden="true" tabindex="-1"></a>  fit.sl<span class="sc">$</span>cvRisk <span class="sc">==</span> <span class="fu">min</span>(fit.sl<span class="sc">$</span>cvRisk)))</span>
+<span id="cb109-3"><a href="g-computation-using-ml.html#cb109-3" aria-hidden="true" tabindex="-1"></a>lowest.risk.learner</span></code></pre></div>
 <pre><code>## [1] &quot;SL.glmnet_All&quot;</code></pre>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="g-computation-using-ml.html#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.matrix</span>(<span class="fu">head</span>(Yhat[,lowest.risk.learner]), </span>
-<span id="cb42-2"><a href="g-computation-using-ml.html#cb42-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">ncol=</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="g-computation-using-ml.html#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.matrix</span>(<span class="fu">head</span>(Yhat[,lowest.risk.learner]), </span>
+<span id="cb111-2"><a href="g-computation-using-ml.html#cb111-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">ncol=</span><span class="dv">1</span>)</span></code></pre></div>
 <pre><code>##       [,1]
 ## 1 14.57121
 ## 2 28.96897
@@ -706,7 +723,7 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 <li><strong>Ensamble SL</strong>:</li>
 </ol>
 <p>Here are the first 6 rows from the candidate learner predictions:</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="g-computation-using-ml.html#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(Yhat)</span></code></pre></div>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="g-computation-using-ml.html#cb113-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(Yhat)</span></code></pre></div>
 <pre><code>##   SL.glm_All SL.glmnet_All SL.xgboost_All
 ## 1   14.61647      14.57121      14.890952
 ## 2   28.66305      28.96897      42.775368
@@ -730,7 +747,7 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 <li><p>Scaled coefficients <span class="math inline">\(\mathbf{\beta_{scaled}}\)</span> represents the <strong>value / importance of the corresponding candidate learner</strong>.</p></li>
 </ul>
 <p>Scaled coefs</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="g-computation-using-ml.html#cb46-1" aria-hidden="true" tabindex="-1"></a>fit.sl<span class="sc">$</span>coef</span></code></pre></div>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="g-computation-using-ml.html#cb115-1" aria-hidden="true" tabindex="-1"></a>fit.sl<span class="sc">$</span>coef</span></code></pre></div>
 <pre><code>##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
 ##     0.00000000     0.93740912     0.06259088</code></pre>
 <p>Hence, in creating superlearner prediction column,</p>
@@ -743,8 +760,8 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 <li>A new prediction column is produced based on the fitted values from this meta regression.</li>
 </ul>
 <p>You can simply multiply these coefs to the predictions from candidate learners, and them sum them to get ensable SL. Here are the first 6 values:</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="g-computation-using-ml.html#cb48-1" aria-hidden="true" tabindex="-1"></a>SL.ens <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">t</span>(Yhat)<span class="sc">*</span>fit.sl<span class="sc">$</span>coef)</span>
-<span id="cb48-2"><a href="g-computation-using-ml.html#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(SL.ens)</span></code></pre></div>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="g-computation-using-ml.html#cb117-1" aria-hidden="true" tabindex="-1"></a>SL.ens <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">t</span>(Yhat)<span class="sc">*</span>fit.sl<span class="sc">$</span>coef)</span>
+<span id="cb117-2"><a href="g-computation-using-ml.html#cb117-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(SL.ens)</span></code></pre></div>
 <pre><code>##   SL.glm_All SL.glmnet_All SL.xgboost_All
 ## 1          0      13.65919      0.9320378
 ## 2          0      27.15577      2.6773480
@@ -752,7 +769,7 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 ## 4          0      18.00642      1.5697163
 ## 5          0      11.42518      0.5520509
 ## 6          0      20.25714      0.7443745</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="g-computation-using-ml.html#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.matrix</span>(<span class="fu">head</span>(<span class="fu">rowSums</span>(SL.ens)), <span class="at">ncol =</span> <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="g-computation-using-ml.html#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.matrix</span>(<span class="fu">head</span>(<span class="fu">rowSums</span>(SL.ens)), <span class="at">ncol =</span> <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>##       [,1]
 ## 1 14.59123
 ## 2 29.83312
@@ -761,7 +778,7 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 ## 5 11.97723
 ## 6 21.00152</code></pre>
 <p>Alternatively, you can get them directly from the package: here are the first 6 values</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="g-computation-using-ml.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all.pred<span class="sc">$</span>pred)</span></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="g-computation-using-ml.html#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all.pred<span class="sc">$</span>pred)</span></code></pre></div>
 <pre><code>##       [,1]
 ## 1 14.59123
 ## 2 29.83312
@@ -774,12 +791,12 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 <div id="extract-outcome-prediction-as-if-everyone-is-treated-2" class="section level3" number="3.3.2">
 <h3><span class="header-section-number">3.3.2</span> Extract outcome prediction as if everyone is treated</h3>
 <p>We are going to use <strong>Ensamble SL</strong> predictions in the following calculations. If you wanted to use discrete SL predictions instead, that would be fine too.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="g-computation-using-ml.html#cb54-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb54-2"><a href="g-computation-using-ml.html#cb54-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
-<span id="cb54-3"><a href="g-computation-using-ml.html#cb54-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span></code></pre></div>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="g-computation-using-ml.html#cb123-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb123-2"><a href="g-computation-using-ml.html#cb123-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
+<span id="cb123-3"><a href="g-computation-using-ml.html#cb123-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span></code></pre></div>
 <pre><code>## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
 ## prediction from a rank-deficient fit may be misleading</code></pre>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="g-computation-using-ml.html#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="g-computation-using-ml.html#cb125-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
 <pre><code>##        V1        
 ##  Min.   :-31.15  
 ##  1st Qu.: 18.70  
@@ -790,12 +807,12 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 </div>
 <div id="extract-outcome-prediction-as-if-everyone-is-untreated-2" class="section level3" number="3.3.3">
 <h3><span class="header-section-number">3.3.3</span> Extract outcome prediction as if everyone is untreated</h3>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="g-computation-using-ml.html#cb58-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb58-2"><a href="g-computation-using-ml.html#cb58-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
-<span id="cb58-3"><a href="g-computation-using-ml.html#cb58-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span></code></pre></div>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="g-computation-using-ml.html#cb127-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb127-2"><a href="g-computation-using-ml.html#cb127-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
+<span id="cb127-3"><a href="g-computation-using-ml.html#cb127-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span></code></pre></div>
 <pre><code>## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
 ## prediction from a rank-deficient fit may be misleading</code></pre>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="g-computation-using-ml.html#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
+<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="g-computation-using-ml.html#cb129-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
 <pre><code>##        V1        
 ##  Min.   :-33.10  
 ##  1st Qu.: 16.76  
@@ -806,9 +823,12 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 </div>
 <div id="treatment-effect-estimate-3" class="section level3" number="3.3.4">
 <h3><span class="header-section-number">3.3.4</span> Treatment effect estimate</h3>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="g-computation-using-ml.html#cb62-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="g-computation-using-ml.html#cb131-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
 <p>Mean value of predicted treatment effect</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="g-computation-using-ml.html#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="g-computation-using-ml.html#cb132-1" aria-hidden="true" tabindex="-1"></a>TE3 <span class="ot">&lt;-</span> <span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE)</span>
+<span id="cb132-2"><a href="g-computation-using-ml.html#cb132-2" aria-hidden="true" tabindex="-1"></a>TE3</span></code></pre></div>
+<pre><code>## [1] 1.914702</code></pre>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="g-computation-using-ml.html#cb134-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
 <pre><code>##        V1       
 ##  Min.   :1.099  
 ##  1st Qu.:1.849  
@@ -825,20 +845,23 @@ Figure 3.1: Cross validation from <a href="https://en.wikipedia.org/wiki/Cross-v
 <li>if data is clustered and not independent and identically distributed, use ID for the <strong>cluster</strong></li>
 </ul>
 <p>Also, it is easy to show that, depending on the choice of meta-learners, the coefficients of the meta learners can be slightly different.</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="g-computation-using-ml.html#cb65-1" aria-hidden="true" tabindex="-1"></a>fit.sl2 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, <span class="at">method =</span> <span class="st">&quot;method.NNLS2&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="g-computation-using-ml.html#cb136-1" aria-hidden="true" tabindex="-1"></a>fit.sl2 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, <span class="at">method =</span> <span class="st">&quot;method.NNLS2&quot;</span>)</span></code></pre></div>
 <pre><code>## Loading required package: quadprog</code></pre>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="g-computation-using-ml.html#cb67-1" aria-hidden="true" tabindex="-1"></a>fit.sl2<span class="sc">$</span>coef</span></code></pre></div>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="g-computation-using-ml.html#cb138-1" aria-hidden="true" tabindex="-1"></a>fit.sl2<span class="sc">$</span>coef</span></code></pre></div>
 <pre><code>##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
 ##     0.00000000     0.93740912     0.06259088</code></pre>
-<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="g-computation-using-ml.html#cb69-1" aria-hidden="true" tabindex="-1"></a>fit.sl2 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, <span class="at">method =</span> <span class="st">&quot;method.CC_LS&quot;</span>)</span>
-<span id="cb69-2"><a href="g-computation-using-ml.html#cb69-2" aria-hidden="true" tabindex="-1"></a>fit.sl2<span class="sc">$</span>coef</span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="g-computation-using-ml.html#cb140-1" aria-hidden="true" tabindex="-1"></a>fit.sl2 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, <span class="at">method =</span> <span class="st">&quot;method.CC_LS&quot;</span>)</span>
+<span id="cb140-2"><a href="g-computation-using-ml.html#cb140-2" aria-hidden="true" tabindex="-1"></a>fit.sl2<span class="sc">$</span>coef</span></code></pre></div>
 <pre><code>##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
 ##     0.00000000     0.93662601     0.06337399</code></pre>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="g-computation-using-ml.html#cb71-1" aria-hidden="true" tabindex="-1"></a>fit.sl4 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, <span class="at">method =</span> <span class="st">&quot;method.CC_nloglik&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="g-computation-using-ml.html#cb142-1" aria-hidden="true" tabindex="-1"></a>fit.sl4 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, <span class="at">method =</span> <span class="st">&quot;method.CC_nloglik&quot;</span>)</span></code></pre></div>
 <pre><code>## Loading required package: nloptr</code></pre>
-<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="g-computation-using-ml.html#cb73-1" aria-hidden="true" tabindex="-1"></a>fit.sl4<span class="sc">$</span>coef</span></code></pre></div>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="g-computation-using-ml.html#cb144-1" aria-hidden="true" tabindex="-1"></a>fit.sl4<span class="sc">$</span>coef</span></code></pre></div>
 <pre><code>##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
 ##              0              1              0</code></pre>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="g-computation-using-ml.html#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(TE1, <span class="at">file =</span> <span class="st">&quot;data/gcompxg.RDS&quot;</span>)</span>
+<span id="cb146-2"><a href="g-computation-using-ml.html#cb146-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(TE2, <span class="at">file =</span> <span class="st">&quot;data/gcompls.RDS&quot;</span>)</span>
+<span id="cb146-3"><a href="g-computation-using-ml.html#cb146-3" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(TE3, <span class="at">file =</span> <span class="st">&quot;data/gcompsl.RDS&quot;</span>)</span></code></pre></div>
 
 </div>
 </div>

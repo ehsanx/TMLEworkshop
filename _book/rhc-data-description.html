@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-08-21" />
+<meta name="date" content="2021-08-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,6 +52,8 @@
 
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script type="text/javascript">
 
 // toggle visibility of R source blocks in R Markdown output
@@ -206,9 +208,8 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="1.7" data-path="rhc-data-description.html"><a href="rhc-data-description.html#comparison-with-literature"><i class="fa fa-check"></i><b>1.7</b> Comparison with literature</a>
 <ul>
-<li class="chapter" data-level="1.7.1" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm"><i class="fa fa-check"></i><b>1.7.1</b> PSM</a></li>
-<li class="chapter" data-level="1.7.2" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm-diagnostics"><i class="fa fa-check"></i><b>1.7.2</b> PSM diagnostics</a></li>
-<li class="chapter" data-level="1.7.3" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm-results"><i class="fa fa-check"></i><b>1.7.3</b> PSM results</a></li>
+<li class="chapter" data-level="1.7.1" data-path="rhc-data-description.html"><a href="rhc-data-description.html#psm-in-rhc-data"><i class="fa fa-check"></i><b>1.7.1</b> PSM in RHC data</a></li>
+<li class="chapter" data-level="1.7.2" data-path="rhc-data-description.html"><a href="rhc-data-description.html#tmle-in-rhc-data"><i class="fa fa-check"></i><b>1.7.2</b> TMLE in RHC data</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path="g-computation.html"><a href="g-computation.html"><i class="fa fa-check"></i><b>2</b> G-computation</a>
@@ -240,9 +241,10 @@ div.csl-indent {
 <li class="chapter" data-level="3.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-regression-tree"><i class="fa fa-check"></i><b>3.1</b> G-comp using Regression tree</a>
 <ul>
 <li class="chapter" data-level="3.1.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#a-tree-based-algorithm"><i class="fa fa-check"></i><b>3.1.1</b> A tree based algorithm</a></li>
-<li class="chapter" data-level="3.1.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-treated"><i class="fa fa-check"></i><b>3.1.2</b> Extract outcome prediction as if everyone is treated</a></li>
-<li class="chapter" data-level="3.1.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-untreated"><i class="fa fa-check"></i><b>3.1.3</b> Extract outcome prediction as if everyone is untreated</a></li>
-<li class="chapter" data-level="3.1.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#treatment-effect-estimate-1"><i class="fa fa-check"></i><b>3.1.4</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="3.1.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#cross-validation"><i class="fa fa-check"></i><b>3.1.2</b> Cross-validation</a></li>
+<li class="chapter" data-level="3.1.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-treated"><i class="fa fa-check"></i><b>3.1.3</b> Extract outcome prediction as if everyone is treated</a></li>
+<li class="chapter" data-level="3.1.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-untreated"><i class="fa fa-check"></i><b>3.1.4</b> Extract outcome prediction as if everyone is untreated</a></li>
+<li class="chapter" data-level="3.1.5" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#treatment-effect-estimate-1"><i class="fa fa-check"></i><b>3.1.5</b> Treatment effect estimate</a></li>
 </ul></li>
 <li class="chapter" data-level="3.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-regularized-methods"><i class="fa fa-check"></i><b>3.2</b> G-comp using regularized methods</a>
 <ul>
@@ -262,45 +264,65 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="4" data-path="iptw.html"><a href="iptw.html"><i class="fa fa-check"></i><b>4</b> IPTW</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="iptw.html"><a href="iptw.html#iptw-from-parametric-models"><i class="fa fa-check"></i><b>4.1</b> IPTW from parametric models</a>
-<ul>
-<li class="chapter" data-level="4.1.1" data-path="iptw.html"><a href="iptw.html#step-1-exposure-modelling"><i class="fa fa-check"></i><b>4.1.1</b> Step 1: exposure modelling</a></li>
-<li class="chapter" data-level="4.1.2" data-path="iptw.html"><a href="iptw.html#step-2-convert-ps-to-ipw"><i class="fa fa-check"></i><b>4.1.2</b> Step 2: Convert PS to IPW</a></li>
-<li class="chapter" data-level="4.1.3" data-path="iptw.html"><a href="iptw.html#step-3-balance-checking"><i class="fa fa-check"></i><b>4.1.3</b> Step 3: Balance checking</a></li>
-<li class="chapter" data-level="4.1.4" data-path="iptw.html"><a href="iptw.html#step-4-outcome-modelling"><i class="fa fa-check"></i><b>4.1.4</b> Step 4: outcome modelling</a></li>
-</ul></li>
+<li class="chapter" data-level="4.1" data-path="iptw.html"><a href="iptw.html#iptw-steps"><i class="fa fa-check"></i><b>4.1</b> IPTW steps</a></li>
+<li class="chapter" data-level="4.2" data-path="iptw.html"><a href="iptw.html#step-1-exposure-modelling"><i class="fa fa-check"></i><b>4.2</b> Step 1: exposure modelling</a></li>
+<li class="chapter" data-level="4.3" data-path="iptw.html"><a href="iptw.html#step-2-convert-ps-to-ipw"><i class="fa fa-check"></i><b>4.3</b> Step 2: Convert PS to IPW</a></li>
+<li class="chapter" data-level="4.4" data-path="iptw.html"><a href="iptw.html#step-3-balance-checking"><i class="fa fa-check"></i><b>4.4</b> Step 3: Balance checking</a></li>
+<li class="chapter" data-level="4.5" data-path="iptw.html"><a href="iptw.html#step-4-outcome-modelling"><i class="fa fa-check"></i><b>4.5</b> Step 4: outcome modelling</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html"><i class="fa fa-check"></i><b>5</b> IPTW using ML</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#iptw-from-superlearner"><i class="fa fa-check"></i><b>5.1</b> IPTW from Superlearner</a>
-<ul>
-<li class="chapter" data-level="5.1.1" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-1-exposure-modelling-1"><i class="fa fa-check"></i><b>5.1.1</b> Step 1: exposure modelling</a></li>
-<li class="chapter" data-level="5.1.2" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-2-convert-ps-to-ipw-1"><i class="fa fa-check"></i><b>5.1.2</b> Step 2: Convert PS to IPW</a></li>
-<li class="chapter" data-level="5.1.3" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-3-balance-checking-1"><i class="fa fa-check"></i><b>5.1.3</b> Step 3: Balance checking</a></li>
-<li class="chapter" data-level="5.1.4" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-4-outcome-modelling-1"><i class="fa fa-check"></i><b>5.1.4</b> Step 4: outcome modelling</a></li>
-</ul></li>
+<li class="chapter" data-level="5.1" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#iptw-steps-from-sl"><i class="fa fa-check"></i><b>5.1</b> IPTW Steps from SL</a></li>
+<li class="chapter" data-level="5.2" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-1-exposure-modelling-1"><i class="fa fa-check"></i><b>5.2</b> Step 1: exposure modelling</a></li>
+<li class="chapter" data-level="5.3" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-2-convert-ps-to-ipw-1"><i class="fa fa-check"></i><b>5.3</b> Step 2: Convert PS to IPW</a></li>
+<li class="chapter" data-level="5.4" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-3-balance-checking-1"><i class="fa fa-check"></i><b>5.4</b> Step 3: Balance checking</a></li>
+<li class="chapter" data-level="5.5" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-4-outcome-modelling-1"><i class="fa fa-check"></i><b>5.5</b> Step 4: outcome modelling</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="tmle.html"><a href="tmle.html"><i class="fa fa-check"></i><b>6</b> TMLE</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="tmle.html"><a href="tmle.html#doubly-robust-estimators"><i class="fa fa-check"></i><b>6.1</b> Doubly robust estimators</a></li>
-<li class="chapter" data-level="6.2" data-path="tmle.html"><a href="tmle.html#targeted-maximum-likelihood-estimation-tmle"><i class="fa fa-check"></i><b>6.2</b> Targeted Maximum Likelihood Estimation (TMLE)</a></li>
-<li class="chapter" data-level="6.3" data-path="tmle.html"><a href="tmle.html#transformation-of-continuous-outcome-variable"><i class="fa fa-check"></i><b>6.3</b> Transformation of continuous outcome variable</a></li>
-<li class="chapter" data-level="6.4" data-path="tmle.html"><a href="tmle.html#initial-estimate"><i class="fa fa-check"></i><b>6.4</b> Initial estimate</a></li>
-<li class="chapter" data-level="6.5" data-path="tmle.html"><a href="tmle.html#estimate-the-propensity-scores"><i class="fa fa-check"></i><b>6.5</b> Estimate the propensity scores</a>
+<li class="chapter" data-level="6.2" data-path="tmle.html"><a href="tmle.html#tmle-1"><i class="fa fa-check"></i><b>6.2</b> TMLE</a></li>
+<li class="chapter" data-level="6.3" data-path="tmle.html"><a href="tmle.html#tmle-steps"><i class="fa fa-check"></i><b>6.3</b> TMLE Steps</a></li>
+<li class="chapter" data-level="6.4" data-path="tmle.html"><a href="tmle.html#step-1-transformation-of-y"><i class="fa fa-check"></i><b>6.4</b> Step 1: Transformation of Y</a></li>
+<li class="chapter" data-level="6.5" data-path="tmle.html"><a href="tmle.html#step-2-initial-g-comp-estimate"><i class="fa fa-check"></i><b>6.5</b> Step 2: Initial G-comp estimate</a>
 <ul>
-<li class="chapter" data-level="6.5.1" data-path="tmle.html"><a href="tmle.html#use-the-propensity-scores-to-update-the-initial-estimate"><i class="fa fa-check"></i><b>6.5.1</b> Use the propensity scores to update the initial estimate</a></li>
+<li class="chapter" data-level="6.5.1" data-path="tmle.html"><a href="tmle.html#get-predictions-under-both-treatments-a-0-and-1"><i class="fa fa-check"></i><b>6.5.1</b> Get predictions under both treatments <span class="math inline">\(A = 0\)</span> and <span class="math inline">\(1\)</span></a></li>
+<li class="chapter" data-level="6.5.2" data-path="tmle.html"><a href="tmle.html#get-initial-treatment-effect-estimate"><i class="fa fa-check"></i><b>6.5.2</b> Get initial treatment effect estimate</a></li>
 </ul></li>
-<li class="chapter" data-level="6.6" data-path="tmle.html"><a href="tmle.html#treatment-effect-estimate-4"><i class="fa fa-check"></i><b>6.6</b> Treatment effect estimate</a></li>
-<li class="chapter" data-level="6.7" data-path="tmle.html"><a href="tmle.html#statistical-inference"><i class="fa fa-check"></i><b>6.7</b> Statistical inference</a></li>
+<li class="chapter" data-level="6.6" data-path="tmle.html"><a href="tmle.html#step-3-ps-model"><i class="fa fa-check"></i><b>6.6</b> Step 3: PS model</a></li>
+<li class="chapter" data-level="6.7" data-path="tmle.html"><a href="tmle.html#step-4-estimate-h"><i class="fa fa-check"></i><b>6.7</b> Step 4: Estimate <span class="math inline">\(H\)</span></a></li>
+<li class="chapter" data-level="6.8" data-path="tmle.html"><a href="tmle.html#step-5-estimate-epsilon"><i class="fa fa-check"></i><b>6.8</b> Step 5: Estimate <span class="math inline">\(\epsilon\)</span></a>
+<ul>
+<li class="chapter" data-level="6.8.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1"><i class="fa fa-check"></i><b>6.8.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.8.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon"><i class="fa fa-check"></i><b>6.8.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.9" data-path="tmle.html"><a href="tmle.html#step-6-update"><i class="fa fa-check"></i><b>6.9</b> Step 6: Update</a>
+<ul>
+<li class="chapter" data-level="6.9.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-1"><i class="fa fa-check"></i><b>6.9.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.9.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-1"><i class="fa fa-check"></i><b>6.9.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.10" data-path="tmle.html"><a href="tmle.html#step-7-effect-estimate"><i class="fa fa-check"></i><b>6.10</b> Step 7: Effect estimate</a>
+<ul>
+<li class="chapter" data-level="6.10.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-2"><i class="fa fa-check"></i><b>6.10.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.10.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-2"><i class="fa fa-check"></i><b>6.10.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.11" data-path="tmle.html"><a href="tmle.html#step-8-rescale-effect-estimate"><i class="fa fa-check"></i><b>6.11</b> Step 8: Rescale effect estimate</a>
+<ul>
+<li class="chapter" data-level="6.11.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-3"><i class="fa fa-check"></i><b>6.11.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.11.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-3"><i class="fa fa-check"></i><b>6.11.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.12" data-path="tmle.html"><a href="tmle.html#step-9-confidence-interval-estimation"><i class="fa fa-check"></i><b>6.12</b> Step 9: Confidence interval estimation</a>
+<ul>
+<li class="chapter" data-level="6.12.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-4"><i class="fa fa-check"></i><b>6.12.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.12.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-4"><i class="fa fa-check"></i><b>6.12.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>7</b> Pre-packaged software</a>
 <ul>
-<li class="chapter" data-level="7.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3"><i class="fa fa-check"></i><b>7.1</b> sl3</a></li>
-<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-1"><i class="fa fa-check"></i><b>7.2</b> tmle</a></li>
-<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#ltmle"><i class="fa fa-check"></i><b>7.3</b> ltmle</a></li>
-<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>7.4</b> AIPW</a></li>
-<li class="chapter" data-level="7.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.5</b> RHC results</a></li>
-<li class="chapter" data-level="7.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.6</b> Other packages</a></li>
+<li class="chapter" data-level="7.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-2"><i class="fa fa-check"></i><b>7.1</b> tmle</a></li>
+<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3-optional"><i class="fa fa-check"></i><b>7.2</b> sl3 (optional)</a></li>
+<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.3</b> RHC results</a></li>
+<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.4</b> Other packages</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>8</b> Final Words</a>
 <ul>
@@ -320,16 +342,6 @@ div.csl-indent {
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html"><i class="fa fa-check"></i>Preface</a>
-<ul>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#background-1"><i class="fa fa-check"></i>Background</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#goal-1"><i class="fa fa-check"></i>Goal</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#philosophy-1"><i class="fa fa-check"></i>Philosophy</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#pre-requisites-1"><i class="fa fa-check"></i>Pre-requisites</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#version-history-1"><i class="fa fa-check"></i>Version history</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#contributor-list-1"><i class="fa fa-check"></i>Contributor list</a></li>
-<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#license-1"><i class="fa fa-check"></i>License</a></li>
-</ul></li>
 <li class="divider"></li>
 <li><a href="https://ehsank.com/" target="blank">Contact</a></li>
 
@@ -569,8 +581,8 @@ div.csl-indent {
 <div id="comparison-with-literature" class="section level2" number="1.7">
 <h2><span class="header-section-number">1.7</span> Comparison with literature</h2>
 <p><span class="citation"><a href="#ref-connors1996effectiveness" role="doc-biblioref">Connors et al.</a> (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span> conducted a propensity score matching analysis. Table 5 in <span class="citation"><a href="#ref-connors1996effectiveness" role="doc-biblioref">Connors et al.</a> (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span> showed that, after propensity score pair (1-to-1) matching, means of length of stay (<span class="math inline">\(Y\)</span>), when stratified by RHC (<span class="math inline">\(A\)</span>) was significantly different.</p>
-<div id="psm" class="section level3" number="1.7.1">
-<h3><span class="header-section-number">1.7.1</span> PSM</h3>
+<div id="psm-in-rhc-data" class="section level3" number="1.7.1">
+<h3><span class="header-section-number">1.7.1</span> PSM in RHC data</h3>
 <p>We also conduct propensity score pair matching analysis, as follows.</p>
 <p><strong>Note</strong>: In this workshop, we will not cover Propensity Score Matching (PSM) in this workshop. If you want to learn more about this, feel free to check out this other workshop: <a href="https://ehsanx.github.io/psw/">Understanding Propensity Score Matching</a>.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="rhc-data-description.html#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
@@ -586,9 +598,8 @@ div.csl-indent {
 <span id="cb22-3"><a href="rhc-data-description.html#cb22-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">distance =</span> ObsData<span class="sc">$</span>PS,</span>
 <span id="cb22-4"><a href="rhc-data-description.html#cb22-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">method =</span> <span class="st">&quot;nearest&quot;</span>, <span class="at">replace=</span><span class="cn">FALSE</span>,</span>
 <span id="cb22-5"><a href="rhc-data-description.html#cb22-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ratio =</span> <span class="dv">1</span>, <span class="at">caliper =</span> .<span class="dv">1</span><span class="sc">*</span><span class="fu">sd</span>(logitPS))</span></code></pre></div>
-</div>
-<div id="psm-diagnostics" class="section level3" number="1.7.2">
-<h3><span class="header-section-number">1.7.2</span> PSM diagnostics</h3>
+<div id="psm-diagnostics" class="section level4" number="1.7.1.1">
+<h4><span class="header-section-number">1.7.1.1</span> PSM diagnostics</h4>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="rhc-data-description.html#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(cobalt)</span>
 <span id="cb23-2"><a href="rhc-data-description.html#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bal.plot</span>(match.obj, </span>
 <span id="cb23-3"><a href="rhc-data-description.html#cb23-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">var.name =</span> <span class="st">&quot;distance&quot;</span>, </span>
@@ -601,19 +612,35 @@ div.csl-indent {
 <p><img src="TMLEw_files/figure-html/ps2b-1.png" width="480" /></p>
 <p>The love plot suggests satisfactory propensity score matching (all SMD &lt; 0.1).</p>
 </div>
-<div id="psm-results" class="section level3" number="1.7.3">
-<h3><span class="header-section-number">1.7.3</span> PSM results</h3>
+<div id="psm-results" class="section level4" number="1.7.1.2">
+<h4><span class="header-section-number">1.7.1.2</span> PSM results</h4>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="rhc-data-description.html#cb25-1" aria-hidden="true" tabindex="-1"></a>matched.data <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj)</span>
 <span id="cb25-2"><a href="rhc-data-description.html#cb25-2" aria-hidden="true" tabindex="-1"></a>tab1y <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>),</span>
 <span id="cb25-3"><a href="rhc-data-description.html#cb25-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> matched.data, <span class="at">strata =</span> <span class="st">&quot;A&quot;</span>, </span>
 <span id="cb25-4"><a href="rhc-data-description.html#cb25-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">test =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb25-5"><a href="rhc-data-description.html#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(tab1y, <span class="at">showAllLevels =</span> <span class="cn">FALSE</span>, </span>
-<span id="cb25-6"><a href="rhc-data-description.html#cb25-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">test =</span> <span class="cn">TRUE</span>) </span></code></pre></div>
+<span id="cb25-6"><a href="rhc-data-description.html#cb25-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">test =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>##                Stratified by A
 ##                 0             1             p      test
 ##   n              1628          1628                    
 ##   Y (mean (SD)) 21.20 (25.58) 24.05 (27.49)  0.002</code></pre>
-<p>We also find the same conclusion based on propensity score pair matched data.</p>
+<ul>
+<li>Hence, we also find the same conclusion based on propensity score pair matched data.</li>
+<li>We can also estimate the effect of <code>RHC</code> on <code>length of stay</code> using propensity score-matched sample:</li>
+</ul>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="rhc-data-description.html#cb27-1" aria-hidden="true" tabindex="-1"></a>fit.matched <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y<span class="sc">~</span>A,</span>
+<span id="cb27-2"><a href="rhc-data-description.html#cb27-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">family=</span>gaussian, </span>
+<span id="cb27-3"><a href="rhc-data-description.html#cb27-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> matched.data)</span>
+<span id="cb27-4"><a href="rhc-data-description.html#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">publish</span>(fit.matched)</span></code></pre></div>
+<pre><code>##     Variable Units Coefficient         CI.95    p-value 
+##  (Intercept)             21.20 [19.91;22.49]    &lt; 1e-04 
+##            A              2.86   [1.03;4.68]   0.002172</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="rhc-data-description.html#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(fit.matched, <span class="at">file =</span> <span class="st">&quot;data/match.RDS&quot;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="tmle-in-rhc-data" class="section level3" number="1.7.2">
+<h3><span class="header-section-number">1.7.2</span> TMLE in RHC data</h3>
+<p>There are other papers that have used RHC data <span class="citation">(<a href="#ref-keele2021comparing" role="doc-biblioref">Keele and Small 2021</a>, <a href="#ref-keele2018pre" role="doc-biblioref">2018</a>)</span>. Particularly, <span class="citation"><a href="#ref-keele2021comparing" role="doc-biblioref">Keele and Small</a> (<a href="#ref-keele2021comparing" role="doc-biblioref">2021</a>)</span> used TMLE (with super learner) method in estimating the impact of RHC on length of stay, and found point estimate <span class="math inline">\(2.01 (95\% CI: 0.6-3.41)\)</span>. In today’s workshop, we will learn about TMLE method.</p>
 
 </div>
 </div>
@@ -622,6 +649,12 @@ div.csl-indent {
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-connors1996effectiveness" class="csl-entry">
 Connors, Alfred F, Theodore Speroff, Neal V Dawson, Charles Thomas, Frank E Harrell, Douglas Wagner, Norman Desbiens, et al. 1996. <span>“The Effectiveness of Right Heart Catheterization in the Initial Care of Critically III Patients.”</span> <em>Jama</em> 276 (11): 889–97. <a href="https://tinyurl.com/Connors1996">https://tinyurl.com/Connors1996</a>.
+</div>
+<div id="ref-keele2018pre" class="csl-entry">
+Keele, Luke, and Dylan S Small. 2018. <span>“Pre-Analysis Plan for a Comparison of Matching and Black Box-Based Covariate Adjustment.”</span> <em>Observational Studies</em> 4 (1): 97–110.
+</div>
+<div id="ref-keele2021comparing" class="csl-entry">
+———. 2021. <span>“Comparing Covariate Prioritization via Matching to Machine Learning Methods for Causal Inference Using Five Empirical Applications.”</span> <em>The American Statistician</em>, 1–9.
 </div>
 </div>
             </section>

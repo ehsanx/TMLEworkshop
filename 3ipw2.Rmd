@@ -2,7 +2,7 @@
 
 Similar to G-computation, we will try to use machine learning methods, particularly Superlearner in estimating IPW estimates
 
-```{r ipw2setup01, include=FALSE}
+```{r ipw2setup01ic, include=FALSE}
 require(knitr)
 require(glmnet)
 require(kableExtra)
@@ -162,3 +162,6 @@ out.fit <- glm(out.formula,
 publish(out.fit)
 ```
 
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(out.fit, file = "data/ipwsl.RDS")
+```

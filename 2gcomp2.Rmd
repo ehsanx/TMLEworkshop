@@ -1,6 +1,6 @@
 # G-computation using ML
 
-```{r setup01, include=FALSE}
+```{r setup01gm, include=FALSE}
 require(knitr)
 require(glmnet)
 require(kableExtra)
@@ -199,6 +199,8 @@ ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0
 Mean value of predicted treatment effect 
 
 ```{r reg2acnx1b, cache=cachex, echo = TRUE}
+TE1 <- mean(ObsData$Pred.TE)
+TE1
 summary(ObsData$Pred.TE)
 ```
 
@@ -257,6 +259,8 @@ ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0
 Mean value of predicted treatment effect 
 
 ```{r reg2acnx1br, cache=cachex, echo = TRUE}
+TE2 <- mean(ObsData$Pred.TE)
+TE2
 summary(ObsData$Pred.TE)
 ```
 
@@ -461,6 +465,8 @@ ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0
 Mean value of predicted treatment effect 
 
 ```{r reg2acnx1bs, cache=cachex, echo = TRUE}
+TE3 <- mean(ObsData$Pred.TE)
+TE3
 summary(ObsData$Pred.TE)
 ```
 
@@ -479,4 +485,10 @@ fit.sl2 <- recombineSL(fit.sl, Y = Y, method = "method.CC_LS")
 fit.sl2$coef
 fit.sl4 <- recombineSL(fit.sl, Y = Y, method = "method.CC_nloglik")
 fit.sl4$coef
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(TE1, file = "data/gcompxg.RDS")
+saveRDS(TE2, file = "data/gcompls.RDS")
+saveRDS(TE3, file = "data/gcompsl.RDS")
 ```
