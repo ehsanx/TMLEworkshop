@@ -1,3 +1,174 @@
+--- 
+title: "R Guide for TMLE in Medical Research"
+author: ""
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output:
+  bookdown::html_document2:
+    includes:
+      in_header: header.html
+  bookdown::gitbook:
+    includes:
+      in_header: header.html
+  bookdown::pdf_book:
+    includes:
+      in_header: header.html
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: ehsanx/intro2R
+description: "Intro to R."
+---
+
+# Preface {-}
+
+Placeholder
+
+
+## Background  {-}
+## Goal  {-}
+## Philosophy  {-}
+## Pre-requisites {-}
+## Version history {-}
+## Contributor list {-}
+## License {-}
+
+<!--chapter:end:index.Rmd-->
+
+
+# RHC data description
+
+Placeholder
+
+
+## Data download
+## Analytic data
+## Notations
+## Variables
+## Table 1 stratified by RHC exposure
+## Basic regression analysis
+### Crude analysis
+### Adjusted analysis
+### Regression diagnostics
+## Comparison with literature
+### PSM
+### PSM diagnostics
+### PSM results
+
+<!--chapter:end:1RHC.Rmd-->
+
+
+# G-computation
+
+Placeholder
+
+
+## Closer look at the data
+### View data from 6 participants
+### Restructure the data to estimate treatment effect
+### Treat the problem as a missing value problem
+### Impute better value?
+## Use Regression for predicting outcome
+### Predict outcome for treated
+### Look at the predicted outcome data for treated
+### Predict outcome for untreated
+### Look at the predicted outcome data for untreated
+### Look at the predicted outcome data for all!
+## Parametric G-computation
+### Steps
+### Treatment effect estimate
+## Estimating the confidence intervals
+
+<!--chapter:end:2gcomp.Rmd-->
+
+
+# G-computation using ML
+
+Placeholder
+
+
+## G-comp using Regression tree
+### A tree based algorithm
+### Cross-validation
+### Extract outcome prediction as if everyone is treated
+### Extract outcome prediction as if everyone is untreated
+### Treatment effect estimate
+## G-comp using regularized methods
+### A regularized model
+### Extract outcome prediction as if everyone is treated
+### Extract outcome prediction as if everyone is untreated
+### Treatment effect estimate
+## G-comp using SuperLearner
+### Steps  
+### Extract outcome prediction as if everyone is treated
+### Extract outcome prediction as if everyone is untreated
+### Treatment effect estimate
+### Additional details for SL
+
+<!--chapter:end:2gcomp2.Rmd-->
+
+
+# IPTW
+
+Placeholder
+
+
+## IPTW steps 
+## Step 1: exposure modelling
+## Step 2: Convert PS to IPW 
+## Step 3: Balance checking
+## Step 4: outcome modelling 
+
+<!--chapter:end:3ipw.Rmd-->
+
+
+# IPTW using ML
+
+Placeholder
+
+
+## IPTW Steps from SL
+## Step 1: exposure modelling
+## Step 2: Convert PS to IPW 
+## Step 3: Balance checking
+## Step 4: outcome modelling 
+
+<!--chapter:end:3ipw2.Rmd-->
+
+
+# TMLE
+
+Placeholder
+
+
+## Doubly robust estimators
+## TMLE
+## TMLE Steps
+## Step 1: Transformation of Y
+## Step 2: Initial G-comp estimate
+### Get predictions under both treatments $A = 0$ and $1$
+### Get initial treatment effect estimate
+## Step 3: PS model
+## Step 4: Estimate $H$ 
+## Step 5: Estimate $\epsilon$
+### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
+### Only 1 $\hat\epsilon$
+## Step 6: Update
+### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
+### Only 1 $\hat\epsilon$
+## Step 7: Effect estimate
+### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
+### Only 1 $\hat\epsilon$
+## Step 8: Rescale effect estimate
+### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
+### Only 1 $\hat\epsilon$
+## Step 9: Confidence interval estimation
+### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
+### Only 1 $\hat\epsilon$
+
+<!--chapter:end:4tmle.Rmd-->
+
 
 ```{r setup04, include=FALSE}
 require(knitr)
@@ -55,8 +226,8 @@ print(rhc_task)
 
 Next, we create our SuperLearner. To do this, 
 
-- we need to specify a **selection of machine learning algorithms** we want to include as candidates, as well as 
-- a **metalearner** that the SuperLearner will use to combine or choose from the machine learning algorithms provided (@coyle2021tlverse). 
+- we need to specify a selection of machine learning algorithms we want to include as candidates, as well as 
+- a metalearner that the SuperLearner will use to combine or choose from the machine learning algorithms provided (@coyle2021tlverse). 
 
 ```{r sl3_02}
 # see what algorithms are available for a continuous outcome 
@@ -139,17 +310,15 @@ Most helpful resources:
   - both binary and 
   - continuous outcomes, and 
   - uses the _SuperLearner_ package to construct both models just like we did in the steps above.
-- The default SuperLearner library for estimating the outcome includes [@tmlePkgDocs] 
+- The default SuperLearner library for estimating the outcome includes 
   - generalized linear models (GLMs), 
-  - GLM with lasso regularization, and 
-  - gradient boosting. 
-- The default library for estimating the propensity scores also include the same 
-- It is certainly possible to use different set of learners
-  - More methods can be added by 
-    - specifying lists of models in the _Q.SL.library_ (for the outcome model) and 
-    - _g.SL.library_ (for the propensity score model) arguments. 
-- Note also that the outcome $Y$ is required to be within the range of $[0,1]$ for this method as well, 
-  - so we need to pass in the transformed data, then transform back the estimate.
+  - GLM with elastic net regularization, and 
+  - Bayesian additive regression trees. 
+- The default library for estimating the propensity scores also includes 
+  - GLMs and 
+  - Bayesian additive regression trees (though specified slightly differently), and replaces the GLM with regularization with generalized additive models (GAMs) (@tmlePkgDocs). 
+  - More methods can be added by specifying lists of models in the _Q.SL.library_ (for the outcome model) and _g.SL.library_ (for the propensity score model) arguments. 
+- Note also that the outcome $Y$ is required to be within the range of $[0,1]$ for this method as well, so we need to pass in the transformed data, then transform back the estimate.
 
 ```{r tmle_pkg, cache=TRUE, results='hide', message=FALSE, warning=FALSE}
 set.seed(1444) 
@@ -280,4 +449,53 @@ Other packages that may be useful:
 |---|---|---|
 | tmle3 | [GitHub](https://github.com/tlverse/tmle3), [framework overview](https://tlverse.org/tmle3/articles/framework.html), [tlverse handbook](https://tlverse.org/tlverse-handbook/tmle3.html) | tmle3 is still under development | 
 | aipw | [GitHub](https://github.com/yqzhong7/AIPW), [CRAN vignette](https://cran.r-project.org/web/packages/AIPW/vignettes/AIPW.html) | |
+
+
+<!--chapter:end:5software.Rmd-->
+
+
+# Final Words
+
+Placeholder
+
+
+## Select variables judiciously
+## Why SL and TMLE
+### Prediction goal
+### Causal inference
+### Identifiability assumptions
+## Further reading
+### Key articles
+### Additional readings
+### Workshops
+### Recorded webinars
+#### Introductory materials
+#### More theory talks
+#### More applied talks
+
+<!--chapter:end:6final.Rmd-->
+
+`r if (knitr:::is_html_output()) '
+# References {-}
+'`
+<div id="refs"></div>
+
+
+<!--chapter:end:7references.Rmd-->
+
+
+# Preface {-}
+
+Placeholder
+
+
+## Background  {-}
+## Goal  {-}
+## Philosophy  {-}
+## Pre-requisites {-}
+## Version history {-}
+## Contributor list {-}
+## License {-}
+
+<!--chapter:end:index0.Rmd-->
 

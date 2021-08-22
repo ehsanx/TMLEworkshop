@@ -12,6 +12,7 @@ require(SuperLearner)
 require(Publish)
 require(tableone)
 require(survey)
+require(cobalt)
 require(WeightIt)
 options(knitr.kable.NA = '')
 cachex=TRUE
@@ -23,7 +24,7 @@ ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
 baselinevars <- names(dplyr::select(ObsData, !c(A,Y)))
 ```
 
-## IPTW from parametric models
+## IPTW steps 
 
 **Modelling Steps**:
 
@@ -36,7 +37,7 @@ According to @austin2011tutorial, we need to follow 4 steps:
 |Step 3| Assess balance in weighted sample and overlap ($PS$ and $L$)|
 |Step 4| outcome modelling: $Prob(Y=1|A=1)$ to obtain treatment effect estimate  |
 
-### Step 1: exposure modelling
+## Step 1: exposure modelling
 
 ```{r ps1, cache=cachex, echo = TRUE}
 ps.formula <- as.formula(paste("A ~",
@@ -87,7 +88,7 @@ legend("topright", c("No RHC","RHC"),
 ```
 
 
-### Step 2: Convert PS to IPW 
+## Step 2: Convert PS to IPW 
 
 - Convert PS to IPW using the formula. We are using the formula for average treatment effect (ATE). 
 - It is possible to use alternative formulas, but we are using ATE formula for our illustration.
@@ -109,7 +110,7 @@ summary(W.out$weights)
 ```
 
 
-### Step 3: Balance checking
+## Step 3: Balance checking
 
 We can check balance numerically. 
 
@@ -117,6 +118,7 @@ We can check balance numerically.
 - $SMD \gt 0.1$ means we do not have balance
 
 ```{r balp, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+require(cobalt)
 bal.tab(W.out, un = TRUE, 
         thresholds = c(m = .1))
 ```
@@ -132,7 +134,7 @@ love.plot(W.out, binary = "std",
           line = TRUE)
 ```
 
-### Step 4: outcome modelling 
+## Step 4: outcome modelling 
 
 Estimate the effect of treatment on outcomes 
 

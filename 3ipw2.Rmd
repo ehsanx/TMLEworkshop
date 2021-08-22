@@ -8,7 +8,6 @@ require(glmnet)
 require(kableExtra)
 require(dplyr)
 require(xgboost)
-require(SuperLearner)
 require(Publish)
 require(tableone)
 require(survey)
@@ -27,7 +26,7 @@ ps.formula <- as.formula(paste("A ~",
                                      collapse = "+")))
 ```
 
-## IPTW from Superlearner
+## IPTW Steps from SL
 
 **Modelling Steps**:
 
@@ -39,7 +38,7 @@ We will still follow the same steps
 |Step 3| Assess balance in weighted sample and overlap ($PS$ and $L$)|
 |Step 4| outcome modelling: $Prob(Y=1|A=1)$ to obtain treatment effect estimate  |
 
-### Step 1: exposure modelling
+## Step 1: exposure modelling
 
 This is the exposure model that we decided on:
 
@@ -64,6 +63,8 @@ PS.fit.SL <- SuperLearner(Y=ObsData$A,
                        family="binomial")
 ```
 
+Here, `method.AUC` is also possible to use instead of `method.NNLS` for binary response. We could use `cvControl = list(V = 3, stratifyCV = TRUE)` to make the splits be stratified by the binary response.
+
 Obtain the propesnity score (PS) values from the fit
 
 ```{r ipw2psx2, cache=TRUE, echo = TRUE}
@@ -85,7 +86,7 @@ legend("topright", c("No RHC","RHC"),
 ```
 
 
-### Step 2: Convert PS to IPW 
+## Step 2: Convert PS to IPW 
 
 - Convert PS from SL to IPW using the formula (again, ATE formula). 
 
@@ -118,7 +119,7 @@ W.out2 <- weightit(ps.formula,
 summary(W.out2$weights)
 ```
 
-### Step 3: Balance checking
+## Step 3: Balance checking
 
 - We first check balance numerically for SMD = 0.1 as threshold for balance.
 
@@ -139,7 +140,7 @@ love.plot(W.out, binary = "std",
           line = TRUE)
 ```
 
-### Step 4: outcome modelling 
+## Step 4: outcome modelling 
 
 Estimate the effect of treatment on outcomes 
 

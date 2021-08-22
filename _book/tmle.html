@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 5 TMLE | R Guide for TMLE in Medical Research</title>
+  <title>Chapter 6 TMLE | R Guide for TMLE in Medical Research</title>
   <meta name="description" content="Intro to R." />
   <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 5 TMLE | R Guide for TMLE in Medical Research" />
+  <meta property="og:title" content="Chapter 6 TMLE | R Guide for TMLE in Medical Research" />
   <meta property="og:type" content="book" />
   
   
@@ -16,21 +16,21 @@
   <meta name="github-repo" content="ehsanx/intro2R" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 5 TMLE | R Guide for TMLE in Medical Research" />
+  <meta name="twitter:title" content="Chapter 6 TMLE | R Guide for TMLE in Medical Research" />
   
   <meta name="twitter:description" content="Intro to R." />
   
 
 
 
-<meta name="date" content="2021-08-18" />
+<meta name="date" content="2021-08-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="iptw.html"/>
+<link rel="prev" href="iptw-using-ml.html"/>
 <link rel="next" href="pre-packaged-software.html"/>
 <script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
@@ -78,6 +78,69 @@ document.write('<input onclick="toggle_R();" type="button" value="Hide Global" i
 </script>
 
 
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
 
 <style type="text/css">
 /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
@@ -170,15 +233,17 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.1" data-path="g-computation.html"><a href="g-computation.html#steps"><i class="fa fa-check"></i><b>2.3.1</b> Steps</a></li>
 <li class="chapter" data-level="2.3.2" data-path="g-computation.html"><a href="g-computation.html#treatment-effect-estimate"><i class="fa fa-check"></i><b>2.3.2</b> Treatment effect estimate</a></li>
 </ul></li>
+<li class="chapter" data-level="2.4" data-path="g-computation.html"><a href="g-computation.html#estimating-the-confidence-intervals"><i class="fa fa-check"></i><b>2.4</b> Estimating the confidence intervals</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html"><i class="fa fa-check"></i><b>3</b> G-computation using ML</a>
 <ul>
 <li class="chapter" data-level="3.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-regression-tree"><i class="fa fa-check"></i><b>3.1</b> G-comp using Regression tree</a>
 <ul>
 <li class="chapter" data-level="3.1.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#a-tree-based-algorithm"><i class="fa fa-check"></i><b>3.1.1</b> A tree based algorithm</a></li>
-<li class="chapter" data-level="3.1.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-treated"><i class="fa fa-check"></i><b>3.1.2</b> Extract outcome prediction as if everyone is treated</a></li>
-<li class="chapter" data-level="3.1.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-untreated"><i class="fa fa-check"></i><b>3.1.3</b> Extract outcome prediction as if everyone is untreated</a></li>
-<li class="chapter" data-level="3.1.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#treatment-effect-estimate-1"><i class="fa fa-check"></i><b>3.1.4</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="3.1.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#cross-validation"><i class="fa fa-check"></i><b>3.1.2</b> Cross-validation</a></li>
+<li class="chapter" data-level="3.1.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-treated"><i class="fa fa-check"></i><b>3.1.3</b> Extract outcome prediction as if everyone is treated</a></li>
+<li class="chapter" data-level="3.1.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-untreated"><i class="fa fa-check"></i><b>3.1.4</b> Extract outcome prediction as if everyone is untreated</a></li>
+<li class="chapter" data-level="3.1.5" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#treatment-effect-estimate-1"><i class="fa fa-check"></i><b>3.1.5</b> Treatment effect estimate</a></li>
 </ul></li>
 <li class="chapter" data-level="3.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-regularized-methods"><i class="fa fa-check"></i><b>3.2</b> G-comp using regularized methods</a>
 <ul>
@@ -189,55 +254,105 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="3.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-superlearner"><i class="fa fa-check"></i><b>3.3</b> G-comp using SuperLearner</a>
 <ul>
-<li class="chapter" data-level="3.3.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#superlearner"><i class="fa fa-check"></i><b>3.3.1</b> SuperLearner</a></li>
+<li class="chapter" data-level="3.3.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#steps-1"><i class="fa fa-check"></i><b>3.3.1</b> Steps</a></li>
 <li class="chapter" data-level="3.3.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-treated-2"><i class="fa fa-check"></i><b>3.3.2</b> Extract outcome prediction as if everyone is treated</a></li>
 <li class="chapter" data-level="3.3.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-untreated-2"><i class="fa fa-check"></i><b>3.3.3</b> Extract outcome prediction as if everyone is untreated</a></li>
 <li class="chapter" data-level="3.3.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#treatment-effect-estimate-3"><i class="fa fa-check"></i><b>3.3.4</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="3.3.5" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#additional-details-for-sl"><i class="fa fa-check"></i><b>3.3.5</b> Additional details for SL</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="iptw.html"><a href="iptw.html"><i class="fa fa-check"></i><b>4</b> IPTW</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="iptw.html"><a href="iptw.html#iptw-from-parametric-models"><i class="fa fa-check"></i><b>4.1</b> IPTW from parametric models</a>
-<ul>
-<li class="chapter" data-level="4.1.1" data-path="iptw.html"><a href="iptw.html#steps-1"><i class="fa fa-check"></i><b>4.1.1</b> Steps</a></li>
-<li class="chapter" data-level="4.1.2" data-path="iptw.html"><a href="iptw.html#treatment-effect-estimate-4"><i class="fa fa-check"></i><b>4.1.2</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="4.1" data-path="iptw.html"><a href="iptw.html#iptw-steps"><i class="fa fa-check"></i><b>4.1</b> IPTW steps</a></li>
+<li class="chapter" data-level="4.2" data-path="iptw.html"><a href="iptw.html#step-1-exposure-modelling"><i class="fa fa-check"></i><b>4.2</b> Step 1: exposure modelling</a></li>
+<li class="chapter" data-level="4.3" data-path="iptw.html"><a href="iptw.html#step-2-convert-ps-to-ipw"><i class="fa fa-check"></i><b>4.3</b> Step 2: Convert PS to IPW</a></li>
+<li class="chapter" data-level="4.4" data-path="iptw.html"><a href="iptw.html#step-3-balance-checking"><i class="fa fa-check"></i><b>4.4</b> Step 3: Balance checking</a></li>
+<li class="chapter" data-level="4.5" data-path="iptw.html"><a href="iptw.html#step-4-outcome-modelling"><i class="fa fa-check"></i><b>4.5</b> Step 4: outcome modelling</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="iptw.html"><a href="iptw.html#iptw-from-ml"><i class="fa fa-check"></i><b>4.2</b> IPTW from ML</a></li>
-<li class="chapter" data-level="4.3" data-path="iptw.html"><a href="iptw.html#iptw-from-superlearner"><i class="fa fa-check"></i><b>4.3</b> IPTW from SuperLearner</a></li>
+<li class="chapter" data-level="5" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html"><i class="fa fa-check"></i><b>5</b> IPTW using ML</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#iptw-steps-from-sl"><i class="fa fa-check"></i><b>5.1</b> IPTW Steps from SL</a></li>
+<li class="chapter" data-level="5.2" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-1-exposure-modelling-1"><i class="fa fa-check"></i><b>5.2</b> Step 1: exposure modelling</a></li>
+<li class="chapter" data-level="5.3" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-2-convert-ps-to-ipw-1"><i class="fa fa-check"></i><b>5.3</b> Step 2: Convert PS to IPW</a></li>
+<li class="chapter" data-level="5.4" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-3-balance-checking-1"><i class="fa fa-check"></i><b>5.4</b> Step 3: Balance checking</a></li>
+<li class="chapter" data-level="5.5" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-4-outcome-modelling-1"><i class="fa fa-check"></i><b>5.5</b> Step 4: outcome modelling</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="tmle.html"><a href="tmle.html"><i class="fa fa-check"></i><b>5</b> TMLE</a>
+<li class="chapter" data-level="6" data-path="tmle.html"><a href="tmle.html"><i class="fa fa-check"></i><b>6</b> TMLE</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="tmle.html"><a href="tmle.html#transformation-of-continuous-outcome-variable"><i class="fa fa-check"></i><b>5.1</b> Transformation of continuous outcome variable</a></li>
-<li class="chapter" data-level="5.2" data-path="tmle.html"><a href="tmle.html#initial-estimate"><i class="fa fa-check"></i><b>5.2</b> Initial estimate</a></li>
-<li class="chapter" data-level="5.3" data-path="tmle.html"><a href="tmle.html#update"><i class="fa fa-check"></i><b>5.3</b> Update</a></li>
-<li class="chapter" data-level="5.4" data-path="tmle.html"><a href="tmle.html#treatment-effect-estimate-5"><i class="fa fa-check"></i><b>5.4</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="6.1" data-path="tmle.html"><a href="tmle.html#doubly-robust-estimators"><i class="fa fa-check"></i><b>6.1</b> Doubly robust estimators</a></li>
+<li class="chapter" data-level="6.2" data-path="tmle.html"><a href="tmle.html#tmle-1"><i class="fa fa-check"></i><b>6.2</b> TMLE</a></li>
+<li class="chapter" data-level="6.3" data-path="tmle.html"><a href="tmle.html#tmle-steps"><i class="fa fa-check"></i><b>6.3</b> TMLE Steps</a></li>
+<li class="chapter" data-level="6.4" data-path="tmle.html"><a href="tmle.html#step-1-transformation-of-y"><i class="fa fa-check"></i><b>6.4</b> Step 1: Transformation of Y</a></li>
+<li class="chapter" data-level="6.5" data-path="tmle.html"><a href="tmle.html#step-2-initial-g-comp-estimate"><i class="fa fa-check"></i><b>6.5</b> Step 2: Initial G-comp estimate</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="tmle.html"><a href="tmle.html#get-predictions-under-both-treatments-a-0-and-1"><i class="fa fa-check"></i><b>6.5.1</b> Get predictions under both treatments <span class="math inline">\(A = 0\)</span> and <span class="math inline">\(1\)</span></a></li>
+<li class="chapter" data-level="6.5.2" data-path="tmle.html"><a href="tmle.html#get-initial-treatment-effect-estimate"><i class="fa fa-check"></i><b>6.5.2</b> Get initial treatment effect estimate</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>6</b> Pre-packaged software</a>
+<li class="chapter" data-level="6.6" data-path="tmle.html"><a href="tmle.html#step-3-ps-model"><i class="fa fa-check"></i><b>6.6</b> Step 3: PS model</a></li>
+<li class="chapter" data-level="6.7" data-path="tmle.html"><a href="tmle.html#step-4-estimate-h"><i class="fa fa-check"></i><b>6.7</b> Step 4: Estimate <span class="math inline">\(H\)</span></a></li>
+<li class="chapter" data-level="6.8" data-path="tmle.html"><a href="tmle.html#step-5-estimate-epsilon"><i class="fa fa-check"></i><b>6.8</b> Step 5: Estimate <span class="math inline">\(\epsilon\)</span></a>
 <ul>
-<li class="chapter" data-level="6.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3"><i class="fa fa-check"></i><b>6.1</b> sl3</a></li>
-<li class="chapter" data-level="6.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-1"><i class="fa fa-check"></i><b>6.2</b> tmle</a></li>
-<li class="chapter" data-level="6.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#ltmle"><i class="fa fa-check"></i><b>6.3</b> ltmle</a></li>
-<li class="chapter" data-level="6.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle3"><i class="fa fa-check"></i><b>6.4</b> tmle3</a></li>
-<li class="chapter" data-level="6.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>6.5</b> AIPW</a></li>
-<li class="chapter" data-level="6.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>6.6</b> RHC results</a></li>
+<li class="chapter" data-level="6.8.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1"><i class="fa fa-check"></i><b>6.8.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.8.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon"><i class="fa fa-check"></i><b>6.8.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>7</b> Final Words</a>
+<li class="chapter" data-level="6.9" data-path="tmle.html"><a href="tmle.html#step-6-update"><i class="fa fa-check"></i><b>6.9</b> Step 6: Update</a>
 <ul>
-<li class="chapter" data-level="7.1" data-path="final-words.html"><a href="final-words.html#why-sl-and-tmle"><i class="fa fa-check"></i><b>7.1</b> Why SL and TMLE</a>
-<ul>
-<li class="chapter" data-level="7.1.1" data-path="final-words.html"><a href="final-words.html#prediction-goal"><i class="fa fa-check"></i><b>7.1.1</b> Prediction goal</a></li>
-<li class="chapter" data-level="7.1.2" data-path="final-words.html"><a href="final-words.html#causal-inference"><i class="fa fa-check"></i><b>7.1.2</b> Causal inference</a></li>
-<li class="chapter" data-level="7.1.3" data-path="final-words.html"><a href="final-words.html#identifiability-assumptions"><i class="fa fa-check"></i><b>7.1.3</b> Identifiability assumptions</a></li>
+<li class="chapter" data-level="6.9.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-1"><i class="fa fa-check"></i><b>6.9.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.9.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-1"><i class="fa fa-check"></i><b>6.9.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
 </ul></li>
-<li class="chapter" data-level="7.2" data-path="final-words.html"><a href="final-words.html#further-reading"><i class="fa fa-check"></i><b>7.2</b> Further reading</a>
+<li class="chapter" data-level="6.10" data-path="tmle.html"><a href="tmle.html#step-7-effect-estimate"><i class="fa fa-check"></i><b>6.10</b> Step 7: Effect estimate</a>
 <ul>
-<li class="chapter" data-level="7.2.1" data-path="final-words.html"><a href="final-words.html#key-articles"><i class="fa fa-check"></i><b>7.2.1</b> Key articles</a></li>
-<li class="chapter" data-level="7.2.2" data-path="final-words.html"><a href="final-words.html#additional-readings"><i class="fa fa-check"></i><b>7.2.2</b> Additional readings</a></li>
-<li class="chapter" data-level="7.2.3" data-path="final-words.html"><a href="final-words.html#workshops"><i class="fa fa-check"></i><b>7.2.3</b> Workshops</a></li>
-<li class="chapter" data-level="7.2.4" data-path="final-words.html"><a href="final-words.html#recorded-webinars"><i class="fa fa-check"></i><b>7.2.4</b> Recorded webinars</a></li>
+<li class="chapter" data-level="6.10.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-2"><i class="fa fa-check"></i><b>6.10.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.10.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-2"><i class="fa fa-check"></i><b>6.10.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.11" data-path="tmle.html"><a href="tmle.html#step-8-rescale-effect-estimate"><i class="fa fa-check"></i><b>6.11</b> Step 8: Rescale effect estimate</a>
+<ul>
+<li class="chapter" data-level="6.11.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-3"><i class="fa fa-check"></i><b>6.11.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.11.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-3"><i class="fa fa-check"></i><b>6.11.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.12" data-path="tmle.html"><a href="tmle.html#step-9-confidence-interval-estimation"><i class="fa fa-check"></i><b>6.12</b> Step 9: Confidence interval estimation</a>
+<ul>
+<li class="chapter" data-level="6.12.1" data-path="tmle.html"><a href="tmle.html#hatepsilon-hatepsilon_0-and-hatepsilon_1-4"><i class="fa fa-check"></i><b>6.12.1</b> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></a></li>
+<li class="chapter" data-level="6.12.2" data-path="tmle.html"><a href="tmle.html#only-1-hatepsilon-4"><i class="fa fa-check"></i><b>6.12.2</b> Only 1 <span class="math inline">\(\hat\epsilon\)</span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>7</b> Pre-packaged software</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3"><i class="fa fa-check"></i><b>7.1</b> sl3</a></li>
+<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-2"><i class="fa fa-check"></i><b>7.2</b> tmle</a></li>
+<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#ltmle"><i class="fa fa-check"></i><b>7.3</b> ltmle</a></li>
+<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>7.4</b> AIPW</a></li>
+<li class="chapter" data-level="7.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.5</b> RHC results</a></li>
+<li class="chapter" data-level="7.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.6</b> Other packages</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>8</b> Final Words</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="final-words.html"><a href="final-words.html#select-variables-judiciously"><i class="fa fa-check"></i><b>8.1</b> Select variables judiciously</a></li>
+<li class="chapter" data-level="8.2" data-path="final-words.html"><a href="final-words.html#why-sl-and-tmle"><i class="fa fa-check"></i><b>8.2</b> Why SL and TMLE</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="final-words.html"><a href="final-words.html#prediction-goal"><i class="fa fa-check"></i><b>8.2.1</b> Prediction goal</a></li>
+<li class="chapter" data-level="8.2.2" data-path="final-words.html"><a href="final-words.html#causal-inference"><i class="fa fa-check"></i><b>8.2.2</b> Causal inference</a></li>
+<li class="chapter" data-level="8.2.3" data-path="final-words.html"><a href="final-words.html#identifiability-assumptions"><i class="fa fa-check"></i><b>8.2.3</b> Identifiability assumptions</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="final-words.html"><a href="final-words.html#further-reading"><i class="fa fa-check"></i><b>8.3</b> Further reading</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="final-words.html"><a href="final-words.html#key-articles"><i class="fa fa-check"></i><b>8.3.1</b> Key articles</a></li>
+<li class="chapter" data-level="8.3.2" data-path="final-words.html"><a href="final-words.html#additional-readings"><i class="fa fa-check"></i><b>8.3.2</b> Additional readings</a></li>
+<li class="chapter" data-level="8.3.3" data-path="final-words.html"><a href="final-words.html#workshops"><i class="fa fa-check"></i><b>8.3.3</b> Workshops</a></li>
+<li class="chapter" data-level="8.3.4" data-path="final-words.html"><a href="final-words.html#recorded-webinars"><i class="fa fa-check"></i><b>8.3.4</b> Recorded webinars</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#background-1"><i class="fa fa-check"></i>Background</a></li>
+<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#goal-1"><i class="fa fa-check"></i>Goal</a></li>
+<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#philosophy-1"><i class="fa fa-check"></i>Philosophy</a></li>
+<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#pre-requisites-1"><i class="fa fa-check"></i>Pre-requisites</a></li>
+<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#version-history-1"><i class="fa fa-check"></i>Version history</a></li>
+<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#contributor-list-1"><i class="fa fa-check"></i>Contributor list</a></li>
+<li class="chapter" data-level="" data-path="preface-1.html"><a href="preface-1.html#license-1"><i class="fa fa-check"></i>License</a></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://ehsank.com/" target="blank">Contact</a></li>
 
@@ -258,20 +373,505 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="tmle" class="section level1" number="5">
-<h1><span class="header-section-number">Chapter 5</span> TMLE</h1>
-<div id="transformation-of-continuous-outcome-variable" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> Transformation of continuous outcome variable</h2>
+<div id="tmle" class="section level1" number="6">
+<h1><span class="header-section-number">Chapter 6</span> TMLE</h1>
+<div id="doubly-robust-estimators" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> Doubly robust estimators</h2>
+<p>Now that we have covered</p>
+<ul>
+<li>outcome models (e.g., G-computation) and</li>
+<li>exposure models (e.g., propensity score models),</li>
+</ul>
+<p>let us talk about Doubly robust (DR) estimators. DR has several important properties:</p>
+<ul>
+<li>They use information from
+<ul>
+<li>both the exposure and</li>
+<li>the outcome models.</li>
+</ul></li>
+<li>They provide a <strong>consistent estimator</strong> if either of the above mentioned models is correctly specified.
+<ul>
+<li>consistent estimator means as the sample size increases, distribution of the estimates gets concentrated near the true parameter</li>
+</ul></li>
+<li>They provide an <strong>efficient estimator</strong> if both the exposure and the outcome model are correctly specified.
+<ul>
+<li>efficient estimator means estimates approximates the true parameter in terms of a chosen loss function (e.g., could be RMSE).</li>
+</ul></li>
+</ul>
 </div>
-<div id="initial-estimate" class="section level2" number="5.2">
-<h2><span class="header-section-number">5.2</span> Initial estimate</h2>
+<div id="tmle-1" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> TMLE</h2>
+<p>Targeted Maximum Likelihood Estimation (TMLE) is a DR method, using</p>
+<ul>
+<li>an initial estimate from the outcome model (G-computation)</li>
+<li>the propensity score (exposure) model to improve.</li>
+</ul>
+<p>In addition to being DR, TMLE has several other desirable properties:</p>
+<ul>
+<li>It allows the use of <strong>data-adaptive algorithms</strong> like machine learning without sacrificing interpretability.
+<ul>
+<li>ML is only used in intermediary steps to develop the estimator, so the optimization and interpretation of the estimator as a whole remains intact.</li>
+<li>The use of machine learning can help mitigate model misspecification.</li>
+</ul></li>
+<li>It has been shown to outperform other methods, particularly in <strong>sparse data settings</strong>.</li>
+</ul>
 </div>
-<div id="update" class="section level2" number="5.3">
-<h2><span class="header-section-number">5.3</span> Update</h2>
+<div id="tmle-steps" class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> TMLE Steps</h2>
+<p>According to <span class="citation"><a href="#ref-luque2018targeted" role="doc-biblioref">Luque-Fernandez et al.</a> (<a href="#ref-luque2018targeted" role="doc-biblioref">2018</a>)</span>, we need to the following steps (2-7) for obtaining point estimates when dealing with binary outcome. But as we are dealing with continuous outcome, we need an added transformation step at the beginning, and also at the end.</p>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td>Step 1</td>
+<td>Transformation of continuous outcome variable</td>
+</tr>
+<tr class="even">
+<td>Step 2</td>
+<td>Predict from initial outcome modelling: G-computation</td>
+</tr>
+<tr class="odd">
+<td>Step 3</td>
+<td>Predict from propensity score model</td>
+</tr>
+<tr class="even">
+<td>Step 4</td>
+<td>Estimate clever covariate <span class="math inline">\(H\)</span></td>
+</tr>
+<tr class="odd">
+<td>Step 5</td>
+<td>Estimate fluctuation parameter <span class="math inline">\(\epsilon\)</span></td>
+</tr>
+<tr class="even">
+<td>Step 6</td>
+<td>Update the initial outcome model prediction based on targeted adjustment of the initial predictions using the PS model</td>
+</tr>
+<tr class="odd">
+<td>Step 7</td>
+<td>Find treatment effect estimate</td>
+</tr>
+<tr class="even">
+<td>Step 8</td>
+<td>Transform back the treatment effect estimate in the original outcome scale</td>
+</tr>
+<tr class="odd">
+<td>Step 9</td>
+<td>Confidence interval estimation based on closed form formula</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>We will go through the steps of TMLE one-by-one, using the RHC dataset presented in previous chapters.</li>
+<li>As a reminder, the exposure we are considering is RHC (right heart catheterization) and the outcome of interest is length of stay in the hospital.</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="tmle.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
+<span id="cb1-2"><a href="tmle.html#cb1-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span></code></pre></div>
 </div>
-<div id="treatment-effect-estimate-5" class="section level2" number="5.4">
-<h2><span class="header-section-number">5.4</span> Treatment effect estimate</h2>
+<div id="step-1-transformation-of-y" class="section level2" number="6.4">
+<h2><span class="header-section-number">6.4</span> Step 1: Transformation of Y</h2>
+<p>In our example, the outcome is continuous.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="tmle.html#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Y)</span></code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    2.00    7.00   14.00   21.56   25.00  394.00</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="tmle.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>Y), <span class="at">main =</span> <span class="st">&quot;Observed Y&quot;</span>)</span></code></pre></div>
+<p><img src="TMLEw_files/figure-html/transf1-1.png" width="672" /></p>
+<p>General recommendation is to <strong>transform</strong> continuous outcome to be within the range [0,1] <span class="citation">(<a href="#ref-gruber2010targeted" role="doc-biblioref">Gruber and Laan 2010</a>)</span>.</p>
+<!--- However, it is recommended that even with continuous outcomes we use a log-likelihood loss function for the maximum likelihood estimation, as we would with a binary outcome.  --->
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="tmle.html#cb5-1" aria-hidden="true" tabindex="-1"></a>min.Y <span class="ot">&lt;-</span> <span class="fu">min</span>(ObsData<span class="sc">$</span>Y)</span>
+<span id="cb5-2"><a href="tmle.html#cb5-2" aria-hidden="true" tabindex="-1"></a>max.Y <span class="ot">&lt;-</span> <span class="fu">max</span>(ObsData<span class="sc">$</span>Y)</span>
+<span id="cb5-3"><a href="tmle.html#cb5-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Y.bounded <span class="ot">&lt;-</span> (ObsData<span class="sc">$</span>Y<span class="sc">-</span>min.Y)<span class="sc">/</span>(max.Y<span class="sc">-</span>min.Y)</span></code></pre></div>
+<p>Check the range of our transformed outcome variable</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="tmle.html#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Y.bounded)</span></code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.00000 0.01276 0.03061 0.04990 0.05867 1.00000</code></pre>
+</div>
+<div id="step-2-initial-g-comp-estimate" class="section level2" number="6.5">
+<h2><span class="header-section-number">6.5</span> Step 2: Initial G-comp estimate</h2>
+<p>We construct our outcome model, and make our initial predictions. For this step, we will use <strong>SuperLearner</strong>. This requires no apriori assumptions about the structure of our outcome model.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="tmle.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
+<span id="cb8-2"><a href="tmle.html#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb8-3"><a href="tmle.html#cb8-3" aria-hidden="true" tabindex="-1"></a>ObsData.noY <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(Y,Y.bounded))</span>
+<span id="cb8-4"><a href="tmle.html#cb8-4" aria-hidden="true" tabindex="-1"></a>Y.fit.sl <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>Y.bounded, </span>
+<span id="cb8-5"><a href="tmle.html#cb8-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noY, </span>
+<span id="cb8-6"><a href="tmle.html#cb8-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>),</span>
+<span id="cb8-7"><a href="tmle.html#cb8-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
+<span id="cb8-8"><a href="tmle.html#cb8-8" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.glmnet&quot;</span>, </span>
+<span id="cb8-9"><a href="tmle.html#cb8-9" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.xgboost&quot;</span>),</span>
+<span id="cb8-10"><a href="tmle.html#cb8-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span><span class="st">&quot;method.NNLS&quot;</span>,</span>
+<span id="cb8-11"><a href="tmle.html#cb8-11" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;gaussian&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="tmle.html#cb9-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>init.Pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(Y.fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
+<span id="cb9-2"><a href="tmle.html#cb9-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span>
+<span id="cb9-3"><a href="tmle.html#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="tmle.html#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>init.Pred)</span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :-0.06060  
+##  1st Qu.: 0.03775  
+##  Median : 0.05019  
+##  Mean   : 0.04990  
+##  3rd Qu.: 0.06188  
+##  Max.   : 0.19344</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="tmle.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># alternatively, we could write</span></span>
+<span id="cb11-2"><a href="tmle.html#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ObsData$init.Pred &lt;- Y.fit.sl$SL.predict</span></span></code></pre></div>
+<ul>
+<li>We will use these initial prediction values later.</li>
+<li><span class="math inline">\(Q^0(A,L)\)</span> is often used to represent the predictions from initial G-comp model.</li>
+</ul>
+<div id="get-predictions-under-both-treatments-a-0-and-1" class="section level3" number="6.5.1">
+<h3><span class="header-section-number">6.5.1</span> Get predictions under both treatments <span class="math inline">\(A = 0\)</span> and <span class="math inline">\(1\)</span></h3>
+<ul>
+<li>We could estimate the treatment effect from this initial model.</li>
+<li>We will need the <span class="math inline">\(Q^0(A=1,L)\)</span> and <span class="math inline">\(Q^0(A=0,L)\)</span> predictions later.</li>
+<li><span class="math inline">\(Q^0(A=1,L)\)</span> predictions:</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="tmle.html#cb12-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb12-2"><a href="tmle.html#cb12-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(Y.fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
+<span id="cb12-3"><a href="tmle.html#cb12-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span>
+<span id="cb12-4"><a href="tmle.html#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :-0.06060  
+##  1st Qu.: 0.04282  
+##  Median : 0.05488  
+##  Mean   : 0.05428  
+##  3rd Qu.: 0.06537  
+##  Max.   : 0.19344</code></pre>
+<ul>
+<li><span class="math inline">\(Q^0(A=0,L)\)</span> predictions:</li>
+</ul>
+</div>
+<div id="get-initial-treatment-effect-estimate" class="section level3" number="6.5.2">
+<h3><span class="header-section-number">6.5.2</span> Get initial treatment effect estimate</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="tmle.html#cb14-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb14-2"><a href="tmle.html#cb14-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(Y.fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
+<span id="cb14-3"><a href="tmle.html#cb14-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span>
+<span id="cb14-4"><a href="tmle.html#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :-0.06724  
+##  1st Qu.: 0.03598  
+##  Median : 0.04780  
+##  Mean   : 0.04722  
+##  3rd Qu.: 0.05821  
+##  Max.   : 0.18408</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="tmle.html#cb16-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="tmle.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :0.003033  
+##  1st Qu.:0.006598  
+##  Median :0.006993  
+##  Mean   :0.007061  
+##  3rd Qu.:0.007468  
+##  Max.   :0.012404</code></pre>
+</div>
+</div>
+<div id="step-3-ps-model" class="section level2" number="6.6">
+<h2><span class="header-section-number">6.6</span> Step 3: PS model</h2>
+<p>At this point, we have our initial estimate and now want to perform our targeted improvement.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="tmle.html#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
+<span id="cb19-2"><a href="tmle.html#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">124</span>)</span>
+<span id="cb19-3"><a href="tmle.html#cb19-3" aria-hidden="true" tabindex="-1"></a>ObsData.noYA <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(Y,Y.bounded,</span>
+<span id="cb19-4"><a href="tmle.html#cb19-4" aria-hidden="true" tabindex="-1"></a>                                          A,init.Pred,</span>
+<span id="cb19-5"><a href="tmle.html#cb19-5" aria-hidden="true" tabindex="-1"></a>                                          Pred.Y1,Pred.Y0,</span>
+<span id="cb19-6"><a href="tmle.html#cb19-6" aria-hidden="true" tabindex="-1"></a>                                          Pred.TE))</span>
+<span id="cb19-7"><a href="tmle.html#cb19-7" aria-hidden="true" tabindex="-1"></a>PS.fit.SL <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>A, </span>
+<span id="cb19-8"><a href="tmle.html#cb19-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noYA, </span>
+<span id="cb19-9"><a href="tmle.html#cb19-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>),</span>
+<span id="cb19-10"><a href="tmle.html#cb19-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
+<span id="cb19-11"><a href="tmle.html#cb19-11" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.glmnet&quot;</span>, </span>
+<span id="cb19-12"><a href="tmle.html#cb19-12" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.xgboost&quot;</span>),</span>
+<span id="cb19-13"><a href="tmle.html#cb19-13" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span><span class="st">&quot;method.NNLS&quot;</span>,</span>
+<span id="cb19-14"><a href="tmle.html#cb19-14" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="tmle.html#cb20-1" aria-hidden="true" tabindex="-1"></a>all.pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(PS.fit.SL, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb20-2"><a href="tmle.html#cb20-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>PS.SL <span class="ot">&lt;-</span> all.pred<span class="sc">$</span>pred</span></code></pre></div>
+<ul>
+<li>These propensity score predictions (<code>PS.SL</code>) are represented as <span class="math inline">\(g(A_i=1|L_i)\)</span>.</li>
+<li>We can estimate <span class="math inline">\(g(A_i=0|L_i)\)</span> as <span class="math inline">\(1 - g(A_i=1|L_i)\)</span> or <code>1 - PS.SL</code>.</li>
+</ul>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="tmle.html#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>PS.SL)</span></code></pre></div>
+<pre><code>##        V1         
+##  Min.   :0.00269  
+##  1st Qu.:0.14870  
+##  Median :0.34699  
+##  Mean   :0.38083  
+##  3rd Qu.:0.59316  
+##  Max.   :0.97250</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="tmle.html#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>PS.SL, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
+<pre><code>## $`0`
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.00269 0.08870 0.18953 0.22227 0.32987 0.78919 
+## 
+## $`1`
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.08083 0.51406 0.65538 0.63865 0.77110 0.97250</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="tmle.html#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">0</span>]), </span>
+<span id="cb25-2"><a href="tmle.html#cb25-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">main =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb25-3"><a href="tmle.html#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">1</span>]), </span>
+<span id="cb25-4"><a href="tmle.html#cb25-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb25-5"><a href="tmle.html#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;No RHC&quot;</span>,<span class="st">&quot;RHC&quot;</span>), </span>
+<span id="cb25-6"><a href="tmle.html#cb25-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;blue&quot;</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span></code></pre></div>
+<p><img src="TMLEw_files/figure-html/ipw2psx2btmle-1.png" width="672" /></p>
+</div>
+<div id="step-4-estimate-h" class="section level2" number="6.7">
+<h2><span class="header-section-number">6.7</span> Step 4: Estimate <span class="math inline">\(H\)</span></h2>
+<p>Clever covariate <span class="math inline">\(H(A_i, L_i) = \frac{I(A_i=1)}{g(A_i=1|L_i)} - \frac{I(A_i=0)}{g(A_i=0|L_i)}\)</span> <span class="citation">(<a href="#ref-luque2018targeted" role="doc-biblioref">Luque-Fernandez et al. 2018</a>)</span></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="tmle.html#cb26-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>H.A1L <span class="ot">&lt;-</span> (ObsData<span class="sc">$</span>A) <span class="sc">/</span> ObsData<span class="sc">$</span>PS.SL </span>
+<span id="cb26-2"><a href="tmle.html#cb26-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>H.A0L <span class="ot">&lt;-</span> (<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>A) <span class="sc">/</span> (<span class="dv">1</span><span class="sc">-</span> ObsData<span class="sc">$</span>PS.SL)</span>
+<span id="cb26-3"><a href="tmle.html#cb26-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>H.AL <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>H.A1L <span class="sc">-</span> ObsData<span class="sc">$</span>H.A0L</span>
+<span id="cb26-4"><a href="tmle.html#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>H.AL)</span></code></pre></div>
+<pre><code>##        V1         
+##  Min.   :-4.7435  
+##  1st Qu.:-1.3075  
+##  Median :-1.0767  
+##  Mean   :-0.1826  
+##  3rd Qu.: 1.3778  
+##  Max.   :12.3720</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="tmle.html#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>H.AL, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
+<pre><code>## $`0`
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  -4.744  -1.492  -1.234  -1.359  -1.097  -1.003 
+## 
+## $`1`
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   1.028   1.297   1.526   1.730   1.945  12.372</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="tmle.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(<span class="fu">apply</span>(<span class="fu">cbind</span>(<span class="sc">-</span>ObsData<span class="sc">$</span>H.A0L,ObsData<span class="sc">$</span>H.A1L), </span>
+<span id="cb30-2"><a href="tmle.html#cb30-2" aria-hidden="true" tabindex="-1"></a>      <span class="dv">2</span>, summary))</span></code></pre></div>
+<pre><code>##           Min.   1st Qu.    Median       Mean  3rd Qu.     Max.
+## [1,] -4.743533 -1.307494 -1.076741 -0.8414464 0.000000  0.00000
+## [2,]  0.000000  0.000000  0.000000  0.6588811 1.377787 12.37196</code></pre>
+<p>Aggregated or individual clever covariate components show slight difference in their summaries.</p>
+</div>
+<div id="step-5-estimate-epsilon" class="section level2" number="6.8">
+<h2><span class="header-section-number">6.8</span> Step 5: Estimate <span class="math inline">\(\epsilon\)</span></h2>
+<ul>
+<li><p>Fluctuation parameter <span class="math inline">\(\epsilon\)</span>, representing <strong>how large of an adjustment we will make</strong> to the initial estimate.</p></li>
+<li><p>The fluctuation parameter <span class="math inline">\(\hat\epsilon\)</span> could be</p>
+<ul>
+<li>a scalar or</li>
+<li>a vector with 2 components <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span>.</li>
+</ul></li>
+<li><p>It is estimated through MLE, using a model with an offset based on the initial estimate, and clever covariates as independent variables <span class="citation">(<a href="#ref-gruber2009targeted" role="doc-biblioref">Gruber and Van Der Laan 2009</a>)</span>:</p>
+<p><span class="math inline">\(E(Y=1|A,L)(\epsilon) = \frac{1}{1+\exp(-\log\frac{\bar Q^0(A,L)}{(1-\bar Q^0(A,L))}-\epsilon \times H(A,L))}\)</span></p></li>
+</ul>
+<div id="hatepsilon-hatepsilon_0-and-hatepsilon_1" class="section level3" number="6.8.1">
+<h3><span class="header-section-number">6.8.1</span> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></h3>
+<p>This is more close to how how <code>tmle</code> package has implement clever covariates</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="tmle.html#cb32-1" aria-hidden="true" tabindex="-1"></a>eps_mod <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y.bounded <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> H.A1L <span class="sc">+</span> H.A0L <span class="sc">+</span>  </span>
+<span id="cb32-2"><a href="tmle.html#cb32-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">offset</span>(<span class="fu">qlogis</span>(init.Pred)), </span>
+<span id="cb32-3"><a href="tmle.html#cb32-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb32-4"><a href="tmle.html#cb32-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData)</span>
+<span id="cb32-5"><a href="tmle.html#cb32-5" aria-hidden="true" tabindex="-1"></a>epsilon <span class="ot">&lt;-</span> <span class="fu">coef</span>(eps_mod)  </span>
+<span id="cb32-6"><a href="tmle.html#cb32-6" aria-hidden="true" tabindex="-1"></a>epsilon[<span class="st">&quot;H.A1L&quot;</span>]</span></code></pre></div>
+<pre><code>##      H.A1L 
+## 0.00573477</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="tmle.html#cb34-1" aria-hidden="true" tabindex="-1"></a>epsilon[<span class="st">&quot;H.A0L&quot;</span>]</span></code></pre></div>
+<pre><code>##       H.A0L 
+## 0.003333366</code></pre>
+<p>Note that, if <code>init.Pred</code> includes -ve values, <code>NaNs</code> would be produced after applying <code>qlogis()</code>.</p>
+</div>
+<div id="only-1-hatepsilon" class="section level3" number="6.8.2">
+<h3><span class="header-section-number">6.8.2</span> Only 1 <span class="math inline">\(\hat\epsilon\)</span></h3>
+<p>For demonstration purposes</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="tmle.html#cb36-1" aria-hidden="true" tabindex="-1"></a>eps_mod1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y.bounded <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> H.AL <span class="sc">+</span></span>
+<span id="cb36-2"><a href="tmle.html#cb36-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">offset</span>(<span class="fu">qlogis</span>(init.Pred)),</span>
+<span id="cb36-3"><a href="tmle.html#cb36-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb36-4"><a href="tmle.html#cb36-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData)</span>
+<span id="cb36-5"><a href="tmle.html#cb36-5" aria-hidden="true" tabindex="-1"></a>epsilon1 <span class="ot">&lt;-</span> <span class="fu">coef</span>(eps_mod1) </span>
+<span id="cb36-6"><a href="tmle.html#cb36-6" aria-hidden="true" tabindex="-1"></a>epsilon1</span></code></pre></div>
+<pre><code>##        H.AL 
+## 0.001703316</code></pre>
+<p>Alternative could be to use <code>H.AL</code> as weights (not shown here).</p>
+</div>
+</div>
+<div id="step-6-update" class="section level2" number="6.9">
+<h2><span class="header-section-number">6.9</span> Step 6: Update</h2>
+<div id="hatepsilon-hatepsilon_0-and-hatepsilon_1-1" class="section level3" number="6.9.1">
+<h3><span class="header-section-number">6.9.1</span> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></h3>
+<p>We can use <code>epsilon["H.A1L"]</code> and <code>epsilon["H.A0L"]</code> to update</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="tmle.html#cb38-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1.update <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y1) <span class="sc">+</span>  </span>
+<span id="cb38-2"><a href="tmle.html#cb38-2" aria-hidden="true" tabindex="-1"></a>                                   epsilon[<span class="st">&quot;H.A1L&quot;</span>]<span class="sc">*</span>ObsData<span class="sc">$</span>H.A1L)</span>
+<span id="cb38-3"><a href="tmle.html#cb38-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0.update <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y0) <span class="sc">+</span> </span>
+<span id="cb38-4"><a href="tmle.html#cb38-4" aria-hidden="true" tabindex="-1"></a>                                   epsilon[<span class="st">&quot;H.A0L&quot;</span>]<span class="sc">*</span>ObsData<span class="sc">$</span>H.A0L)</span>
+<span id="cb38-5"><a href="tmle.html#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1.update)</span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :0.001473  
+##  1st Qu.:0.043052  
+##  Median :0.055075  
+##  Mean   :0.054543  
+##  3rd Qu.:0.065632  
+##  Max.   :0.194681  
+##  NA&#39;s   :5</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="tmle.html#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0.update) </span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :0.000268  
+##  1st Qu.:0.036216  
+##  Median :0.047958  
+##  Mean   :0.047463  
+##  3rd Qu.:0.058348  
+##  Max.   :0.184080  
+##  NA&#39;s   :12</code></pre>
+</div>
+<div id="only-1-hatepsilon-1" class="section level3" number="6.9.2">
+<h3><span class="header-section-number">6.9.2</span> Only 1 <span class="math inline">\(\hat\epsilon\)</span></h3>
+<p>Alternatively, we could use <code>epsilon</code> to from <code>H.AL</code> to update</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="tmle.html#cb42-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1.update1 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y1) <span class="sc">+</span>  </span>
+<span id="cb42-2"><a href="tmle.html#cb42-2" aria-hidden="true" tabindex="-1"></a>                                   epsilon1<span class="sc">*</span>ObsData<span class="sc">$</span>H.AL)</span>
+<span id="cb42-3"><a href="tmle.html#cb42-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0.update1 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y0) <span class="sc">+</span> </span>
+<span id="cb42-4"><a href="tmle.html#cb42-4" aria-hidden="true" tabindex="-1"></a>                                   epsilon1<span class="sc">*</span>ObsData<span class="sc">$</span>H.AL)</span>
+<span id="cb42-5"><a href="tmle.html#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1.update1)</span></code></pre></div>
+<pre><code>##        V1         
+##  Min.   :0.00147  
+##  1st Qu.:0.04292  
+##  Median :0.05491  
+##  Mean   :0.05433  
+##  3rd Qu.:0.06540  
+##  Max.   :0.19381  
+##  NA&#39;s   :5</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="tmle.html#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0.update1)  </span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :0.000266  
+##  1st Qu.:0.036073  
+##  Median :0.047785  
+##  Mean   :0.047330  
+##  3rd Qu.:0.058238  
+##  Max.   :0.184433  
+##  NA&#39;s   :12</code></pre>
+<p>Note that, if <code>Pred.Y1</code> and <code>Pred.Y0</code> include -ve values, <code>NaNs</code> would be produced after applying <code>qlogis()</code>.</p>
+</div>
+</div>
+<div id="step-7-effect-estimate" class="section level2" number="6.10">
+<h2><span class="header-section-number">6.10</span> Step 7: Effect estimate</h2>
+<p>Now that the updated predictions of our outcome models are calculated, we can calculate the ATE.</p>
+<div id="hatepsilon-hatepsilon_0-and-hatepsilon_1-2" class="section level3" number="6.10.1">
+<h3><span class="header-section-number">6.10.1</span> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></h3>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="tmle.html#cb46-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded.vector <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1.update <span class="sc">-</span>  </span>
+<span id="cb46-2"><a href="tmle.html#cb46-2" aria-hidden="true" tabindex="-1"></a>                           ObsData<span class="sc">$</span>Pred.Y0.update</span>
+<span id="cb46-3"><a href="tmle.html#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ATE.TMLE.bounded.vector) </span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :0.002861  
+##  1st Qu.:0.006585  
+##  Median :0.007051  
+##  Mean   :0.007141  
+##  3rd Qu.:0.007626  
+##  Max.   :0.013738  
+##  NA&#39;s   :12</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="tmle.html#cb48-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded <span class="ot">&lt;-</span> <span class="fu">mean</span>(ATE.TMLE.bounded.vector, </span>
+<span id="cb48-2"><a href="tmle.html#cb48-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">na.rm =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb48-3"><a href="tmle.html#cb48-3" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded</span></code></pre></div>
+<pre><code>## [1] 0.007140618</code></pre>
+</div>
+<div id="only-1-hatepsilon-2" class="section level3" number="6.10.2">
+<h3><span class="header-section-number">6.10.2</span> Only 1 <span class="math inline">\(\hat\epsilon\)</span></h3>
+<p>Alternatively, using <code>H.AL</code>:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="tmle.html#cb50-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded.vector1 <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1.update1 <span class="sc">-</span>  </span>
+<span id="cb50-2"><a href="tmle.html#cb50-2" aria-hidden="true" tabindex="-1"></a>                           ObsData<span class="sc">$</span>Pred.Y0.update1</span>
+<span id="cb50-3"><a href="tmle.html#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ATE.TMLE.bounded.vector1) </span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :0.003029  
+##  1st Qu.:0.006599  
+##  Median :0.006994  
+##  Mean   :0.007060  
+##  3rd Qu.:0.007466  
+##  Max.   :0.012427  
+##  NA&#39;s   :12</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="tmle.html#cb52-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(ATE.TMLE.bounded.vector1, </span>
+<span id="cb52-2"><a href="tmle.html#cb52-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">na.rm =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb52-3"><a href="tmle.html#cb52-3" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded1</span></code></pre></div>
+<pre><code>## [1] 0.007059689</code></pre>
+</div>
+</div>
+<div id="step-8-rescale-effect-estimate" class="section level2" number="6.11">
+<h2><span class="header-section-number">6.11</span> Step 8: Rescale effect estimate</h2>
+<p>We make sure to transform back to our original scale.</p>
+<div id="hatepsilon-hatepsilon_0-and-hatepsilon_1-3" class="section level3" number="6.11.1">
+<h3><span class="header-section-number">6.11.1</span> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></h3>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="tmle.html#cb54-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>ATE.TMLE.bounded   </span>
+<span id="cb54-2"><a href="tmle.html#cb54-2" aria-hidden="true" tabindex="-1"></a>ATE.TMLE</span></code></pre></div>
+<pre><code>## [1] 2.799122</code></pre>
+</div>
+<div id="only-1-hatepsilon-3" class="section level3" number="6.11.2">
+<h3><span class="header-section-number">6.11.2</span> Only 1 <span class="math inline">\(\hat\epsilon\)</span></h3>
+<p>Alternatively, using <code>H.AL</code>:</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="tmle.html#cb56-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE1 <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>ATE.TMLE.bounded1</span>
+<span id="cb56-2"><a href="tmle.html#cb56-2" aria-hidden="true" tabindex="-1"></a>ATE.TMLE1</span></code></pre></div>
+<pre><code>## [1] 2.767398</code></pre>
+</div>
+</div>
+<div id="step-9-confidence-interval-estimation" class="section level2" number="6.12">
+<h2><span class="header-section-number">6.12</span> Step 9: Confidence interval estimation</h2>
+<ul>
+<li>Since the machine learning algorithms were used only in intermediary steps, rather than estimating our parameter of interest directly, 95% confidence intervals can be calculated directly <span class="citation">(<a href="#ref-luque2018targeted" role="doc-biblioref">Luque-Fernandez et al. 2018</a>)</span>.</li>
+<li>Based on semi-parametric theory, closed form variance formula is already derived <span class="citation">(<a href="#ref-van2012targeted" role="doc-biblioref">Laan and Petersen 2012</a>)</span>.</li>
+<li>Time-consuming bootstrap procedure is not necessary.</li>
+</ul>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="tmle.html#cb58-1" aria-hidden="true" tabindex="-1"></a>ci.estimate <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">data =</span> ObsData, <span class="at">H.AL.components =</span> <span class="dv">1</span>){</span>
+<span id="cb58-2"><a href="tmle.html#cb58-2" aria-hidden="true" tabindex="-1"></a>  min.Y <span class="ot">&lt;-</span> <span class="fu">min</span>(data<span class="sc">$</span>Y)</span>
+<span id="cb58-3"><a href="tmle.html#cb58-3" aria-hidden="true" tabindex="-1"></a>  max.Y <span class="ot">&lt;-</span> <span class="fu">max</span>(data<span class="sc">$</span>Y)</span>
+<span id="cb58-4"><a href="tmle.html#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># transform predicted outcomes back to original scale</span></span>
+<span id="cb58-5"><a href="tmle.html#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">2</span>){</span>
+<span id="cb58-6"><a href="tmle.html#cb58-6" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y1.update.rescaled <span class="ot">&lt;-</span> </span>
+<span id="cb58-7"><a href="tmle.html#cb58-7" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y1.update <span class="sc">+</span> min.Y</span>
+<span id="cb58-8"><a href="tmle.html#cb58-8" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y0.update.rescaled <span class="ot">&lt;-</span> </span>
+<span id="cb58-9"><a href="tmle.html#cb58-9" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y0.update <span class="sc">+</span> min.Y</span>
+<span id="cb58-10"><a href="tmle.html#cb58-10" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb58-11"><a href="tmle.html#cb58-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb58-12"><a href="tmle.html#cb58-12" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y1.update.rescaled <span class="ot">&lt;-</span> </span>
+<span id="cb58-13"><a href="tmle.html#cb58-13" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y1.update1 <span class="sc">+</span> min.Y</span>
+<span id="cb58-14"><a href="tmle.html#cb58-14" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y0.update.rescaled <span class="ot">&lt;-</span> </span>
+<span id="cb58-15"><a href="tmle.html#cb58-15" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y0.update1 <span class="sc">+</span> min.Y</span>
+<span id="cb58-16"><a href="tmle.html#cb58-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb58-17"><a href="tmle.html#cb58-17" aria-hidden="true" tabindex="-1"></a>  EY1_TMLE1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(data<span class="sc">$</span>Pred.Y1.update.rescaled, </span>
+<span id="cb58-18"><a href="tmle.html#cb58-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb58-19"><a href="tmle.html#cb58-19" aria-hidden="true" tabindex="-1"></a>  EY0_TMLE1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(data<span class="sc">$</span>Pred.Y0.update.rescaled, </span>
+<span id="cb58-20"><a href="tmle.html#cb58-20" aria-hidden="true" tabindex="-1"></a>                    <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb58-21"><a href="tmle.html#cb58-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ATE efficient influence curve</span></span>
+<span id="cb58-22"><a href="tmle.html#cb58-22" aria-hidden="true" tabindex="-1"></a>  D1 <span class="ot">&lt;-</span> data<span class="sc">$</span>A<span class="sc">/</span>data<span class="sc">$</span>PS.SL<span class="sc">*</span></span>
+<span id="cb58-23"><a href="tmle.html#cb58-23" aria-hidden="true" tabindex="-1"></a>    (data<span class="sc">$</span>Y <span class="sc">-</span> data<span class="sc">$</span>Pred.Y1.update.rescaled) <span class="sc">+</span> </span>
+<span id="cb58-24"><a href="tmle.html#cb58-24" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y1.update.rescaled <span class="sc">-</span> EY1_TMLE1</span>
+<span id="cb58-25"><a href="tmle.html#cb58-25" aria-hidden="true" tabindex="-1"></a>  D0 <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> data<span class="sc">$</span>A)<span class="sc">/</span>(<span class="dv">1</span> <span class="sc">-</span> data<span class="sc">$</span>PS.SL)<span class="sc">*</span></span>
+<span id="cb58-26"><a href="tmle.html#cb58-26" aria-hidden="true" tabindex="-1"></a>    (data<span class="sc">$</span>Y <span class="sc">-</span> data<span class="sc">$</span>Pred.Y0.update.rescaled) <span class="sc">+</span> </span>
+<span id="cb58-27"><a href="tmle.html#cb58-27" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y0.update.rescaled <span class="sc">-</span> EY0_TMLE1</span>
+<span id="cb58-28"><a href="tmle.html#cb58-28" aria-hidden="true" tabindex="-1"></a>  EIC <span class="ot">&lt;-</span> D1 <span class="sc">-</span> D0</span>
+<span id="cb58-29"><a href="tmle.html#cb58-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ATE variance</span></span>
+<span id="cb58-30"><a href="tmle.html#cb58-30" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(data)</span>
+<span id="cb58-31"><a href="tmle.html#cb58-31" aria-hidden="true" tabindex="-1"></a>  varHat.IC <span class="ot">&lt;-</span> <span class="fu">var</span>(EIC, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)<span class="sc">/</span>n</span>
+<span id="cb58-32"><a href="tmle.html#cb58-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ATE 95% CI</span></span>
+<span id="cb58-33"><a href="tmle.html#cb58-33" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">2</span>) {</span>
+<span id="cb58-34"><a href="tmle.html#cb58-34" aria-hidden="true" tabindex="-1"></a>    ATE.TMLE.CI <span class="ot">&lt;-</span> <span class="fu">c</span>(ATE.TMLE <span class="sc">-</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC), </span>
+<span id="cb58-35"><a href="tmle.html#cb58-35" aria-hidden="true" tabindex="-1"></a>                   ATE.TMLE <span class="sc">+</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC))</span>
+<span id="cb58-36"><a href="tmle.html#cb58-36" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb58-37"><a href="tmle.html#cb58-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb58-38"><a href="tmle.html#cb58-38" aria-hidden="true" tabindex="-1"></a>    ATE.TMLE.CI <span class="ot">&lt;-</span> <span class="fu">c</span>(ATE.TMLE1 <span class="sc">-</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC), </span>
+<span id="cb58-39"><a href="tmle.html#cb58-39" aria-hidden="true" tabindex="-1"></a>                   ATE.TMLE1 <span class="sc">+</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC))</span>
+<span id="cb58-40"><a href="tmle.html#cb58-40" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb58-41"><a href="tmle.html#cb58-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ATE.TMLE.CI)</span>
+<span id="cb58-42"><a href="tmle.html#cb58-42" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div id="hatepsilon-hatepsilon_0-and-hatepsilon_1-4" class="section level3" number="6.12.1">
+<h3><span class="header-section-number">6.12.1</span> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></h3>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="tmle.html#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ci.estimate</span>(<span class="at">data =</span> ObsData, <span class="at">H.AL.components =</span> <span class="dv">2</span>)</span></code></pre></div>
+<pre><code>## [1] 1.818815 3.779430</code></pre>
+</div>
+<div id="only-1-hatepsilon-4" class="section level3" number="6.12.2">
+<h3><span class="header-section-number">6.12.2</span> Only 1 <span class="math inline">\(\hat\epsilon\)</span></h3>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="tmle.html#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ci.estimate</span>(<span class="at">data =</span> ObsData, <span class="at">H.AL.components =</span> <span class="dv">1</span>)</span></code></pre></div>
+<pre><code>## [1] 1.786472 3.748324</code></pre>
 
+</div>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-gruber2010targeted" class="csl-entry">
+Gruber, Susan, and Mark J van der Laan. 2010. <span>“A Targeted Maximum Likelihood Estimator of a Causal Effect on a Bounded Continuous Outcome.”</span> <em>The International Journal of Biostatistics</em> 6 (1).
+</div>
+<div id="ref-gruber2009targeted" class="csl-entry">
+Gruber, Susan, and Mark J Van Der Laan. 2009. <span>“Targeted Maximum Likelihood Estimation: A Gentle Introduction.”</span>
+</div>
+<div id="ref-van2012targeted" class="csl-entry">
+Laan, Mark J van der, and Maya L Petersen. 2012. <em>Targeted Learning</em>. NY: Springer.
+</div>
+<div id="ref-luque2018targeted" class="csl-entry">
+Luque-Fernandez, Miguel Angel, Michael Schomaker, Bernard Rachet, and Mireille E Schnitzer. 2018. <span>“Targeted Maximum Likelihood Estimation for a Binary Treatment: A Tutorial.”</span> <em>Statistics in Medicine</em> 37 (16): 2530–46.
 </div>
 </div>
             </section>
@@ -279,7 +879,7 @@ div.csl-indent {
           </div>
         </div>
       </div>
-<a href="iptw.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="iptw-using-ml.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 <a href="pre-packaged-software.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
@@ -331,6 +931,20 @@ gitbook.start({
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>

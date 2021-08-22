@@ -162,7 +162,7 @@ Diagnostics do not necessarily look so good.
 
 @connors1996effectiveness conducted a propensity score matching analysis. Table 5 in @connors1996effectiveness showed that, after propensity score pair (1-to-1) matching, means of length of stay ($Y$), when stratified by RHC ($A$) was significantly different. 
 
-### PSM
+### PSM in RHC data
 
 We also conduct propensity score pair matching analysis, as follows. 
 
@@ -189,7 +189,7 @@ match.obj <- matchit(ps.formula, data =ObsData,
                      ratio = 1, caliper = .1*sd(logitPS))
 ```
 
-### PSM diagnostics
+#### PSM diagnostics
 
 ```{r ps2x, cache=TRUE, echo = TRUE}
 require(cobalt)
@@ -208,7 +208,7 @@ love.plot(match.obj, binary = "std",
 
 The love plot suggests satisfactory propensity score matching (all SMD < 0.1).
 
-### PSM results
+#### PSM results
 
 ```{r ps3, cache=TRUE, echo = TRUE}
 matched.data <- match.data(match.obj)
@@ -220,3 +220,7 @@ print(tab1y, showAllLevels = FALSE,
 ```
 
 We also find the same conclusion based on propensity score pair matched data.
+
+### TMLE in RHC data
+
+There are other papers that have used RHC data [@keele2021comparing;@keele2018pre]. Particularly, @keele2021comparing used TMLE method in estimating the impact of RHC on length of stay, and found point estimate $2.01 (95\% CI: 0.6-3.41)$. In today's workshop, we will learn about TMLE method.

@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-08-20" />
+<meta name="date" content="2021-08-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -284,19 +284,25 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="6" data-path="tmle.html"><a href="tmle.html"><i class="fa fa-check"></i><b>6</b> TMLE</a>
 <ul>
-<li class="chapter" data-level="6.1" data-path="tmle.html"><a href="tmle.html#transformation-of-continuous-outcome-variable"><i class="fa fa-check"></i><b>6.1</b> Transformation of continuous outcome variable</a></li>
-<li class="chapter" data-level="6.2" data-path="tmle.html"><a href="tmle.html#initial-estimate"><i class="fa fa-check"></i><b>6.2</b> Initial estimate</a></li>
-<li class="chapter" data-level="6.3" data-path="tmle.html"><a href="tmle.html#update"><i class="fa fa-check"></i><b>6.3</b> Update</a></li>
-<li class="chapter" data-level="6.4" data-path="tmle.html"><a href="tmle.html#treatment-effect-estimate-4"><i class="fa fa-check"></i><b>6.4</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="6.1" data-path="tmle.html"><a href="tmle.html#doubly-robust-estimators"><i class="fa fa-check"></i><b>6.1</b> Doubly robust estimators</a></li>
+<li class="chapter" data-level="6.2" data-path="tmle.html"><a href="tmle.html#targeted-maximum-likelihood-estimation-tmle"><i class="fa fa-check"></i><b>6.2</b> Targeted Maximum Likelihood Estimation (TMLE)</a></li>
+<li class="chapter" data-level="6.3" data-path="tmle.html"><a href="tmle.html#transformation-of-continuous-outcome-variable"><i class="fa fa-check"></i><b>6.3</b> Transformation of continuous outcome variable</a></li>
+<li class="chapter" data-level="6.4" data-path="tmle.html"><a href="tmle.html#initial-estimate"><i class="fa fa-check"></i><b>6.4</b> Initial estimate</a></li>
+<li class="chapter" data-level="6.5" data-path="tmle.html"><a href="tmle.html#estimate-the-propensity-scores"><i class="fa fa-check"></i><b>6.5</b> Estimate the propensity scores</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="tmle.html"><a href="tmle.html#use-the-propensity-scores-to-update-the-initial-estimate"><i class="fa fa-check"></i><b>6.5.1</b> Use the propensity scores to update the initial estimate</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="tmle.html"><a href="tmle.html#treatment-effect-estimate-4"><i class="fa fa-check"></i><b>6.6</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="6.7" data-path="tmle.html"><a href="tmle.html#statistical-inference"><i class="fa fa-check"></i><b>6.7</b> Statistical inference</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>7</b> Pre-packaged software</a>
 <ul>
 <li class="chapter" data-level="7.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3"><i class="fa fa-check"></i><b>7.1</b> sl3</a></li>
 <li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-1"><i class="fa fa-check"></i><b>7.2</b> tmle</a></li>
 <li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#ltmle"><i class="fa fa-check"></i><b>7.3</b> ltmle</a></li>
-<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle3"><i class="fa fa-check"></i><b>7.4</b> tmle3</a></li>
-<li class="chapter" data-level="7.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>7.5</b> AIPW</a></li>
-<li class="chapter" data-level="7.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.6</b> RHC results</a></li>
+<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>7.4</b> AIPW</a></li>
+<li class="chapter" data-level="7.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.5</b> RHC results</a></li>
+<li class="chapter" data-level="7.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.6</b> Other packages</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>8</b> Final Words</a>
 <ul>
@@ -1128,7 +1134,7 @@ Mean for females
 </ul>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="g-computation.html#cb9-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
 <span id="cb9-2"><a href="g-computation.html#cb9-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">1</span>, </span>
-<span id="cb9-3"><a href="g-computation.html#cb9-3" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb9-3"><a href="g-computation.html#cb9-3" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span>A)), </span>
 <span id="cb9-4"><a href="g-computation.html#cb9-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
 <p>Mean predicted outcome for treated</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="g-computation.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
@@ -1235,7 +1241,7 @@ Mia
 <h3><span class="header-section-number">2.2.3</span> Predict outcome for untreated</h3>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="g-computation.html#cb14-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
 <span id="cb14-2"><a href="g-computation.html#cb14-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">0</span>, </span>
-<span id="cb14-3"><a href="g-computation.html#cb14-3" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb14-3"><a href="g-computation.html#cb14-3" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span>A)), </span>
 <span id="cb14-4"><a href="g-computation.html#cb14-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
 <p>Mean predicted outcome for untreated</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="g-computation.html#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
@@ -1520,12 +1526,12 @@ Figure 2.1: Defining treatment effect in terms of potential outcomes and observa
 <span id="cb20-6"><a href="g-computation.html#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2</span></span>
 <span id="cb20-7"><a href="g-computation.html#cb20-7" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
 <span id="cb20-8"><a href="g-computation.html#cb20-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">1</span>, </span>
-<span id="cb20-9"><a href="g-computation.html#cb20-9" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb20-9"><a href="g-computation.html#cb20-9" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span>A)), </span>
 <span id="cb20-10"><a href="g-computation.html#cb20-10" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
 <span id="cb20-11"><a href="g-computation.html#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3</span></span>
 <span id="cb20-12"><a href="g-computation.html#cb20-12" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit1, </span>
 <span id="cb20-13"><a href="g-computation.html#cb20-13" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">0</span>, </span>
-<span id="cb20-14"><a href="g-computation.html#cb20-14" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb20-14"><a href="g-computation.html#cb20-14" aria-hidden="true" tabindex="-1"></a>                                                dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span>A)), </span>
 <span id="cb20-15"><a href="g-computation.html#cb20-15" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
 <span id="cb20-16"><a href="g-computation.html#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4</span></span>
 <span id="cb20-17"><a href="g-computation.html#cb20-17" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
@@ -1560,11 +1566,11 @@ Figure 2.1: Defining treatment effect in terms of potential outcomes and observa
 <span id="cb30-4"><a href="g-computation.html#cb30-4" aria-hidden="true" tabindex="-1"></a>  fit.boot <span class="ot">&lt;-</span> <span class="fu">lm</span>(formula, <span class="at">data =</span> boot_sample)</span>
 <span id="cb30-5"><a href="g-computation.html#cb30-5" aria-hidden="true" tabindex="-1"></a>  Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.boot, </span>
 <span id="cb30-6"><a href="g-computation.html#cb30-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">1</span>, </span>
-<span id="cb30-7"><a href="g-computation.html#cb30-7" aria-hidden="true" tabindex="-1"></a>                                          dplyr<span class="sc">::</span><span class="fu">select</span>(boot_sample, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb30-7"><a href="g-computation.html#cb30-7" aria-hidden="true" tabindex="-1"></a>                                          dplyr<span class="sc">::</span><span class="fu">select</span>(boot_sample, <span class="sc">!</span>A)), </span>
 <span id="cb30-8"><a href="g-computation.html#cb30-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
 <span id="cb30-9"><a href="g-computation.html#cb30-9" aria-hidden="true" tabindex="-1"></a>  Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.boot, </span>
 <span id="cb30-10"><a href="g-computation.html#cb30-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">0</span>, </span>
-<span id="cb30-11"><a href="g-computation.html#cb30-11" aria-hidden="true" tabindex="-1"></a>                                          dplyr<span class="sc">::</span><span class="fu">select</span>(boot_sample, <span class="sc">!</span><span class="fu">c</span>(A,Y))), </span>
+<span id="cb30-11"><a href="g-computation.html#cb30-11" aria-hidden="true" tabindex="-1"></a>                                          dplyr<span class="sc">::</span><span class="fu">select</span>(boot_sample, <span class="sc">!</span>A)), </span>
 <span id="cb30-12"><a href="g-computation.html#cb30-12" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
 <span id="cb30-13"><a href="g-computation.html#cb30-13" aria-hidden="true" tabindex="-1"></a>  Pred.TE <span class="ot">&lt;-</span> <span class="fu">mean</span>(Pred.Y1) <span class="sc">-</span> <span class="fu">mean</span>(Pred.Y0)</span>
 <span id="cb30-14"><a href="g-computation.html#cb30-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Pred.TE)</span>

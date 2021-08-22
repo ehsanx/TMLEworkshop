@@ -6,6 +6,7 @@ require(glmnet)
 require(kableExtra)
 require(dplyr)
 require(xgboost)
+require(caret)
 require(SuperLearner)
 options(knitr.kable.NA = '')
 cachex=TRUE
@@ -20,7 +21,7 @@ cachex=TRUE
 ```{r reg2sl, cache=cachex, echo = TRUE}
 # Read the data saved at the last chapter
 ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
-baselinevars <- names(dplyr::select(ObsData, !c(A,Y)))
+baselinevars <- names(dplyr::select(ObsData, !A))
 out.formula <- as.formula(paste("Y~ A +",
                                paste(baselinevars,
                                      collapse = "+")))
@@ -30,10 +31,14 @@ out.formula <- as.formula(paste("Y~ A +",
 
 XGBoost is a fast version of gradient boosting algorithm. Let us use this one to fit the data first. We follow the exact same procedure that we followed in the parametric G-computation setting.
 
-```{r ML1, cache=cachex, echo = TRUE}
+```{r ML1, cache=cachex, echo = TRUE, warning= FALSE}
 require(xgboost)
-Y <-ObsData$Y
+Y <-ObsData$Y 
 ObsData.matrix <- model.matrix(out.formula, data = ObsData)
+```
+
+
+```{r ML1fit, cache=cachex, echo = TRUE}
 fit3 <- xgboost(data = ObsData.matrix, 
                 label = Y,
                 max.depth = 10, 
@@ -46,12 +51,130 @@ fit3 <- xgboost(data = ObsData.matrix,
 ```
 
 
+```{r ML1fit2, cache=cachex, echo = TRUE}
+predY <- predict(fit3, newdata = ObsData.matrix)
+plot(density(Y), 
+     col = "red", 
+     main = "Predicted and observed Y",
+     xlim = c(1,100))  
+legend("topright", 
+       c("Y","Predicted Y"), 
+       lty = c(1,2), 
+       col = c("red","blue"))
+lines(density(predY), col = "blue", lty = 2)
+caret::RMSE(predY,Y)
+```
+
+- What we have done here is we have used the `ObsData.matrix` data to train our model, and we have used `newdata = ObsData.matrix` to obtain prediction. 
+- When we use same model for training and obtaining prediction, often the predictions are highly optimistic (RMSE is unrealistically low for future predictions), and we call this a **over-fitting** problem.
+- One way to deal with this problem is called Cross-validation.
+
+### Cross-validation
+
+Cross-validation means
+
+- splitting the data into
+  - training data
+  - testing data
+- fitting models in training data
+- obtaining prediction $\hat{Y}$ in test data
+
+```{r cvpic, echo = FALSE, out.width = "650px", fig.cap="Cross validation from [wiki](https://en.wikipedia.org/wiki/Cross-validation_(statistics)); training data = used for building model; test data = used for prediction from the model that was built using training data; each iteration = fold"}
+knitr::include_graphics("images/CV.png")
+```
+
+- simplest cross-validation splits the data into $K=2$ parts, but can go higher.
+  - select $K$ judiciously
+    - large sample size means small $K$ may be adequate
+      - for $n \lt 10,000$ consider $K=3$
+      - for $n \lt 500$ consider $K=20$
+    - smaller sample size means larger $K$ may be necessary
+      - for $n \lt 30$ consider leave 1 out 
+
+We use `caret` package to do cross-validation. This is a general framework package for machine learning that can also incorporate other ML approaches such as `xgboost`.
+
+```{r ML1car, cache=cachex, echo = TRUE}
+require(caret)
+set.seed(123)
+X_ObsData.matrix <- xgb.DMatrix(ObsData.matrix)
+Y_ObsData <- ObsData$Y
+```
+
+Below we define $K = 3$ for cross-valudation. Ideally for a sample size close to $n=5,000$, we would select $K=10$, but for learning / demonstration / computational time-saving purposes, we just use $K = 3$. 
+
+```{r ML1carx, cache=cachex, echo = TRUE}
+xgb_trcontrol = trainControl(
+  method = "cv",
+  number = 3,  
+  allowParallel = TRUE,
+  verboseIter = FALSE,
+  returnData = FALSE
+)
+```
+
+One of the advantages of `caret` framework is that, it also allows checking the impact of various parameters. For example, 
+
+- for interaction dept, we previously use `max.depth = 10`. That means $covariate^{10}$ polynomial.
+- We could also check if other interaction dept choices (such as $covariate^{2}$ or $covariate^{4}$) would be better in terms of honest predictions.
+
+```{r ML1carxy, cache=cachex, echo = TRUE}
+xgbGrid <- expand.grid(
+  nrounds = 100, 
+  max_depth = seq(2,10,2),
+  eta = 1,
+  gamma = 0,
+  colsample_bytree = 0.1,
+  min_child_weight = 2,
+  subsample = 0.5 
+)
+```
+
+
+one we set
+
+- resampling or cross-validation settings
+- parameter grid
+
+we can fit the model:
+
+```{r ML1car2, cache=cachex, echo = TRUE}
+fit.xgb <- train(
+  X_ObsData.matrix, Y_ObsData,  
+  trControl = xgb_trcontrol,
+  method = "xgbTree",
+  tuneGrid = xgbGrid,
+  verbose = FALSE
+)
+fit.xgb
+```
+
+Based on the loss function (say, RMSE) it automatically chose the best tuning parameter set:
+
+```{r ML1car3, cache=cachex, echo = TRUE}
+fit.xgb$bestTune$max_depth
+``` 
+
+```{r}
+predY <- predict(fit.xgb, newdata = ObsData.matrix)
+plot(density(Y), 
+     col = "red", 
+     main = "Predicted and observed Y",
+     xlim = c(1,100))  
+legend("topright", 
+       c("Y","Predicted Y"), 
+       lty = c(1,2), 
+       col = c("red","blue"))
+lines(density(predY), col = "blue", lty = 2)
+caret::RMSE(predY,Y)
+```
+
+
 ### Extract outcome prediction as if everyone is treated
 
 ```{r ML12, cache=cachex, echo = TRUE}
 ObsData.matrix.A1 <- ObsData.matrix 
 ObsData.matrix.A1[,"A"] <- 1
-ObsData$Pred.Y1 <- predict(fit3, newdata = ObsData.matrix.A1)
+ObsData$Pred.Y1 <- predict(fit.xgb, newdata = ObsData.matrix.A1)
 summary(ObsData$Pred.Y1)
 ```
 
@@ -61,7 +184,7 @@ summary(ObsData$Pred.Y1)
 ```{r ML13, cache=cachex, echo = TRUE}
 ObsData.matrix.A0 <- ObsData.matrix
 ObsData.matrix.A0[,"A"] <- 0
-ObsData$Pred.Y0 <- predict(fit3, newdata = ObsData.matrix.A0)
+ObsData$Pred.Y0 <- predict(fit.xgb, newdata = ObsData.matrix.A0)
 summary(ObsData$Pred.Y0)
 ```
 
@@ -70,7 +193,6 @@ summary(ObsData$Pred.Y0)
 
 ```{r ML13b, cache=cachex, echo = TRUE}
 ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
-
 ```
 
 
@@ -86,15 +208,18 @@ Notice that the mean is slightly different than the parametric G-computation met
 
 ### A regularized model
 
-LASSO is a regularized method. One of the use of these methods is variable selection. Let us use this method to fit our data.
+LASSO is a regularized method. One of the use of these methods is variable selection. Let us use this method to fit our data. 
 
-```{r ML1r, cache=cachex, echo = TRUE}
+- We are again using cross-validation here, and we chose $K=3$.
+
+```{r ML1r, cache=cachex, echo = TRUE, warning=FALSE}
 require(glmnet)
 Y <-ObsData$Y
 ObsData.matrix <- model.matrix(out.formula, data = ObsData)
 fit4 <-  cv.glmnet(x = ObsData.matrix, 
                 y = Y,
-                alpha = 0.5,
+                alpha = 1,
+                nfolds = 3,
                 relax=TRUE)
 ```
 
@@ -161,38 +286,21 @@ Notice that the mean is very similar to the parametric G-computation method.
   - tree depth
   - tune regularization parameters
   - variable selection
+
+```{r ML1s00, cache=cachex, echo = TRUE}
+SL.library.chosen=c("SL.glm", "SL.glmnet", "SL.xgboost")
+```
+
   
 **SuperLearner** is an ensemble learning method. Let us use this one to fit the data first.
 
-```{r ML1s, cache=cachex, echo = TRUE, results='hide', warning = FALSE}
-require(SuperLearner)
-ObsData.noY <- dplyr::select(ObsData, !Y)
-fit.sl <- SuperLearner(Y=ObsData$Y, 
-                       X=ObsData.noY, 
-                       cvControl = list(V = 3),
-                       SL.library=c("SL.glm", "SL.glmnet", "SL.xgboost"), 
-                       method="method.NNLS",
-                       family="gaussian")
-```
-
 2. **Cross-validation**:
 
-To combat against optimism, we use cross-validation. SuperLearner first **splits** the data according to chosen $K$ fold for the cross-validation. That means
+To combat against optimism, we use cross-validation. SuperLearner first **splits** the data according to chosen $K$ fold for the cross-validation. 
 
-- fitting models in training data
-- obtaining prediction in test data
-
-```{r cvpic, echo = FALSE, out.width = "650px", fig.cap="Cross validation from [wiki](https://en.wikipedia.org/wiki/Cross-validation_(statistics)); training data = used for building model; test data = used for prediction from the model that was built using training data; each iteration = fold"}
-knitr::include_graphics("images/CV.png")
+```{r ML1s000, cache=cachex, echo = TRUE}
+cvControl.chosen = list(V = 3)
 ```
-
-- cross-validation is a core part of superlearner
-  - select $K$ judiciously
-    - large sample size means small $K$ may be adequate
-      - for $n \lt 10,000$ consider $K=3$
-      - for $n \lt 500$ consider $K=20$
-    - smaller sample size means larger $K$ may be necessary
-      - for $n \lt 30$ consider leave 1 out 
 
 3. **Estimate risk**:
 
@@ -203,11 +311,40 @@ $RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^n (Y - \hat{Y})^2}$ for continuous $Y$
 - we obtain risk estimate in each fold (from test data)
 - we average all the estimates risks
 
+We also chose a (non-negative) least squares loss function for the meta learner (explained below):
+
+```{r ML1s0, cache=cachex, echo = TRUE}
+loss.chosen = "method.NNLS"
+```
+
+4. **Find SL prediction**
+
+We first fit the super learner:
+
+```{r ML1s, cache=cachex, echo = TRUE, results='hide', warning = FALSE}
+require(SuperLearner)
+ObsData.noY <- dplyr::select(ObsData, !Y)
+fit.sl <- SuperLearner(Y=ObsData$Y, 
+                       X=ObsData.noY, 
+                       cvControl = cvControl.chosen,
+                       SL.library=SL.library.chosen,
+                       method=loss.chosen,
+                       family="gaussian")
+```
+
+We can obtain the $K$-fold cross-validated risk estimates for each candidate learners.
+
 ```{r ML12stestrisk, cache=cachex, echo = TRUE}
 fit.sl$cvRisk
 ```
 
-4. **Find SL prediction**
+We can also obtain the predictions from each candidate learners.
+
+```{r ML12stest0, cache=cachex, echo = TRUE}
+all.pred <- predict(fit.sl, type = "response")
+Yhat <- all.pred$library.predict
+head(Yhat)
+```  
 
 Once we have the performance measures and predictions from candidate learners, we could go one of **two routes** here
 
@@ -216,10 +353,10 @@ Once we have the performance measures and predictions from candidate learners, w
 `glmnet` has the lowest cross-validated risk
 
 ```{r ML12stest, cache=cachex, echo = TRUE}
-all.pred <- predict(fit.sl, type = "response")
-Yhat <- all.pred$library.predict
-head(Yhat)
-as.matrix(head(Yhat[,"SL.glmnet_All"]), 
+lowest.risk.learner <- names(which(
+  fit.sl$cvRisk == min(fit.sl$cvRisk)))
+lowest.risk.learner
+as.matrix(head(Yhat[,lowest.risk.learner]), 
           ncol=1)
 ```  
 
@@ -231,7 +368,7 @@ Here are the first 6 rows from the candidate learner predictions:
 head(Yhat)
 ``` 
   
-- fit a meta learner
+- fit a **meta learner** (optimal weighted combination; below is a simplified description) using
   - linear regression (without intercept, but could produce -ve coefs) or 
   - preferably non-negative least squares for 
   
@@ -242,6 +379,24 @@ head(Yhat)
   - $\mathbf{\beta_{scaled}}$ = $\mathbf{\beta}$ / $\sum_{i=1}^3{\mathbf{\beta}}$; 
   - so that the  sum of scaled coefs =  1 
 - Scaled coefficients $\mathbf{\beta_{scaled}}$ represents the **value / importance of the corresponding candidate learner**. 
+
+```{r ML12stestxreg, cache=cachex, echo = TRUE, include= FALSE}
+# fit.meta <- lm(Y ~ 0 + Yhat)
+# lm produces -ve
+# non-negative least squares (NNLS)
+fit.meta <- nnls::nnls(A=Yhat,b=Y)
+# alternate would be to use glmnet
+# fit.meta <- glmnet(X, Yhat, 
+#                    lambda = 0, 
+#                    lower.limits = 0, 
+#                    intercept = FALSE)
+fit.meta
+coefs <- coef(fit.meta)
+coefs
+scaled.coefs <- abs(coefs)/sum(abs(coefs))
+scaled.coefs
+``` 
+
 
 Scaled coefs
 
@@ -314,3 +469,14 @@ summary(ObsData$Pred.TE)
 - other similar algorithms such as **cross-fitting** had been shown to have better performances
 - for rare outcomes, consider using **stratification** to attempt to maintain training and test sample ratios the same
 - if data is clustered and not independent and identically distributed, use ID for the **cluster**
+
+Also, it is easy to show that, depending on the choice of meta-learners, the coefficients of the meta learners can be slightly different.
+
+```{r ML12lossf, cache=cachex, echo = TRUE}
+fit.sl2 <- recombineSL(fit.sl, Y = Y, method = "method.NNLS2")
+fit.sl2$coef
+fit.sl2 <- recombineSL(fit.sl, Y = Y, method = "method.CC_LS")
+fit.sl2$coef
+fit.sl4 <- recombineSL(fit.sl, Y = Y, method = "method.CC_nloglik")
+fit.sl4$coef
+```

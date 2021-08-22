@@ -33,7 +33,7 @@ In this workshop we will present an <ins>introductory tutorial explaining an ove
 
 ## Philosophy  {-}
 
-Code-first philosophy is adopted for this workshop; demonstrating the analyses through one real data analysis problem used in the literature. This workshop is not theory-focused, nor utilizes simulated data to explain the ideas.
+Code-first philosophy is adopted for this workshop; demonstrating the analyses through one real data analysis problem used in the literature. This workshop is not theory-focused, nor utilizes simulated data to explain the ideas. Given the focus on implementation, theory is beyond the scope of this workshop. At the end of the workshop, we will provide key references where the theories are well explained (given the adequate background of the readers).
 
 ## Pre-requisites {-}
 

@@ -164,7 +164,7 @@ coef(fit1)
 ```{r reg2ab, cache=cachex, echo = TRUE}
 ObsData$Pred.Y1 <- predict(fit1, 
                            newdata = data.frame(A = 1, 
-                                                dplyr::select(ObsData, !c(A,Y))), 
+                                                dplyr::select(ObsData, !A)), 
                            type = "response")
 ```
 
@@ -194,7 +194,7 @@ kable(small.data1, booktabs = TRUE, digits=1,
 ```{r reg2ac, cache=cachex, echo = TRUE}
 ObsData$Pred.Y0 <- predict(fit1, 
                            newdata = data.frame(A = 0, 
-                                                dplyr::select(ObsData, !c(A,Y))), 
+                                                dplyr::select(ObsData, !A)), 
                            type = "response")
 ```
 
@@ -261,12 +261,12 @@ fit1 <- lm(out.formula, data = ObsData)
 # Step 2
 ObsData$Pred.Y1 <- predict(fit1, 
                            newdata = data.frame(A = 1, 
-                                                dplyr::select(ObsData, !c(A,Y))), 
+                                                dplyr::select(ObsData, !A)), 
                            type = "response")
 # Step 3
 ObsData$Pred.Y0 <- predict(fit1, 
                            newdata = data.frame(A = 0, 
-                                                dplyr::select(ObsData, !c(A,Y))), 
+                                                dplyr::select(ObsData, !A)), 
                            type = "response")
 # Step 4
 ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
@@ -313,11 +313,11 @@ gcomp.boot <- function(formula = out.formula, data = ObsData, indices) {
   fit.boot <- lm(formula, data = boot_sample)
   Pred.Y1 <- predict(fit.boot, 
                      newdata = data.frame(A = 1, 
-                                          dplyr::select(boot_sample, !c(A,Y))), 
+                                          dplyr::select(boot_sample, !A)), 
                            type = "response")
   Pred.Y0 <- predict(fit.boot, 
                      newdata = data.frame(A = 0, 
-                                          dplyr::select(boot_sample, !c(A,Y))), 
+                                          dplyr::select(boot_sample, !A)), 
                            type = "response")
   Pred.TE <- mean(Pred.Y1) - mean(Pred.Y0)
   return(Pred.TE)

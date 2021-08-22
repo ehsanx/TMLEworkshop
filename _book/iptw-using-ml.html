@@ -23,7 +23,7 @@
 
 
 
-<meta name="date" content="2021-08-20" />
+<meta name="date" content="2021-08-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -240,9 +240,10 @@ div.csl-indent {
 <li class="chapter" data-level="3.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-regression-tree"><i class="fa fa-check"></i><b>3.1</b> G-comp using Regression tree</a>
 <ul>
 <li class="chapter" data-level="3.1.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#a-tree-based-algorithm"><i class="fa fa-check"></i><b>3.1.1</b> A tree based algorithm</a></li>
-<li class="chapter" data-level="3.1.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-treated"><i class="fa fa-check"></i><b>3.1.2</b> Extract outcome prediction as if everyone is treated</a></li>
-<li class="chapter" data-level="3.1.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-untreated"><i class="fa fa-check"></i><b>3.1.3</b> Extract outcome prediction as if everyone is untreated</a></li>
-<li class="chapter" data-level="3.1.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#treatment-effect-estimate-1"><i class="fa fa-check"></i><b>3.1.4</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="3.1.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#cross-validation"><i class="fa fa-check"></i><b>3.1.2</b> Cross-validation</a></li>
+<li class="chapter" data-level="3.1.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-treated"><i class="fa fa-check"></i><b>3.1.3</b> Extract outcome prediction as if everyone is treated</a></li>
+<li class="chapter" data-level="3.1.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#extract-outcome-prediction-as-if-everyone-is-untreated"><i class="fa fa-check"></i><b>3.1.4</b> Extract outcome prediction as if everyone is untreated</a></li>
+<li class="chapter" data-level="3.1.5" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#treatment-effect-estimate-1"><i class="fa fa-check"></i><b>3.1.5</b> Treatment effect estimate</a></li>
 </ul></li>
 <li class="chapter" data-level="3.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-regularized-methods"><i class="fa fa-check"></i><b>3.2</b> G-comp using regularized methods</a>
 <ul>
@@ -262,39 +263,41 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="4" data-path="iptw.html"><a href="iptw.html"><i class="fa fa-check"></i><b>4</b> IPTW</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="iptw.html"><a href="iptw.html#iptw-from-parametric-models"><i class="fa fa-check"></i><b>4.1</b> IPTW from parametric models</a>
-<ul>
-<li class="chapter" data-level="4.1.1" data-path="iptw.html"><a href="iptw.html#step-1-exposure-modelling"><i class="fa fa-check"></i><b>4.1.1</b> Step 1: exposure modelling</a></li>
-<li class="chapter" data-level="4.1.2" data-path="iptw.html"><a href="iptw.html#step-2-convert-ps-to-ipw"><i class="fa fa-check"></i><b>4.1.2</b> Step 2: Convert PS to IPW</a></li>
-<li class="chapter" data-level="4.1.3" data-path="iptw.html"><a href="iptw.html#step-3-balance-checking"><i class="fa fa-check"></i><b>4.1.3</b> Step 3: Balance checking</a></li>
-<li class="chapter" data-level="4.1.4" data-path="iptw.html"><a href="iptw.html#step-4-outcome-modelling"><i class="fa fa-check"></i><b>4.1.4</b> Step 4: outcome modelling</a></li>
-</ul></li>
+<li class="chapter" data-level="4.1" data-path="iptw.html"><a href="iptw.html#iptw-steps"><i class="fa fa-check"></i><b>4.1</b> IPTW steps</a></li>
+<li class="chapter" data-level="4.2" data-path="iptw.html"><a href="iptw.html#step-1-exposure-modelling"><i class="fa fa-check"></i><b>4.2</b> Step 1: exposure modelling</a></li>
+<li class="chapter" data-level="4.3" data-path="iptw.html"><a href="iptw.html#step-2-convert-ps-to-ipw"><i class="fa fa-check"></i><b>4.3</b> Step 2: Convert PS to IPW</a></li>
+<li class="chapter" data-level="4.4" data-path="iptw.html"><a href="iptw.html#step-3-balance-checking"><i class="fa fa-check"></i><b>4.4</b> Step 3: Balance checking</a></li>
+<li class="chapter" data-level="4.5" data-path="iptw.html"><a href="iptw.html#step-4-outcome-modelling"><i class="fa fa-check"></i><b>4.5</b> Step 4: outcome modelling</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html"><i class="fa fa-check"></i><b>5</b> IPTW using ML</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#iptw-from-superlearner"><i class="fa fa-check"></i><b>5.1</b> IPTW from Superlearner</a>
-<ul>
-<li class="chapter" data-level="5.1.1" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-1-exposure-modelling-1"><i class="fa fa-check"></i><b>5.1.1</b> Step 1: exposure modelling</a></li>
-<li class="chapter" data-level="5.1.2" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-2-convert-ps-to-ipw-1"><i class="fa fa-check"></i><b>5.1.2</b> Step 2: Convert PS to IPW</a></li>
-<li class="chapter" data-level="5.1.3" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-3-balance-checking-1"><i class="fa fa-check"></i><b>5.1.3</b> Step 3: Balance checking</a></li>
-<li class="chapter" data-level="5.1.4" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-4-outcome-modelling-1"><i class="fa fa-check"></i><b>5.1.4</b> Step 4: outcome modelling</a></li>
-</ul></li>
+<li class="chapter" data-level="5.1" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#iptw-steps-from-sl"><i class="fa fa-check"></i><b>5.1</b> IPTW Steps from SL</a></li>
+<li class="chapter" data-level="5.2" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-1-exposure-modelling-1"><i class="fa fa-check"></i><b>5.2</b> Step 1: exposure modelling</a></li>
+<li class="chapter" data-level="5.3" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-2-convert-ps-to-ipw-1"><i class="fa fa-check"></i><b>5.3</b> Step 2: Convert PS to IPW</a></li>
+<li class="chapter" data-level="5.4" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-3-balance-checking-1"><i class="fa fa-check"></i><b>5.4</b> Step 3: Balance checking</a></li>
+<li class="chapter" data-level="5.5" data-path="iptw-using-ml.html"><a href="iptw-using-ml.html#step-4-outcome-modelling-1"><i class="fa fa-check"></i><b>5.5</b> Step 4: outcome modelling</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="tmle.html"><a href="tmle.html"><i class="fa fa-check"></i><b>6</b> TMLE</a>
 <ul>
-<li class="chapter" data-level="6.1" data-path="tmle.html"><a href="tmle.html#transformation-of-continuous-outcome-variable"><i class="fa fa-check"></i><b>6.1</b> Transformation of continuous outcome variable</a></li>
-<li class="chapter" data-level="6.2" data-path="tmle.html"><a href="tmle.html#initial-estimate"><i class="fa fa-check"></i><b>6.2</b> Initial estimate</a></li>
-<li class="chapter" data-level="6.3" data-path="tmle.html"><a href="tmle.html#update"><i class="fa fa-check"></i><b>6.3</b> Update</a></li>
-<li class="chapter" data-level="6.4" data-path="tmle.html"><a href="tmle.html#treatment-effect-estimate-4"><i class="fa fa-check"></i><b>6.4</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="6.1" data-path="tmle.html"><a href="tmle.html#doubly-robust-estimators"><i class="fa fa-check"></i><b>6.1</b> Doubly robust estimators</a></li>
+<li class="chapter" data-level="6.2" data-path="tmle.html"><a href="tmle.html#targeted-maximum-likelihood-estimation-tmle"><i class="fa fa-check"></i><b>6.2</b> Targeted Maximum Likelihood Estimation (TMLE)</a></li>
+<li class="chapter" data-level="6.3" data-path="tmle.html"><a href="tmle.html#transformation-of-continuous-outcome-variable"><i class="fa fa-check"></i><b>6.3</b> Transformation of continuous outcome variable</a></li>
+<li class="chapter" data-level="6.4" data-path="tmle.html"><a href="tmle.html#initial-estimate"><i class="fa fa-check"></i><b>6.4</b> Initial estimate</a></li>
+<li class="chapter" data-level="6.5" data-path="tmle.html"><a href="tmle.html#estimate-the-propensity-scores"><i class="fa fa-check"></i><b>6.5</b> Estimate the propensity scores</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="tmle.html"><a href="tmle.html#use-the-propensity-scores-to-update-the-initial-estimate"><i class="fa fa-check"></i><b>6.5.1</b> Use the propensity scores to update the initial estimate</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="tmle.html"><a href="tmle.html#treatment-effect-estimate-4"><i class="fa fa-check"></i><b>6.6</b> Treatment effect estimate</a></li>
+<li class="chapter" data-level="6.7" data-path="tmle.html"><a href="tmle.html#statistical-inference"><i class="fa fa-check"></i><b>6.7</b> Statistical inference</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>7</b> Pre-packaged software</a>
 <ul>
 <li class="chapter" data-level="7.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3"><i class="fa fa-check"></i><b>7.1</b> sl3</a></li>
 <li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-1"><i class="fa fa-check"></i><b>7.2</b> tmle</a></li>
 <li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#ltmle"><i class="fa fa-check"></i><b>7.3</b> ltmle</a></li>
-<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle3"><i class="fa fa-check"></i><b>7.4</b> tmle3</a></li>
-<li class="chapter" data-level="7.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>7.5</b> AIPW</a></li>
-<li class="chapter" data-level="7.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.6</b> RHC results</a></li>
+<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#aipw"><i class="fa fa-check"></i><b>7.4</b> AIPW</a></li>
+<li class="chapter" data-level="7.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.5</b> RHC results</a></li>
+<li class="chapter" data-level="7.6" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.6</b> Other packages</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>8</b> Final Words</a>
 <ul>
@@ -353,8 +356,8 @@ div.csl-indent {
 <span id="cb1-4"><a href="iptw-using-ml.html#cb1-4" aria-hidden="true" tabindex="-1"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;A ~&quot;</span>,</span>
 <span id="cb1-5"><a href="iptw-using-ml.html#cb1-5" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">paste</span>(baselinevars,</span>
 <span id="cb1-6"><a href="iptw-using-ml.html#cb1-6" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span></code></pre></div>
-<div id="iptw-from-superlearner" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> IPTW from Superlearner</h2>
+<div id="iptw-steps-from-sl" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> IPTW Steps from SL</h2>
 <p><strong>Modelling Steps</strong>:</p>
 <p>We will still follow the same steps
 | | |
@@ -363,8 +366,9 @@ div.csl-indent {
 |Step 2| Convert <span class="math inline">\(PS\)</span> to <span class="math inline">\(IPW\)</span> = <span class="math inline">\(\frac{A}{PS} + \frac{1-A}{1-PS}\)</span>|
 |Step 3| Assess balance in weighted sample and overlap (<span class="math inline">\(PS\)</span> and <span class="math inline">\(L\)</span>)|
 |Step 4| outcome modelling: <span class="math inline">\(Prob(Y=1|A=1)\)</span> to obtain treatment effect estimate |</p>
-<div id="step-1-exposure-modelling-1" class="section level3" number="5.1.1">
-<h3><span class="header-section-number">5.1.1</span> Step 1: exposure modelling</h3>
+</div>
+<div id="step-1-exposure-modelling-1" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Step 1: exposure modelling</h2>
 <p>This is the exposure model that we decided on:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="iptw-using-ml.html#cb2-1" aria-hidden="true" tabindex="-1"></a>ps.formula</span></code></pre></div>
 <pre><code>## A ~ Disease.category + Cancer + Cardiovascular + Congestive.HF + 
@@ -397,20 +401,20 @@ div.csl-indent {
 <p>Check summaries:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="iptw-using-ml.html#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>PS.SL)</span></code></pre></div>
 <pre><code>##        V1          
-##  Min.   :0.002562  
-##  1st Qu.:0.147542  
-##  Median :0.347337  
+##  Min.   :0.002812  
+##  1st Qu.:0.149304  
+##  Median :0.346952  
 ##  Mean   :0.380833  
-##  3rd Qu.:0.592671  
-##  Max.   :0.973126</code></pre>
+##  3rd Qu.:0.593470  
+##  Max.   :0.972066</code></pre>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="iptw-using-ml.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>PS.SL, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
 <pre><code>## $`0`
 ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## 0.002562 0.087977 0.188885 0.222297 0.330681 0.792066 
+## 0.002812 0.089234 0.189658 0.222538 0.329702 0.787816 
 ## 
 ## $`1`
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.08028 0.51212 0.65434 0.63860 0.77233 0.97313</code></pre>
+## 0.08118 0.51443 0.65532 0.63821 0.76960 0.97207</code></pre>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="iptw-using-ml.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">0</span>]), </span>
 <span id="cb10-2"><a href="iptw-using-ml.html#cb10-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">main =</span> <span class="st">&quot;&quot;</span>)</span>
 <span id="cb10-3"><a href="iptw-using-ml.html#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">1</span>]), </span>
@@ -419,8 +423,8 @@ div.csl-indent {
 <span id="cb10-6"><a href="iptw-using-ml.html#cb10-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;blue&quot;</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span></code></pre></div>
 <p><img src="TMLEw_files/figure-html/ipw2psx2b-1.png" width="672" /></p>
 </div>
-<div id="step-2-convert-ps-to-ipw-1" class="section level3" number="5.1.2">
-<h3><span class="header-section-number">5.1.2</span> Step 2: Convert PS to IPW</h3>
+<div id="step-2-convert-ps-to-ipw-1" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Step 2: Convert PS to IPW</h2>
 <ul>
 <li>Convert PS from SL to IPW using the formula (again, ATE formula).</li>
 </ul>
@@ -428,11 +432,11 @@ div.csl-indent {
 <span id="cb11-2"><a href="iptw-using-ml.html#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>IPW.SL)</span></code></pre></div>
 <pre><code>##        V1        
 ##  Min.   : 1.003  
-##  1st Qu.: 1.144  
-##  Median : 1.332  
-##  Mean   : 1.502  
-##  3rd Qu.: 1.659  
-##  Max.   :12.457</code></pre>
+##  1st Qu.: 1.146  
+##  Median : 1.334  
+##  Mean   : 1.500  
+##  3rd Qu.: 1.658  
+##  Max.   :12.318</code></pre>
 <p>Output from pre-packged software packages to do the same (very similar estimates):</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="iptw-using-ml.html#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(WeightIt)</span>
 <span id="cb13-2"><a href="iptw-using-ml.html#cb13-2" aria-hidden="true" tabindex="-1"></a>W.out <span class="ot">&lt;-</span> <span class="fu">weightit</span>(ps.formula, </span>
@@ -444,7 +448,7 @@ div.csl-indent {
 <span id="cb13-8"><a href="iptw-using-ml.html#cb13-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;SL.xgboost&quot;</span>))</span>
 <span id="cb13-9"><a href="iptw-using-ml.html#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(W.out<span class="sc">$</span>weights)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##   1.002   1.137   1.312   1.459   1.613  12.293</code></pre>
+##   1.002   1.138   1.314   1.462   1.615  12.321</code></pre>
 <p>Alternatively, you can use the previously estimated PS</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="iptw-using-ml.html#cb15-1" aria-hidden="true" tabindex="-1"></a>W.out2 <span class="ot">&lt;-</span> <span class="fu">weightit</span>(ps.formula, </span>
 <span id="cb15-2"><a href="iptw-using-ml.html#cb15-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> ObsData, </span>
@@ -452,10 +456,10 @@ div.csl-indent {
 <span id="cb15-4"><a href="iptw-using-ml.html#cb15-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ps =</span> ObsData<span class="sc">$</span>PS.SL)</span>
 <span id="cb15-5"><a href="iptw-using-ml.html#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(W.out2<span class="sc">$</span>weights)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##   1.003   1.144   1.332   1.502   1.659  12.457</code></pre>
+##   1.003   1.146   1.334   1.500   1.658  12.318</code></pre>
 </div>
-<div id="step-3-balance-checking-1" class="section level3" number="5.1.3">
-<h3><span class="header-section-number">5.1.3</span> Step 3: Balance checking</h3>
+<div id="step-3-balance-checking-1" class="section level2" number="5.4">
+<h2><span class="header-section-number">5.4</span> Step 3: Balance checking</h2>
 <ul>
 <li>We first check balance numerically for SMD = 0.1 as threshold for balance.</li>
 </ul>
@@ -467,75 +471,75 @@ div.csl-indent {
 ## 
 ## Balance Measures
 ##                                           Type Diff.Un Diff.Adj
-## prop.score                            Distance  2.7815   2.1988
+## prop.score                            Distance  2.7655   2.1817
 ## Disease.category_ARF                    Binary -0.0290  -0.0094
 ## Disease.category_CHF                    Binary  0.0261   0.0153
-## Disease.category_Other                  Binary -0.1737  -0.1027
-## Disease.category_MOSF                   Binary  0.1766   0.0969
+## Disease.category_Other                  Binary -0.1737  -0.1024
+## Disease.category_MOSF                   Binary  0.1766   0.0965
 ## Cancer_None                             Binary  0.0439   0.0251
-## Cancer_Localized (Yes)                  Binary -0.0267  -0.0128
-## Cancer_Metastatic                       Binary -0.0172  -0.0124
-## Cardiovascular                          Binary  0.0445   0.0285
+## Cancer_Localized (Yes)                  Binary -0.0267  -0.0126
+## Cancer_Metastatic                       Binary -0.0172  -0.0125
+## Cardiovascular                          Binary  0.0445   0.0284
 ## Congestive.HF                           Binary  0.0268   0.0160
-## Dementia                                Binary -0.0472  -0.0299
+## Dementia                                Binary -0.0472  -0.0298
 ## Psychiatric                             Binary -0.0348  -0.0205
-## Pulmonary                               Binary -0.0737  -0.0434
+## Pulmonary                               Binary -0.0737  -0.0433
 ## Renal                                   Binary  0.0066   0.0048
 ## Hepatic                                 Binary -0.0124  -0.0082
 ## GI.Bleed                                Binary -0.0122  -0.0081
-## Tumor                                   Binary -0.0423  -0.0236
+## Tumor                                   Binary -0.0423  -0.0234
 ## Immunosupperssion                       Binary  0.0358   0.0201
-## Transfer.hx                             Binary  0.0554   0.0284
+## Transfer.hx                             Binary  0.0554   0.0283
 ## MI                                      Binary  0.0139   0.0075
-## age_[-Inf,50)                           Binary -0.0017  -0.0017
-## age_[50,60)                             Binary  0.0161   0.0128
+## age_[-Inf,50)                           Binary -0.0017  -0.0016
+## age_[50,60)                             Binary  0.0161   0.0129
 ## age_[60,70)                             Binary  0.0355   0.0168
-## age_[70,80)                             Binary  0.0144   0.0110
-## age_[80, Inf)                           Binary -0.0643  -0.0389
+## age_[70,80)                             Binary  0.0144   0.0111
+## age_[80, Inf)                           Binary -0.0643  -0.0392
 ## sex_Female                              Binary -0.0462  -0.0284
 ## edu                                    Contin.  0.0914   0.0513
-## DASIndex                               Contin.  0.0626   0.0394
-## APACHE.score                           Contin.  0.5014   0.2687
-## Glasgow.Coma.Score                     Contin. -0.1098  -0.0622
-## blood.pressure                         Contin. -0.4551  -0.2447
-## WBC                                    Contin.  0.0836   0.0517
-## Heart.rate                             Contin.  0.1469   0.0827
-## Respiratory.rate                       Contin. -0.1655  -0.0840
-## Temperature                            Contin. -0.0214  -0.0052
-## PaO2vs.FIO2                            Contin. -0.4332  -0.2379
-## Albumin                                Contin. -0.2299  -0.1308
-## Hematocrit                             Contin. -0.2693  -0.1608
-## Bilirubin                              Contin.  0.1446   0.0779
-## Creatinine                             Contin.  0.2696   0.1446
-## Sodium                                 Contin. -0.0922  -0.0513
-## Potassium                              Contin. -0.0271  -0.0277
-## PaCo2                                  Contin. -0.2486  -0.1501
-## PH                                     Contin. -0.1198  -0.0539
-## Weight                                 Contin.  0.2557   0.1435
-## DNR.status_Yes                          Binary -0.0696  -0.0431
+## DASIndex                               Contin.  0.0626   0.0388
+## APACHE.score                           Contin.  0.5014   0.2676
+## Glasgow.Coma.Score                     Contin. -0.1098  -0.0617
+## blood.pressure                         Contin. -0.4551  -0.2438
+## WBC                                    Contin.  0.0836   0.0514
+## Heart.rate                             Contin.  0.1469   0.0825
+## Respiratory.rate                       Contin. -0.1655  -0.0838
+## Temperature                            Contin. -0.0214  -0.0055
+## PaO2vs.FIO2                            Contin. -0.4332  -0.2370
+## Albumin                                Contin. -0.2299  -0.1304
+## Hematocrit                             Contin. -0.2693  -0.1604
+## Bilirubin                              Contin.  0.1446   0.0777
+## Creatinine                             Contin.  0.2696   0.1441
+## Sodium                                 Contin. -0.0922  -0.0514
+## Potassium                              Contin. -0.0271  -0.0279
+## PaCo2                                  Contin. -0.2486  -0.1497
+## PH                                     Contin. -0.1198  -0.0538
+## Weight                                 Contin.  0.2557   0.1432
+## DNR.status_Yes                          Binary -0.0696  -0.0430
 ## Medical.insurance_Medicaid              Binary -0.0395  -0.0226
 ## Medical.insurance_Medicare              Binary -0.0327  -0.0183
-## Medical.insurance_Medicare &amp; Medicaid   Binary -0.0144  -0.0069
-## Medical.insurance_No insurance          Binary  0.0099   0.0061
-## Medical.insurance_Private               Binary  0.0624   0.0337
-## Medical.insurance_Private &amp; Medicare    Binary  0.0143   0.0081
-## Respiratory.Diag_Yes                    Binary -0.1277  -0.0683
-## Cardiovascular.Diag_Yes                 Binary  0.1395   0.0771
-## Neurological.Diag_Yes                   Binary -0.1079  -0.0601
-## Gastrointestinal.Diag_Yes               Binary  0.0453   0.0251
+## Medical.insurance_Medicare &amp; Medicaid   Binary -0.0144  -0.0068
+## Medical.insurance_No insurance          Binary  0.0099   0.0062
+## Medical.insurance_Private               Binary  0.0624   0.0336
+## Medical.insurance_Private &amp; Medicare    Binary  0.0143   0.0080
+## Respiratory.Diag_Yes                    Binary -0.1277  -0.0681
+## Cardiovascular.Diag_Yes                 Binary  0.1395   0.0769
+## Neurological.Diag_Yes                   Binary -0.1079  -0.0599
+## Gastrointestinal.Diag_Yes               Binary  0.0453   0.0250
 ## Renal.Diag_Yes                          Binary  0.0264   0.0148
 ## Metabolic.Diag_Yes                      Binary -0.0059  -0.0026
 ## Hematologic.Diag_Yes                    Binary -0.0146  -0.0084
-## Sepsis.Diag_Yes                         Binary  0.0912   0.0491
+## Sepsis.Diag_Yes                         Binary  0.0912   0.0490
 ## Trauma.Diag_Yes                         Binary  0.0105   0.0064
 ## Orthopedic.Diag_Yes                     Binary  0.0010   0.0007
-## race_white                              Binary  0.0063   0.0039
-## race_black                              Binary -0.0114  -0.0044
-## race_other                              Binary  0.0050   0.0005
-## income_$11-$25k                         Binary  0.0062   0.0011
+## race_white                              Binary  0.0063   0.0038
+## race_black                              Binary -0.0114  -0.0045
+## race_other                              Binary  0.0050   0.0007
+## income_$11-$25k                         Binary  0.0062   0.0010
 ## income_$25-$50k                         Binary  0.0391   0.0212
-## income_&gt; $50k                           Binary  0.0165   0.0081
-## income_Under $11k                       Binary -0.0618  -0.0304
+## income_&gt; $50k                           Binary  0.0165   0.0080
+## income_Under $11k                       Binary -0.0618  -0.0302
 ##                                              M.Threshold
 ## prop.score                                              
 ## Disease.category_ARF                      Balanced, &lt;0.1
@@ -614,12 +618,12 @@ div.csl-indent {
 ## 
 ## Variable with the greatest mean difference
 ##      Variable Diff.Adj        M.Threshold
-##  APACHE.score   0.2687 Not Balanced, &gt;0.1
+##  APACHE.score   0.2676 Not Balanced, &gt;0.1
 ## 
 ## Effective sample sizes
 ##            Control Treated
-## Unadjusted 3551.   2184.  
-## Adjusted   3320.68 1901.95</code></pre>
+## Unadjusted 3551.    2184. 
+## Adjusted   3319.93  1900.9</code></pre>
 <ul>
 <li>And also via plot</li>
 </ul>
@@ -631,8 +635,8 @@ div.csl-indent {
 <span id="cb19-6"><a href="iptw-using-ml.html#cb19-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">line =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p><img src="TMLEw_files/figure-html/ipw2balp2-1.png" width="480" /></p>
 </div>
-<div id="step-4-outcome-modelling-1" class="section level3" number="5.1.4">
-<h3><span class="header-section-number">5.1.4</span> Step 4: outcome modelling</h3>
+<div id="step-4-outcome-modelling-1" class="section level2" number="5.5">
+<h2><span class="header-section-number">5.5</span> Step 4: outcome modelling</h2>
 <p>Estimate the effect of treatment on outcomes</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="iptw-using-ml.html#cb20-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(Y <span class="sc">~</span> A)</span>
 <span id="cb20-2"><a href="iptw-using-ml.html#cb20-2" aria-hidden="true" tabindex="-1"></a>out.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(out.formula,</span>
@@ -640,8 +644,8 @@ div.csl-indent {
 <span id="cb20-4"><a href="iptw-using-ml.html#cb20-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">weights =</span> IPW.SL)</span>
 <span id="cb20-5"><a href="iptw-using-ml.html#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">publish</span>(out.fit)</span></code></pre></div>
 <pre><code>##     Variable Units Coefficient         CI.95 p-value 
-##  (Intercept)             20.22 [19.31;21.12] &lt; 1e-04 
-##            A              4.24   [2.87;5.61] &lt; 1e-04</code></pre>
+##  (Intercept)             20.21 [19.30;21.12] &lt; 1e-04 
+##            A              4.25   [2.89;5.62] &lt; 1e-04</code></pre>
 <p>Also check the output when we used the weights from the package</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="iptw-using-ml.html#cb22-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(Y <span class="sc">~</span> A)</span>
 <span id="cb22-2"><a href="iptw-using-ml.html#cb22-2" aria-hidden="true" tabindex="-1"></a>out.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(out.formula,</span>
@@ -652,7 +656,6 @@ div.csl-indent {
 ##  (Intercept)             20.15 [19.25;21.05] &lt; 1e-04 
 ##            A              4.35   [2.98;5.72] &lt; 1e-04</code></pre>
 
-</div>
 </div>
 </div>
             </section>
