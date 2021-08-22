@@ -136,3 +136,6 @@ step-9-confidence-interval-estimation
 optional-task-get-initial-estimate
 get-predictions-under-both-treatments-a-0-and-1
 get-initial-treatment-effect-estimate
+psm-in-rhc-data
+tmle-in-rhc-data
+blog

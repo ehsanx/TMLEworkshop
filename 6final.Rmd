@@ -181,3 +181,9 @@ The following webinars and workshops are freely accessible, and great for unders
 
 - [Applications of Targeted Maximum Likelihood Estimation](https://www.youtube.com/watch?v=foY7HoCeo88) by Laura Balzar (UCSF Epi & Biostats)
 - [Applying targeted maximum likelihood estimation to pharmacoepidemiology](https://www.cnodes.ca/online-lecture/targeted-learning-estimation/) by Menglan Pang (CNODES)
+
+#### Blog
+
+- [Kat’s Stats](https://www.khstats.com/) by Katherine Hoffman
+- [towardsdatascience](https://towardsdatascience.com/targeted-maximum-likelihood-tmle-for-causal-inference-1be88542a749) by Yao Yang
+- [The Research Group of Mark van der Laan](https://vanderlaan-lab.org/post/) by Mark van der Laan

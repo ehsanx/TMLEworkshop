@@ -14,6 +14,7 @@ require(tmle3)
 require(sl3)
 options(knitr.kable.NA = '')
 cachex=TRUE
+cachexy=FALSE
 ```
 
 ```{r dataload_01, cache=cachex, echo = TRUE}
@@ -41,16 +42,19 @@ The _sl3_ package implements two types of Super Learning:
 
 The first step is to create a sl3 task which keeps track of the roles of the variables in our problem (@coyle2021tlverse). 
 
-```{r sl3_01}
+```{r sl301, cache=cachexy}
 require(sl3)
 # create sl3 task, specifying outcome and covariates 
 rhc_task <- make_sl3_Task(
   data = ObsData, 
-  covariates = colnames(ObsData)[-which(
-    names(ObsData) == "Y")],
+  covariates = colnames(ObsData)[-which(names(ObsData) == "Y")],
   outcome = "Y"
 )
-print(rhc_task)
+```
+
+
+```{r sl30156, cache=cachexy}
+rhc_task
 ```
 
 Next, we create our SuperLearner. To do this, 
@@ -58,7 +62,7 @@ Next, we create our SuperLearner. To do this,
 - we need to specify a **selection of machine learning algorithms** we want to include as candidates, as well as 
 - a **metalearner** that the SuperLearner will use to combine or choose from the machine learning algorithms provided (@coyle2021tlverse). 
 
-```{r sl3_02}
+```{r sl302, cache=cachexy}
 # see what algorithms are available for a continuous outcome 
 # (similar can be done for a binary outcome)
 sl3_list_learners("continuous")
@@ -66,20 +70,20 @@ sl3_list_learners("continuous")
 
 The chosen candidate algorithms can be created and collected in a Stack.
 
-```{r sl3_03, results='hide', message=FALSE, warning=FALSE}
+```{r sl303, cache=cachexy, results='hide', message=FALSE, warning=FALSE}
 # initialize candidate learners
 lrn_glm <- make_learner(Lrnr_glm)
 lrn_lasso <- make_learner(Lrnr_glmnet) # alpha default is 1
-xgb_50 <- Lrnr_xgboost$new(nrounds = 50)
+xgb_5 <- Lrnr_xgboost$new(nrounds = 5)
 
 # collect learners in stack
 stack <- make_learner(
-  Stack, lrn_glm, lrn_lasso, xgb_50
+  Stack, lrn_glm, lrn_lasso, xgb_5
 )
 ```
 
 The stack is then given to the SuperLearner.
-```{r sl3_04, results='hide', message=FALSE, warning=FALSE}
+```{r sl304, cache=cachexy, results='hide', message=FALSE, warning=FALSE}
 # to make an ensemble SuperLearner
 sl_meta <- Lrnr_nnls$new()
 sl <- Lrnr_sl$new(
@@ -96,7 +100,7 @@ sl_disc <- Lrnr_sl$new(
 
 The SuperLearner is then trained on the sl3 task we created at the start and then it can be used to make predictions.
 
-```{r sl3_05, results='hide', message=FALSE, warning=FALSE}
+```{r sl305, cache=cachexy, results='hide', message=FALSE, warning=FALSE}
 set.seed(1444)
 
 # train SL
@@ -108,10 +112,16 @@ sl_fit <- sl$train(rhc_task)
 sl3_data <- ObsData
 sl3_data$sl_preds <- sl_fit$predict()
 
-sl3_est <- mean(sl3_data$sl_preds[sl3_data$A == 1]) - mean(sl3_data$sl_preds[sl3_data$A == 0])
+sl3_est <- mean(sl3_data$sl_preds[sl3_data$A == 1]) - 
+  mean(sl3_data$sl_preds[sl3_data$A == 0])
 ```
 
-```{r, echo=FALSE}
+```{r}
+saveRDS(sl_fit, file = "data/sl3.RData")
+```
+
+
+```{r sl305b, cache=cachexy, echo=FALSE}
 print(sl3_est)
 
 # TODO
@@ -151,7 +161,7 @@ Most helpful resources:
 - Note also that the outcome $Y$ is required to be within the range of $[0,1]$ for this method as well, 
   - so we need to pass in the transformed data, then transform back the estimate.
 
-```{r tmle_pkg, cache=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r tmlepkg, cache=cachex, results='hide', message=FALSE, warning=FALSE}
 set.seed(1444) 
 
 # transform the outcome to fall within the range [0,1]
@@ -165,21 +175,43 @@ ObsData.noYA <- dplyr::select(ObsData,
 SL.library = c("SL.glm", 
                "SL.glmnet", 
                "SL.xgboost")
-tmle <- tmle::tmle(Y = ObsData$Y_transf, 
+```
+
+
+```{r tmlepkg33, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+tmle.fit <- tmle::tmle(Y = ObsData$Y_transf, 
                    A = ObsData$A, 
                    W = ObsData.noYA, 
                    family = "gaussian", 
+                   V = 3,
                    Q.SL.library = SL.library, 
                    g.SL.library = SL.library)
-tmle_est_tr <- tmle$estimates$ATE$psi
-# transform back the ATE estimate
-tmle_est <- (max.Y-min.Y)*tmle_est_tr
-
-tmle_ci <- paste("(", 
-                 round((max.Y-min.Y)*tmle$estimates$ATE$CI[1], 3), ", ", round((b-a)*tmle$estimates$ATE$CI[2], 3), ")", sep = "")
+tmle.fit
 ```
 
-```{r, echo=FALSE}
+
+```{r tmlepkgtr2, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+summary(tmle.fit)
+```
+
+
+```{r tmlepkgtr, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+tmle_est_tr <- tmle.fit$estimates$ATE$psi
+# transform back the ATE estimate
+tmle_est <- (max.Y-min.Y)*tmle_est_tr
+```
+
+```{r}
+saveRDS(tmle.fit, file = "data/tmle.RData")
+```
+
+```{r tmlepkg2, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+tmle_ci <- paste("(", 
+                 round((max.Y-min.Y)*tmle.fit$estimates$ATE$CI[1], 3), ", ", 
+                 round((max.Y-min.Y)*tmle.fit$estimates$ATE$CI[2], 3), ")", sep = "")
+```
+
+```{r, cache=cachex, echo=FALSE}
 cat("ATE from tmle package: ", tmle_est, tmle_ci, sep = "")
 ```
 
@@ -200,27 +232,41 @@ Most helpful resources:
 
 Similarly to the _tmle_ package, the _ltmle_ package gives the direct TMLE result with the call of one function. 
 
-```{r ltmle_pkg, cache=TRUE, message=FALSE, warning=FALSE}
-
-# ltmle(data=data, Anodes=' A' , Ynodes=' Y' , abar=list(1,0),
-# SL.library=SL.library, estimate.time=F)
-
-
+```{r ltmlepkg, cache=cachex, message=FALSE, warning=FALSE}
 # exclude Y_transf since ltmle scales automatically
-ltmle_data <- dplyr::select(ObsData, !Y_transf) 
+ltmle_data <- dplyr::select(ObsData, !Y_transf)
+```
 
+
+```{r ltmlepkgxd, cache=cachex, message=FALSE, warning=FALSE}
 # run ltmle
 ltmle_est <- ltmle(ltmle_data, 
                    Anodes = "A", 
                    Ynodes = "Y", 
-                   abar = 1, 
-                   SL.library = SL.library)
+                   abar = list(1,0), 
+                   SL.cvControl=list(V=3),
+                   SL.library = SL.library,
+                   estimate.time = FALSE)
+```
 
-# print result & confidence intervals
-ltmle_ci <- paste("(", 
-                  round(summary(ltmle_est)[["treatment"]][["CI"]][,"2.5%"], 3), ", ", round(summary(ltmle_est)[["treatment"]][["CI"]][,"97.5%"], 3), ")", sep = "")
-cat("ATE from ltmle package: ", 
-    ltmle_est$estimates[["tmle"]], ltmle_ci, sep = "")
+
+```{r ltmlepkgpr, cache=cachex}
+summary(ltmle_est)
+```
+
+```{r}
+saveRDS(ltmle_est, file = "data/ltmle.RData")
+```
+
+
+```{r ltmlepkg2, cache=cachex, include = FALSE}
+# # print result & confidence intervals
+# ltmle_ci <- paste("(",
+#                   round(summary(ltmle_est)[["treatment"]][["CI"]][,"2.5%"], 3),
+#                   ", ", round(summary(ltmle_est)[["treatment"]][["CI"]][,"97.5%"], 3),
+#                   ")", sep = "")
+# cat("ATE from ltmle package: ",
+#     ltmle_est$estimates[["tmle"]], ltmle_ci, sep = "")
 ```
 
 - The main difference between the _tmle_ and the _ltmle_ package is that the _ltmle_ package is designed to handle longitudinal data, with measurements data recorded for each subject at multiple timepoints. 
@@ -232,18 +278,30 @@ cat("ATE from ltmle package: ",
 - It has similar parameters as the _tmle_ package. 
 - It is typically used with the _SuperLearner_ library. 
 
-```{r aipw_pkg, cache=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r aipwpkg, cache=cachex, results='hide', message=FALSE, warning=FALSE}
 set.seed(1444) 
 # construct AIPW estimator
 aipw <- AIPW$new(Y=ObsData$Y, 
                  A=ObsData$A, 
                  W=ObsData[colnames(ObsData)[-which(names(ObsData) == "Y")]], 
-                 Q.SL.library = c("SL.mean", "SL.glm"), 
-                 g.SL.library = c("SL.mean", "SL.glm"), 
+                 Q.SL.library = c("SL.glm", 
+                                  "SL.glmnet", 
+                                  "SL.xgboost"), 
+                 g.SL.library = c(c("SL.glm", 
+                                    "SL.glmnet", 
+                                    "SL.xgboost")), 
                  k_split=3, 
                  verbose=FALSE)
+```
+
+
+```{r aipwpkg2, cache=cachex, results='hide', message=FALSE, warning=FALSE}
 # fit AIPW object
 aipw$fit()
+```
+
+
+```{r aipwpkg3, cache=cachex, results='hide', message=FALSE, warning=FALSE}
 # calculate ATE
 aipw$summary()
 print(aipw$estimates)
@@ -255,18 +313,29 @@ aipw_ci <- paste(" (",
                  round(aipw$estimates$RD["95% UCL"], 3), ")", sep = "")
 ```
 
-```{r, echo=FALSE}
-cat("ATE from aipw package: ", aipw_est, aipw_ci, sep = "")
+```{r}
+saveRDS(aipw, file = "data/aipw.RData")
+```
+
+```{r asg, echo=FALSE}
+cat("ATE from aipw package: ", aipw_est, aipw_ci, sep = "") 
 ```
 
 ## RHC results
-```{r summary table, cache=TRUE, echo=FALSE}
-methods <- c("sl3", "tmle", "ltmle", "aipw")
-estimates <- round(c(sl3_est, tmle_est, 
-                     ltmle_est$estimates[["tmle"]], 
+```{r summarytable, cache=cachex, echo=FALSE}
+methods <- c("sl3", 
+             "tmle", 
+             #"ltmle", 
+             "aipw") 
+estimates <- round(c(sl3_est, 
+                     tmle_est, 
+                     #ltmle_est$estimates[["tmle"]], 
                      aipw_est), 3)
 
-CIs <- c(sl3_ci, tmle_ci, ltmle_ci, aipw_ci)
+CIs <- c(sl3_ci, 
+         tmle_ci, 
+         #ltmle_ci, 
+         aipw_ci)
 
 results <- data.frame(methods, estimates, CIs)
 results
