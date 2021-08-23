@@ -109,6 +109,10 @@ W.out <- weightit(ps.formula,
 summary(W.out$weights)
 ```
 
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(W.out, file = "data/ipwslps.RDS")
+```
+
 Alternatively, you can use the previously estimated PS
 
 ```{r ipw2psx2c2clone, cache=TRUE, echo = TRUE}

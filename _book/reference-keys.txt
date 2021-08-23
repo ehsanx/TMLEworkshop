@@ -89,6 +89,7 @@ hatepsilon-hatepsilon_0-and-hatepsilon_1-4
 only-1-hatepsilon-4
 pre-packaged-software
 tmle-2
+tmle-reduced-computation
 sl3-optional
 rhc-results
 other-packages

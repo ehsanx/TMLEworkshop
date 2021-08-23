@@ -108,12 +108,12 @@ Y.fit.sl <- SuperLearner(Y=ObsData$Y.bounded,
                        SL.library=c("SL.glm", 
                                     "SL.glmnet", 
                                     "SL.xgboost"),
-                       method="method.CC_nloglik",
+                       method="method.CC_nloglik", 
                        family="gaussian")
 ```
 
 ```{r SL_out01x, cache=TRUE}
-ObsData$init.Pred <- predict(Y.fit.sl, newdata = ObsData.noY,
+ObsData$init.Pred <- predict(Y.fit.sl, newdata = ObsData.noY, 
                            type = "response")$pred
 
 summary(ObsData$init.Pred)
@@ -132,7 +132,7 @@ summary(ObsData$init.Pred)
 
 ```{r SL_out01, cache=TRUE}
 ObsData.noY$A <- 1
-ObsData$Pred.Y1 <- predict(Y.fit.sl, newdata = ObsData.noY,
+ObsData$Pred.Y1 <- predict(Y.fit.sl, newdata = ObsData.noY, 
                            type = "response")$pred
 summary(ObsData$Pred.Y1)
 ```
@@ -141,7 +141,7 @@ summary(ObsData$Pred.Y1)
 
 ```{r SL_out02, cache=TRUE}
 ObsData.noY$A <- 0
-ObsData$Pred.Y0 <- predict(Y.fit.sl, newdata = ObsData.noY,
+ObsData$Pred.Y0 <- predict(Y.fit.sl, newdata = ObsData.noY, 
                            type = "response")$pred
 summary(ObsData$Pred.Y0)
 ```
@@ -149,11 +149,11 @@ summary(ObsData$Pred.Y0)
 ### Get initial treatment effect estimate
 
 ```{r SL_out03, cache=cachex, echo = TRUE}
-ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
+ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0   
 ```
 
 ```{r SL_out04, cache=cachex, echo = TRUE}
-summary(ObsData$Pred.TE)
+summary(ObsData$Pred.TE) 
 ```
 
 ```{r SL_out, cache=TRUE, message=FALSE, warning=FALSE, include = FALSE}
@@ -202,13 +202,13 @@ PS.fit.SL <- SuperLearner(Y=ObsData$A,
                                     "SL.glmnet", 
                                     "SL.xgboost"),
                        method="method.CC_nloglik",
-                       family="binomial")
+                       family="binomial")  
 ```
 
 
 ```{r SL_out01ps2, cache=TRUE}
 all.pred <- predict(PS.fit.SL, type = "response")
-ObsData$PS.SL <- all.pred$pred
+ObsData$PS.SL <- all.pred$pred 
 ```
 
 - These propensity score predictions (`PS.SL`) are represented as $g(A_i=1|L_i)$.
@@ -222,7 +222,7 @@ plot(density(ObsData$PS.SL[ObsData$A==0]),
 lines(density(ObsData$PS.SL[ObsData$A==1]), 
       col = "blue", lty = 2)
 legend("topright", c("No RHC","RHC"), 
-       col = c("red", "blue"), lty=1:2)
+       col = c("red", "blue"), lty=1:2) 
 ```
 
 
@@ -256,7 +256,7 @@ ObsData$H.AL <- ObsData$H.A1L - ObsData$H.A0L
 summary(ObsData$H.AL)
 tapply(ObsData$H.AL, ObsData$A, summary)
 t(apply(cbind(-ObsData$H.A0L,ObsData$H.A1L), 
-      2, summary))
+      2, summary)) 
 ```
 
 Aggregated or individual clever covariate components show slight difference in their summaries.
@@ -282,7 +282,7 @@ eps_mod <- glm(Y.bounded ~ -1 + H.A1L + H.A0L +
                data = ObsData)
 epsilon <- coef(eps_mod)  
 epsilon["H.A1L"]
-epsilon["H.A0L"]
+epsilon["H.A0L"] 
 ```
 
 Note that, if `init.Pred` includes negative values, `NaNs` would be produced after applying `qlogis()`.
@@ -297,7 +297,7 @@ eps_mod1 <- glm(Y.bounded ~ -1 + H.AL +
                family = "binomial",
                data = ObsData)
 epsilon1 <- coef(eps_mod1) 
-epsilon1
+epsilon1 
 ```
 
 Alternative could be to use `H.AL` as weights (not shown here).
@@ -314,7 +314,7 @@ ObsData$Pred.Y1.update <- plogis(qlogis(ObsData$Pred.Y1) +
 ObsData$Pred.Y0.update <- plogis(qlogis(ObsData$Pred.Y0) + 
                                    epsilon["H.A0L"]*ObsData$H.A0L)
 summary(ObsData$Pred.Y1.update)
-summary(ObsData$Pred.Y0.update) 
+summary(ObsData$Pred.Y0.update)  
 ```
 
 ### Only 1 $\hat\epsilon$
@@ -327,7 +327,7 @@ ObsData$Pred.Y1.update1 <- plogis(qlogis(ObsData$Pred.Y1) +
 ObsData$Pred.Y0.update1 <- plogis(qlogis(ObsData$Pred.Y0) + 
                                    epsilon1*ObsData$H.AL)
 summary(ObsData$Pred.Y1.update1)
-summary(ObsData$Pred.Y0.update1)  
+summary(ObsData$Pred.Y0.update1)   
 ```
 
 Note that, if `Pred.Y1` and `Pred.Y0` include negative values, `NaNs` would be produced after applying `qlogis()`.
@@ -359,7 +359,7 @@ ATE.TMLE.bounded.vector <- ObsData$Pred.Y1.update -
 summary(ATE.TMLE.bounded.vector) 
 ATE.TMLE.bounded <- mean(ATE.TMLE.bounded.vector, 
                          na.rm = TRUE) 
-ATE.TMLE.bounded
+ATE.TMLE.bounded 
 ```
 
 ### Only 1 $\hat\epsilon$
@@ -372,7 +372,7 @@ ATE.TMLE.bounded.vector1 <- ObsData$Pred.Y1.update1 -
 summary(ATE.TMLE.bounded.vector1) 
 ATE.TMLE.bounded1 <- mean(ATE.TMLE.bounded.vector1, 
                          na.rm = TRUE) 
-ATE.TMLE.bounded1
+ATE.TMLE.bounded1 
 ```
 
 ## Step 8: Rescale effect estimate
@@ -383,7 +383,7 @@ We make sure to transform back to our original scale.
 
 ```{r meantmle, cache=TRUE}
 ATE.TMLE <- (max.Y-min.Y)*ATE.TMLE.bounded   
-ATE.TMLE
+ATE.TMLE 
 ```
 
 ### Only 1 $\hat\epsilon$
@@ -392,7 +392,7 @@ Alternatively, using `H.AL`:
 
 ```{r meantmle2, cache=TRUE}
 ATE.TMLE1 <- (max.Y-min.Y)*ATE.TMLE.bounded1
-ATE.TMLE1
+ATE.TMLE1 
 ```
 
 ## Step 9: Confidence interval estimation
@@ -442,21 +442,21 @@ ci.estimate <- function(data = ObsData, H.AL.components = 1){
     ATE.TMLE.CI <- c(ATE.TMLE1 - 1.96*sqrt(varHat.IC), 
                    ATE.TMLE1 + 1.96*sqrt(varHat.IC))
   }
-  return(ATE.TMLE.CI)
+  return(ATE.TMLE.CI) 
 }
 ```
 
 ### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
 
 ```{r tmleinf2b, cache=TRUE}
-CI2 <- ci.estimate(data = ObsData, H.AL.components = 2)
+CI2 <- ci.estimate(data = ObsData, H.AL.components = 2) 
 CI2
 ```
 
 ### Only 1 $\hat\epsilon$
 
 ```{r tmleinf2c, cache=TRUE}
-CI1 <- ci.estimate(data = ObsData, H.AL.components = 1)
+CI1 <- ci.estimate(data = ObsData, H.AL.components = 1) 
 CI1
 ```
 
@@ -481,6 +481,6 @@ CI1
 ```
 
 ```{r, cache=TRUE, echo = TRUE}
-saveRDS(ATE.TMLE1, file = "data/tmlepointh.RDS")
+saveRDS(ATE.TMLE, file = "data/tmlepointh.RDS") 
 saveRDS(CI2, file = "data/tmlecih.RDS")
 ```

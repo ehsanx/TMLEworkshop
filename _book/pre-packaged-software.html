@@ -21,6 +21,7 @@
   <meta name="twitter:description" content="Intro to R." />
   
 
+<meta name="author" content="Ehsan Karim &amp; Hanna Frank" />
 
 
 <meta name="date" content="2021-08-22" />
@@ -320,9 +321,10 @@ div.csl-indent {
 <li class="chapter" data-level="7" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>7</b> Pre-packaged software</a>
 <ul>
 <li class="chapter" data-level="7.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-2"><i class="fa fa-check"></i><b>7.1</b> tmle</a></li>
-<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3-optional"><i class="fa fa-check"></i><b>7.2</b> sl3 (optional)</a></li>
-<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.3</b> RHC results</a></li>
-<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.4</b> Other packages</a></li>
+<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-reduced-computation"><i class="fa fa-check"></i><b>7.2</b> tmle (reduced computation)</a></li>
+<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3-optional"><i class="fa fa-check"></i><b>7.3</b> sl3 (optional)</a></li>
+<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.4</b> RHC results</a></li>
+<li class="chapter" data-level="7.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.5</b> Other packages</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>8</b> Final Words</a>
 <ul>
@@ -393,56 +395,163 @@ div.csl-indent {
 <li>so we need to pass in the transformed data, then transform back the estimate.</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="pre-packaged-software.html#cb257-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1444</span>) </span>
-<span id="cb257-2"><a href="pre-packaged-software.html#cb257-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb257-3"><a href="pre-packaged-software.html#cb257-3" aria-hidden="true" tabindex="-1"></a><span class="co"># transform the outcome to fall within the range [0,1]</span></span>
-<span id="cb257-4"><a href="pre-packaged-software.html#cb257-4" aria-hidden="true" tabindex="-1"></a>min.Y <span class="ot">&lt;-</span> <span class="fu">min</span>(ObsData<span class="sc">$</span>Y)</span>
-<span id="cb257-5"><a href="pre-packaged-software.html#cb257-5" aria-hidden="true" tabindex="-1"></a>max.Y <span class="ot">&lt;-</span> <span class="fu">max</span>(ObsData<span class="sc">$</span>Y)</span>
-<span id="cb257-6"><a href="pre-packaged-software.html#cb257-6" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Y_transf <span class="ot">&lt;-</span> (ObsData<span class="sc">$</span>Y<span class="sc">-</span>min.Y)<span class="sc">/</span>(max.Y<span class="sc">-</span>min.Y)</span>
-<span id="cb257-7"><a href="pre-packaged-software.html#cb257-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb257-8"><a href="pre-packaged-software.html#cb257-8" aria-hidden="true" tabindex="-1"></a><span class="co"># run tmle from the tmle package </span></span>
-<span id="cb257-9"><a href="pre-packaged-software.html#cb257-9" aria-hidden="true" tabindex="-1"></a>ObsData.noYA <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
-<span id="cb257-10"><a href="pre-packaged-software.html#cb257-10" aria-hidden="true" tabindex="-1"></a>                              <span class="sc">!</span><span class="fu">c</span>(Y_transf, Y, A))</span>
-<span id="cb257-11"><a href="pre-packaged-software.html#cb257-11" aria-hidden="true" tabindex="-1"></a>SL.library <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
-<span id="cb257-12"><a href="pre-packaged-software.html#cb257-12" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;SL.glmnet&quot;</span>, </span>
-<span id="cb257-13"><a href="pre-packaged-software.html#cb257-13" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;SL.xgboost&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb258-1"><a href="pre-packaged-software.html#cb258-1" aria-hidden="true" tabindex="-1"></a>tmle.fit <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(<span class="at">Y =</span> ObsData<span class="sc">$</span>Y_transf, </span>
-<span id="cb258-2"><a href="pre-packaged-software.html#cb258-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">A =</span> ObsData<span class="sc">$</span>A, </span>
-<span id="cb258-3"><a href="pre-packaged-software.html#cb258-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">W =</span> ObsData.noYA, </span>
-<span id="cb258-4"><a href="pre-packaged-software.html#cb258-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">family =</span> <span class="st">&quot;gaussian&quot;</span>, </span>
-<span id="cb258-5"><a href="pre-packaged-software.html#cb258-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">V =</span> <span class="dv">3</span>,</span>
-<span id="cb258-6"><a href="pre-packaged-software.html#cb258-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">Q.SL.library =</span> SL.library, </span>
-<span id="cb258-7"><a href="pre-packaged-software.html#cb258-7" aria-hidden="true" tabindex="-1"></a>                   <span class="at">g.SL.library =</span> SL.library)</span>
-<span id="cb258-8"><a href="pre-packaged-software.html#cb258-8" aria-hidden="true" tabindex="-1"></a>tmle.fit</span></code></pre></div>
-<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb259-1"><a href="pre-packaged-software.html#cb259-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tmle.fit)</span></code></pre></div>
-<div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb260-1"><a href="pre-packaged-software.html#cb260-1" aria-hidden="true" tabindex="-1"></a>tmle_est_tr <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi</span>
-<span id="cb260-2"><a href="pre-packaged-software.html#cb260-2" aria-hidden="true" tabindex="-1"></a><span class="co"># transform back the ATE estimate</span></span>
-<span id="cb260-3"><a href="pre-packaged-software.html#cb260-3" aria-hidden="true" tabindex="-1"></a>tmle_est <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>tmle_est_tr</span></code></pre></div>
-<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="pre-packaged-software.html#cb261-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(tmle_est, <span class="at">file =</span> <span class="st">&quot;data/tmle.RDS&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb262"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb262-1"><a href="pre-packaged-software.html#cb262-1" aria-hidden="true" tabindex="-1"></a>tmle_ci <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;(&quot;</span>, </span>
-<span id="cb262-2"><a href="pre-packaged-software.html#cb262-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">round</span>((max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI[<span class="dv">1</span>], <span class="dv">3</span>), <span class="st">&quot;, &quot;</span>, </span>
-<span id="cb262-3"><a href="pre-packaged-software.html#cb262-3" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">round</span>((max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI[<span class="dv">2</span>], <span class="dv">3</span>), <span class="st">&quot;)&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb263"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb263-1"><a href="pre-packaged-software.html#cb263-1" aria-hidden="true" tabindex="-1"></a>tmle.ci <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI</span>
-<span id="cb263-2"><a href="pre-packaged-software.html#cb263-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(tmle.ci, <span class="at">file =</span> <span class="st">&quot;data/tmleci.RDS&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb259-1"><a href="pre-packaged-software.html#cb259-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1444</span>) </span>
+<span id="cb259-2"><a href="pre-packaged-software.html#cb259-2" aria-hidden="true" tabindex="-1"></a><span class="co"># transform the outcome to fall within the range [0,1]</span></span>
+<span id="cb259-3"><a href="pre-packaged-software.html#cb259-3" aria-hidden="true" tabindex="-1"></a>min.Y <span class="ot">&lt;-</span> <span class="fu">min</span>(ObsData<span class="sc">$</span>Y)</span>
+<span id="cb259-4"><a href="pre-packaged-software.html#cb259-4" aria-hidden="true" tabindex="-1"></a>min.Y</span></code></pre></div>
+<pre><code>## [1] 2</code></pre>
+<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="pre-packaged-software.html#cb261-1" aria-hidden="true" tabindex="-1"></a>max.Y <span class="ot">&lt;-</span> <span class="fu">max</span>(ObsData<span class="sc">$</span>Y)</span>
+<span id="cb261-2"><a href="pre-packaged-software.html#cb261-2" aria-hidden="true" tabindex="-1"></a>max.Y</span></code></pre></div>
+<pre><code>## [1] 394</code></pre>
+<div class="sourceCode" id="cb263"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb263-1"><a href="pre-packaged-software.html#cb263-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Y_transf <span class="ot">&lt;-</span> (ObsData<span class="sc">$</span>Y<span class="sc">-</span>min.Y)<span class="sc">/</span>(max.Y<span class="sc">-</span>min.Y)</span>
+<span id="cb263-2"><a href="pre-packaged-software.html#cb263-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb263-3"><a href="pre-packaged-software.html#cb263-3" aria-hidden="true" tabindex="-1"></a><span class="co"># run tmle from the tmle package </span></span>
+<span id="cb263-4"><a href="pre-packaged-software.html#cb263-4" aria-hidden="true" tabindex="-1"></a>ObsData.noYA <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, </span>
+<span id="cb263-5"><a href="pre-packaged-software.html#cb263-5" aria-hidden="true" tabindex="-1"></a>                              <span class="sc">!</span><span class="fu">c</span>(Y_transf, Y, A))</span>
+<span id="cb263-6"><a href="pre-packaged-software.html#cb263-6" aria-hidden="true" tabindex="-1"></a>SL.library <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
+<span id="cb263-7"><a href="pre-packaged-software.html#cb263-7" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;SL.glmnet&quot;</span>, </span>
+<span id="cb263-8"><a href="pre-packaged-software.html#cb263-8" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;SL.xgboost&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb264"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb264-1"><a href="pre-packaged-software.html#cb264-1" aria-hidden="true" tabindex="-1"></a>tmle.fit <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(<span class="at">Y =</span> ObsData<span class="sc">$</span>Y_transf, </span>
+<span id="cb264-2"><a href="pre-packaged-software.html#cb264-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">A =</span> ObsData<span class="sc">$</span>A, </span>
+<span id="cb264-3"><a href="pre-packaged-software.html#cb264-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">W =</span> ObsData.noYA, </span>
+<span id="cb264-4"><a href="pre-packaged-software.html#cb264-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">family =</span> <span class="st">&quot;gaussian&quot;</span>, </span>
+<span id="cb264-5"><a href="pre-packaged-software.html#cb264-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">V =</span> <span class="dv">3</span>,</span>
+<span id="cb264-6"><a href="pre-packaged-software.html#cb264-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">Q.SL.library =</span> SL.library, </span>
+<span id="cb264-7"><a href="pre-packaged-software.html#cb264-7" aria-hidden="true" tabindex="-1"></a>                   <span class="at">g.SL.library =</span> SL.library)</span>
+<span id="cb264-8"><a href="pre-packaged-software.html#cb264-8" aria-hidden="true" tabindex="-1"></a>tmle.fit</span></code></pre></div>
+<pre><code>##  Additive Effect
+##    Parameter Estimate:  0.0073229
+##    Estimated Variance:  2.0642e-06
+##               p-value:  3.4526e-07
+##     95% Conf Interval: (0.0045069, 0.010139) 
+## 
+##  Additive Effect among the Treated
+##    Parameter Estimate:  0.0054449
+##    Estimated Variance:  3.4095e-06
+##               p-value:  0.00319
+##     95% Conf Interval: (0.0018258, 0.0090641) 
+## 
+##  Additive Effect among the Controls
+##    Parameter Estimate:  0.01266
+##    Estimated Variance:  1.9251e-06
+##               p-value:  &lt;2e-16
+##     95% Conf Interval: (0.0099407, 0.01538)</code></pre>
+<div class="sourceCode" id="cb266"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb266-1"><a href="pre-packaged-software.html#cb266-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tmle.fit)</span></code></pre></div>
+<pre><code>##  Initial estimation of Q
+##   Procedure: cv-SuperLearner, ensemble
+##   Model:
+##       Y ~  SL.glm_All + SL.glmnet_All + SL.xgboost_All
+## 
+##   Coefficients: 
+##        SL.glm_All    0.316376 
+##     SL.glmnet_All    0.4996009 
+##    SL.xgboost_All    0.1840231 
+## 
+##   Cross-validated R squared :  0.0607 
+## 
+##  Estimation of g (treatment mechanism)
+##   Procedure: SuperLearner, ensemble   Empirical AUC = 0.9388 
+## 
+##   Model:
+##       A ~  SL.glm_All + SL.glmnet_All + SL.xgboost_All 
+## 
+##   Coefficients: 
+##        SL.glm_All    0 
+##     SL.glmnet_All    0.6490267 
+##    SL.xgboost_All    0.3509733 
+## 
+##  Estimation of g.Z (intermediate variable assignment mechanism)
+##   Procedure: No intermediate variable 
+## 
+##  Estimation of g.Delta (missingness mechanism)
+##   Procedure: No missingness, ensemble
+## 
+##  Bounds on g: (0.0076, 1) 
+## 
+##  Bounds on g for ATT/ATE: (0.0076, 0.9924) 
+## 
+##  Additive Effect
+##    Parameter Estimate:  0.0073229
+##    Estimated Variance:  2.0642e-06
+##               p-value:  3.4526e-07
+##     95% Conf Interval: (0.0045069, 0.010139) 
+## 
+##  Additive Effect among the Treated
+##    Parameter Estimate:  0.0054449
+##    Estimated Variance:  3.4095e-06
+##               p-value:  0.00319
+##     95% Conf Interval: (0.0018258, 0.0090641) 
+## 
+##  Additive Effect among the Controls
+##    Parameter Estimate:  0.01266
+##    Estimated Variance:  1.9251e-06
+##               p-value:  &lt;2e-16
+##     95% Conf Interval: (0.0099407, 0.01538)</code></pre>
+<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb268-1"><a href="pre-packaged-software.html#cb268-1" aria-hidden="true" tabindex="-1"></a>tmle_est_tr <span class="ot">&lt;-</span> tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi</span>
+<span id="cb268-2"><a href="pre-packaged-software.html#cb268-2" aria-hidden="true" tabindex="-1"></a>tmle_est_tr</span></code></pre></div>
+<pre><code>## [1] 0.00732285</code></pre>
+<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="pre-packaged-software.html#cb270-1" aria-hidden="true" tabindex="-1"></a><span class="co"># transform back the ATE estimate</span></span>
+<span id="cb270-2"><a href="pre-packaged-software.html#cb270-2" aria-hidden="true" tabindex="-1"></a>tmle_est <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>tmle_est_tr</span>
+<span id="cb270-3"><a href="pre-packaged-software.html#cb270-3" aria-hidden="true" tabindex="-1"></a>tmle_est</span></code></pre></div>
+<pre><code>## [1] 2.870557</code></pre>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="pre-packaged-software.html#cb272-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(tmle_est, <span class="at">file =</span> <span class="st">&quot;data/tmle.RDS&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="pre-packaged-software.html#cb273-1" aria-hidden="true" tabindex="-1"></a>tmle_ci <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;(&quot;</span>, </span>
+<span id="cb273-2"><a href="pre-packaged-software.html#cb273-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">round</span>((max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI[<span class="dv">1</span>], <span class="dv">3</span>), <span class="st">&quot;, &quot;</span>, </span>
+<span id="cb273-3"><a href="pre-packaged-software.html#cb273-3" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">round</span>((max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI[<span class="dv">2</span>], <span class="dv">3</span>), <span class="st">&quot;)&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="pre-packaged-software.html#cb274-1" aria-hidden="true" tabindex="-1"></a>tmle.ci <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>tmle.fit<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>CI</span>
+<span id="cb274-2"><a href="pre-packaged-software.html#cb274-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(tmle.ci, <span class="at">file =</span> <span class="st">&quot;data/tmleci.RDS&quot;</span>)</span></code></pre></div>
 <pre><code>## ATE from tmle package: 2.870557(1.767, 3.974)</code></pre>
 <p>Notes about the <em>tmle</em> package:</p>
 <ul>
 <li>does not scale the outcome for you</li>
 <li>can give some error messages when dealing with variable types it is not expecting</li>
 <li>practically all steps are nicely packed up in one function, very easy to use but need to dig a little to truly understand what it does</li>
-<li>at first was not straightforward to figure out how to use with a continuous outcome and log-likelihood loss function as the difference between several parameters relating to variable type and loss function was unclear</li>
 </ul>
 <p>Most helpful resources:</p>
 <ul>
 <li><a href="https://cran.r-project.org/web/packages/tmle/tmle.pdf">CRAN docs</a></li>
 <li><a href="https://www.jstatsoft.org/article/view/v051i13">tmle package paper</a></li>
-<li>Vignettes in R</li>
 </ul>
 </div>
-<div id="sl3-optional" class="section level2" number="7.2">
-<h2><span class="header-section-number">7.2</span> sl3 (optional)</h2>
-<div class="sourceCode" id="cb265"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb265-1"><a href="pre-packaged-software.html#cb265-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install sl3 if not done so</span></span>
-<span id="cb265-2"><a href="pre-packaged-software.html#cb265-2" aria-hidden="true" tabindex="-1"></a><span class="co"># remotes::install_github(&quot;tlverse/sl3&quot;)</span></span></code></pre></div>
+<div id="tmle-reduced-computation" class="section level2" number="7.2">
+<h2><span class="header-section-number">7.2</span> tmle (reduced computation)</h2>
+<p>We can use the previously calculated propensity score predictions from SL (calculated using <code>WeightIt</code> package) in the <code>tmle</code> to reduce some computing time.</p>
+<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="pre-packaged-software.html#cb276-1" aria-hidden="true" tabindex="-1"></a>ps.obj <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/ipwslps.RDS&quot;</span>)</span>
+<span id="cb276-2"><a href="pre-packaged-software.html#cb276-2" aria-hidden="true" tabindex="-1"></a>ps.SL <span class="ot">&lt;-</span> ps.obj<span class="sc">$</span>weights</span>
+<span id="cb276-3"><a href="pre-packaged-software.html#cb276-3" aria-hidden="true" tabindex="-1"></a>tmle.fit2 <span class="ot">&lt;-</span> tmle<span class="sc">::</span><span class="fu">tmle</span>(<span class="at">Y =</span> ObsData<span class="sc">$</span>Y_transf, </span>
+<span id="cb276-4"><a href="pre-packaged-software.html#cb276-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">A =</span> ObsData<span class="sc">$</span>A, </span>
+<span id="cb276-5"><a href="pre-packaged-software.html#cb276-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">W =</span> ObsData.noYA, </span>
+<span id="cb276-6"><a href="pre-packaged-software.html#cb276-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">family =</span> <span class="st">&quot;gaussian&quot;</span>,</span>
+<span id="cb276-7"><a href="pre-packaged-software.html#cb276-7" aria-hidden="true" tabindex="-1"></a>                   <span class="at">V =</span> <span class="dv">3</span>,</span>
+<span id="cb276-8"><a href="pre-packaged-software.html#cb276-8" aria-hidden="true" tabindex="-1"></a>                   <span class="at">Q.SL.library =</span> SL.library, </span>
+<span id="cb276-9"><a href="pre-packaged-software.html#cb276-9" aria-hidden="true" tabindex="-1"></a>                   <span class="at">g1W =</span> ps.SL)</span>
+<span id="cb276-10"><a href="pre-packaged-software.html#cb276-10" aria-hidden="true" tabindex="-1"></a>tmle.fit2</span></code></pre></div>
+<pre><code>##  Additive Effect
+##    Parameter Estimate:  0.0079113
+##    Estimated Variance:  0.0063697
+##               p-value:  0.92104
+##     95% Conf Interval: (-0.14852, 0.16434) 
+## 
+##  Additive Effect among the Treated
+##    Parameter Estimate:  0.016964
+##    Estimated Variance:  0.043265
+##               p-value:  0.935
+##     95% Conf Interval: (-0.39072, 0.42465) 
+## 
+##  Additive Effect among the Controls
+##   Warning: Procedure failed to converge
+##    Parameter Estimate:  0.00063631
+##    Estimated Variance:  9.7303e-07
+##               p-value:  0.51888
+##     95% Conf Interval: (-0.0012971, 0.0025697)</code></pre>
+<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb278-1"><a href="pre-packaged-software.html#cb278-1" aria-hidden="true" tabindex="-1"></a><span class="co"># transform back ATE estimate</span></span>
+<span id="cb278-2"><a href="pre-packaged-software.html#cb278-2" aria-hidden="true" tabindex="-1"></a>(max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>tmle.fit2<span class="sc">$</span>estimates<span class="sc">$</span>ATE<span class="sc">$</span>psi</span></code></pre></div>
+<pre><code>## [1] 3.101232</code></pre>
+</div>
+<div id="sl3-optional" class="section level2" number="7.3">
+<h2><span class="header-section-number">7.3</span> sl3 (optional)</h2>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="pre-packaged-software.html#cb280-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install sl3 if not done so</span></span>
+<span id="cb280-2"><a href="pre-packaged-software.html#cb280-2" aria-hidden="true" tabindex="-1"></a><span class="co"># remotes::install_github(&quot;tlverse/sl3&quot;)</span></span></code></pre></div>
 <p>The <em>sl3</em> package is a newer package, that implements two types of Super Learning:</p>
 <ul>
 <li><strong>discrete Super Learning</strong>,
@@ -455,14 +564,14 @@ div.csl-indent {
 </ul></li>
 </ul>
 <p>The first step is to create a sl3 task which keeps track of the roles of the variables in our problem (<span class="citation"><a href="#ref-coyle2021tlverse" role="doc-biblioref">Coyle, Hejazi, Melencia, et al.</a> (<a href="#ref-coyle2021tlverse" role="doc-biblioref">2021</a>)</span>).</p>
-<div class="sourceCode" id="cb266"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb266-1"><a href="pre-packaged-software.html#cb266-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(sl3)</span>
-<span id="cb266-2"><a href="pre-packaged-software.html#cb266-2" aria-hidden="true" tabindex="-1"></a><span class="co"># create sl3 task, specifying outcome and covariates </span></span>
-<span id="cb266-3"><a href="pre-packaged-software.html#cb266-3" aria-hidden="true" tabindex="-1"></a>rhc_task <span class="ot">&lt;-</span> <span class="fu">make_sl3_Task</span>(</span>
-<span id="cb266-4"><a href="pre-packaged-software.html#cb266-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> ObsData, </span>
-<span id="cb266-5"><a href="pre-packaged-software.html#cb266-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">covariates =</span> <span class="fu">colnames</span>(ObsData)[<span class="sc">-</span><span class="fu">which</span>(<span class="fu">names</span>(ObsData) <span class="sc">==</span> <span class="st">&quot;Y&quot;</span>)],</span>
-<span id="cb266-6"><a href="pre-packaged-software.html#cb266-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span></span>
-<span id="cb266-7"><a href="pre-packaged-software.html#cb266-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="pre-packaged-software.html#cb267-1" aria-hidden="true" tabindex="-1"></a>rhc_task</span></code></pre></div>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="pre-packaged-software.html#cb281-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(sl3)</span>
+<span id="cb281-2"><a href="pre-packaged-software.html#cb281-2" aria-hidden="true" tabindex="-1"></a><span class="co"># create sl3 task, specifying outcome and covariates </span></span>
+<span id="cb281-3"><a href="pre-packaged-software.html#cb281-3" aria-hidden="true" tabindex="-1"></a>rhc_task <span class="ot">&lt;-</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb281-4"><a href="pre-packaged-software.html#cb281-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> ObsData, </span>
+<span id="cb281-5"><a href="pre-packaged-software.html#cb281-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">covariates =</span> <span class="fu">colnames</span>(ObsData)[<span class="sc">-</span><span class="fu">which</span>(<span class="fu">names</span>(ObsData) <span class="sc">==</span> <span class="st">&quot;Y&quot;</span>)],</span>
+<span id="cb281-6"><a href="pre-packaged-software.html#cb281-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span></span>
+<span id="cb281-7"><a href="pre-packaged-software.html#cb281-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="pre-packaged-software.html#cb282-1" aria-hidden="true" tabindex="-1"></a>rhc_task</span></code></pre></div>
 <pre><code>## A sl3 Task with 5735 obs and these nodes:
 ## $covariates
 ##  [1] &quot;Disease.category&quot;      &quot;Cancer&quot;                &quot;Cardiovascular&quot;       
@@ -502,9 +611,9 @@ div.csl-indent {
 <li>we need to specify a <strong>selection of machine learning algorithms</strong> we want to include as candidates, as well as</li>
 <li>a <strong>metalearner</strong> that the SuperLearner will use to combine or choose from the machine learning algorithms provided (<span class="citation"><a href="#ref-coyle2021tlverse" role="doc-biblioref">Coyle, Hejazi, Melencia, et al.</a> (<a href="#ref-coyle2021tlverse" role="doc-biblioref">2021</a>)</span>).</li>
 </ul>
-<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="pre-packaged-software.html#cb269-1" aria-hidden="true" tabindex="-1"></a><span class="co"># see what algorithms are available for a continuous outcome </span></span>
-<span id="cb269-2"><a href="pre-packaged-software.html#cb269-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (similar can be done for a binary outcome)</span></span>
-<span id="cb269-3"><a href="pre-packaged-software.html#cb269-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sl3_list_learners</span>(<span class="st">&quot;continuous&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="pre-packaged-software.html#cb284-1" aria-hidden="true" tabindex="-1"></a><span class="co"># see what algorithms are available for a continuous outcome </span></span>
+<span id="cb284-2"><a href="pre-packaged-software.html#cb284-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (similar can be done for a binary outcome)</span></span>
+<span id="cb284-3"><a href="pre-packaged-software.html#cb284-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sl3_list_learners</span>(<span class="st">&quot;continuous&quot;</span>)</span></code></pre></div>
 <pre><code>##  [1] &quot;Lrnr_arima&quot;                     &quot;Lrnr_bartMachine&quot;              
 ##  [3] &quot;Lrnr_bilstm&quot;                    &quot;Lrnr_bound&quot;                    
 ##  [5] &quot;Lrnr_caret&quot;                     &quot;Lrnr_cv_selector&quot;              
@@ -528,43 +637,46 @@ div.csl-indent {
 ## [41] &quot;Lrnr_svm&quot;                       &quot;Lrnr_tsDyn&quot;                    
 ## [43] &quot;Lrnr_xgboost&quot;</code></pre>
 <p>The chosen candidate algorithms can be created and collected in a Stack.</p>
-<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="pre-packaged-software.html#cb271-1" aria-hidden="true" tabindex="-1"></a><span class="co"># initialize candidate learners</span></span>
-<span id="cb271-2"><a href="pre-packaged-software.html#cb271-2" aria-hidden="true" tabindex="-1"></a>lrn_glm <span class="ot">&lt;-</span> <span class="fu">make_learner</span>(Lrnr_glm)</span>
-<span id="cb271-3"><a href="pre-packaged-software.html#cb271-3" aria-hidden="true" tabindex="-1"></a>lrn_lasso <span class="ot">&lt;-</span> <span class="fu">make_learner</span>(Lrnr_glmnet) <span class="co"># alpha default is 1</span></span>
-<span id="cb271-4"><a href="pre-packaged-software.html#cb271-4" aria-hidden="true" tabindex="-1"></a>xgb_5 <span class="ot">&lt;-</span> Lrnr_xgboost<span class="sc">$</span><span class="fu">new</span>(<span class="at">nrounds =</span> <span class="dv">5</span>)</span>
-<span id="cb271-5"><a href="pre-packaged-software.html#cb271-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb271-6"><a href="pre-packaged-software.html#cb271-6" aria-hidden="true" tabindex="-1"></a><span class="co"># collect learners in stack</span></span>
-<span id="cb271-7"><a href="pre-packaged-software.html#cb271-7" aria-hidden="true" tabindex="-1"></a>stack <span class="ot">&lt;-</span> <span class="fu">make_learner</span>(</span>
-<span id="cb271-8"><a href="pre-packaged-software.html#cb271-8" aria-hidden="true" tabindex="-1"></a>  Stack, lrn_glm, lrn_lasso, xgb_5</span>
-<span id="cb271-9"><a href="pre-packaged-software.html#cb271-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="pre-packaged-software.html#cb286-1" aria-hidden="true" tabindex="-1"></a><span class="co"># initialize candidate learners</span></span>
+<span id="cb286-2"><a href="pre-packaged-software.html#cb286-2" aria-hidden="true" tabindex="-1"></a>lrn_glm <span class="ot">&lt;-</span> <span class="fu">make_learner</span>(Lrnr_glm)</span>
+<span id="cb286-3"><a href="pre-packaged-software.html#cb286-3" aria-hidden="true" tabindex="-1"></a>lrn_lasso <span class="ot">&lt;-</span> <span class="fu">make_learner</span>(Lrnr_glmnet) <span class="co"># alpha default is 1</span></span>
+<span id="cb286-4"><a href="pre-packaged-software.html#cb286-4" aria-hidden="true" tabindex="-1"></a>xgb_5 <span class="ot">&lt;-</span> Lrnr_xgboost<span class="sc">$</span><span class="fu">new</span>(<span class="at">nrounds =</span> <span class="dv">5</span>)</span>
+<span id="cb286-5"><a href="pre-packaged-software.html#cb286-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb286-6"><a href="pre-packaged-software.html#cb286-6" aria-hidden="true" tabindex="-1"></a><span class="co"># collect learners in stack</span></span>
+<span id="cb286-7"><a href="pre-packaged-software.html#cb286-7" aria-hidden="true" tabindex="-1"></a>stack <span class="ot">&lt;-</span> <span class="fu">make_learner</span>(</span>
+<span id="cb286-8"><a href="pre-packaged-software.html#cb286-8" aria-hidden="true" tabindex="-1"></a>  Stack, lrn_glm, lrn_lasso, xgb_5</span>
+<span id="cb286-9"><a href="pre-packaged-software.html#cb286-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>The stack is then given to the SuperLearner.</p>
-<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="pre-packaged-software.html#cb272-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to make an ensemble SuperLearner</span></span>
-<span id="cb272-2"><a href="pre-packaged-software.html#cb272-2" aria-hidden="true" tabindex="-1"></a>sl_meta <span class="ot">&lt;-</span> Lrnr_nnls<span class="sc">$</span><span class="fu">new</span>()</span>
-<span id="cb272-3"><a href="pre-packaged-software.html#cb272-3" aria-hidden="true" tabindex="-1"></a>sl <span class="ot">&lt;-</span> Lrnr_sl<span class="sc">$</span><span class="fu">new</span>(</span>
-<span id="cb272-4"><a href="pre-packaged-software.html#cb272-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">learners =</span> stack,</span>
-<span id="cb272-5"><a href="pre-packaged-software.html#cb272-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">metalearner =</span> sl_meta)</span>
-<span id="cb272-6"><a href="pre-packaged-software.html#cb272-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb272-7"><a href="pre-packaged-software.html#cb272-7" aria-hidden="true" tabindex="-1"></a><span class="co"># or a discrete SuperLearner</span></span>
-<span id="cb272-8"><a href="pre-packaged-software.html#cb272-8" aria-hidden="true" tabindex="-1"></a>sl_disc_meta <span class="ot">&lt;-</span> Lrnr_cv_selector<span class="sc">$</span><span class="fu">new</span>()</span>
-<span id="cb272-9"><a href="pre-packaged-software.html#cb272-9" aria-hidden="true" tabindex="-1"></a>sl_disc <span class="ot">&lt;-</span> Lrnr_sl<span class="sc">$</span><span class="fu">new</span>(</span>
-<span id="cb272-10"><a href="pre-packaged-software.html#cb272-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">learners =</span> stack, </span>
-<span id="cb272-11"><a href="pre-packaged-software.html#cb272-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">metalearner =</span> sl_disc_meta</span>
-<span id="cb272-12"><a href="pre-packaged-software.html#cb272-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="pre-packaged-software.html#cb287-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to make an ensemble SuperLearner</span></span>
+<span id="cb287-2"><a href="pre-packaged-software.html#cb287-2" aria-hidden="true" tabindex="-1"></a>sl_meta <span class="ot">&lt;-</span> Lrnr_nnls<span class="sc">$</span><span class="fu">new</span>()</span>
+<span id="cb287-3"><a href="pre-packaged-software.html#cb287-3" aria-hidden="true" tabindex="-1"></a>sl <span class="ot">&lt;-</span> Lrnr_sl<span class="sc">$</span><span class="fu">new</span>(</span>
+<span id="cb287-4"><a href="pre-packaged-software.html#cb287-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">learners =</span> stack,</span>
+<span id="cb287-5"><a href="pre-packaged-software.html#cb287-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">metalearner =</span> sl_meta)</span>
+<span id="cb287-6"><a href="pre-packaged-software.html#cb287-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb287-7"><a href="pre-packaged-software.html#cb287-7" aria-hidden="true" tabindex="-1"></a><span class="co"># or a discrete SuperLearner</span></span>
+<span id="cb287-8"><a href="pre-packaged-software.html#cb287-8" aria-hidden="true" tabindex="-1"></a>sl_disc_meta <span class="ot">&lt;-</span> Lrnr_cv_selector<span class="sc">$</span><span class="fu">new</span>()</span>
+<span id="cb287-9"><a href="pre-packaged-software.html#cb287-9" aria-hidden="true" tabindex="-1"></a>sl_disc <span class="ot">&lt;-</span> Lrnr_sl<span class="sc">$</span><span class="fu">new</span>(</span>
+<span id="cb287-10"><a href="pre-packaged-software.html#cb287-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">learners =</span> stack, </span>
+<span id="cb287-11"><a href="pre-packaged-software.html#cb287-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">metalearner =</span> sl_disc_meta</span>
+<span id="cb287-12"><a href="pre-packaged-software.html#cb287-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>The SuperLearner is then trained on the sl3 task we created at the start and then it can be used to make predictions.</p>
-<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="pre-packaged-software.html#cb273-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1444</span>)</span>
-<span id="cb273-2"><a href="pre-packaged-software.html#cb273-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb273-3"><a href="pre-packaged-software.html#cb273-3" aria-hidden="true" tabindex="-1"></a><span class="co"># train SL</span></span>
-<span id="cb273-4"><a href="pre-packaged-software.html#cb273-4" aria-hidden="true" tabindex="-1"></a>sl_fit <span class="ot">&lt;-</span> sl<span class="sc">$</span><span class="fu">train</span>(rhc_task)</span>
-<span id="cb273-5"><a href="pre-packaged-software.html#cb273-5" aria-hidden="true" tabindex="-1"></a><span class="co"># or for discrete SL</span></span>
-<span id="cb273-6"><a href="pre-packaged-software.html#cb273-6" aria-hidden="true" tabindex="-1"></a><span class="co"># sl_fit &lt;- sl_disc$train(rhc_task)</span></span>
-<span id="cb273-7"><a href="pre-packaged-software.html#cb273-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb273-8"><a href="pre-packaged-software.html#cb273-8" aria-hidden="true" tabindex="-1"></a><span class="co"># make predictions</span></span>
-<span id="cb273-9"><a href="pre-packaged-software.html#cb273-9" aria-hidden="true" tabindex="-1"></a>sl3_data <span class="ot">&lt;-</span> ObsData</span>
-<span id="cb273-10"><a href="pre-packaged-software.html#cb273-10" aria-hidden="true" tabindex="-1"></a>sl3_data<span class="sc">$</span>sl_preds <span class="ot">&lt;-</span> sl_fit<span class="sc">$</span><span class="fu">predict</span>()</span>
-<span id="cb273-11"><a href="pre-packaged-software.html#cb273-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb273-12"><a href="pre-packaged-software.html#cb273-12" aria-hidden="true" tabindex="-1"></a>sl3_est <span class="ot">&lt;-</span> <span class="fu">mean</span>(sl3_data<span class="sc">$</span>sl_preds[sl3_data<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span> </span>
-<span id="cb273-13"><a href="pre-packaged-software.html#cb273-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(sl3_data<span class="sc">$</span>sl_preds[sl3_data<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>])</span></code></pre></div>
-<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="pre-packaged-software.html#cb274-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(sl3_est, <span class="at">file =</span> <span class="st">&quot;data/sl3.RDS&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="pre-packaged-software.html#cb288-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1444</span>)</span>
+<span id="cb288-2"><a href="pre-packaged-software.html#cb288-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb288-3"><a href="pre-packaged-software.html#cb288-3" aria-hidden="true" tabindex="-1"></a><span class="co"># train SL</span></span>
+<span id="cb288-4"><a href="pre-packaged-software.html#cb288-4" aria-hidden="true" tabindex="-1"></a>sl_fit <span class="ot">&lt;-</span> sl<span class="sc">$</span><span class="fu">train</span>(rhc_task)</span>
+<span id="cb288-5"><a href="pre-packaged-software.html#cb288-5" aria-hidden="true" tabindex="-1"></a><span class="co"># or for discrete SL</span></span>
+<span id="cb288-6"><a href="pre-packaged-software.html#cb288-6" aria-hidden="true" tabindex="-1"></a><span class="co"># sl_fit &lt;- sl_disc$train(rhc_task)</span></span>
+<span id="cb288-7"><a href="pre-packaged-software.html#cb288-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb288-8"><a href="pre-packaged-software.html#cb288-8" aria-hidden="true" tabindex="-1"></a><span class="co"># make predictions</span></span>
+<span id="cb288-9"><a href="pre-packaged-software.html#cb288-9" aria-hidden="true" tabindex="-1"></a>sl3_data <span class="ot">&lt;-</span> ObsData</span>
+<span id="cb288-10"><a href="pre-packaged-software.html#cb288-10" aria-hidden="true" tabindex="-1"></a>sl3_data<span class="sc">$</span>sl_preds <span class="ot">&lt;-</span> sl_fit<span class="sc">$</span><span class="fu">predict</span>()</span>
+<span id="cb288-11"><a href="pre-packaged-software.html#cb288-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb288-12"><a href="pre-packaged-software.html#cb288-12" aria-hidden="true" tabindex="-1"></a>sl3_est <span class="ot">&lt;-</span> <span class="fu">mean</span>(sl3_data<span class="sc">$</span>sl_preds[sl3_data<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span> </span>
+<span id="cb288-13"><a href="pre-packaged-software.html#cb288-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(sl3_data<span class="sc">$</span>sl_preds[sl3_data<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb288-14"><a href="pre-packaged-software.html#cb288-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb288-15"><a href="pre-packaged-software.html#cb288-15" aria-hidden="true" tabindex="-1"></a>sl3_est</span></code></pre></div>
+<pre><code>## [1] 5.331201</code></pre>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="pre-packaged-software.html#cb290-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(sl3_est, <span class="at">file =</span> <span class="st">&quot;data/sl3.RDS&quot;</span>)</span></code></pre></div>
 <p>Notes about the <em>sl3</em> package:</p>
 <ul>
 <li>fairly easy to implement &amp; understand structure</li>
@@ -666,8 +778,8 @@ saveRDS(ltmle_est, file = "data/ltmle.RDS")
 
 --->
 </div>
-<div id="rhc-results" class="section level2" number="7.3">
-<h2><span class="header-section-number">7.3</span> RHC results</h2>
+<div id="rhc-results" class="section level2" number="7.4">
+<h2><span class="header-section-number">7.4</span> RHC results</h2>
 <p>Gathering previously saved results:</p>
 <table>
 <thead>
@@ -689,7 +801,21 @@ Estimate
 <tbody>
 <tr>
 <td style="text-align:left;">
-PS.match
+Adj. Reg
+</td>
+<td style="text-align:right;">
+2.90
+</td>
+<td style="text-align:right;">
+1.37
+</td>
+<td style="text-align:right;">
+4.43
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PS match
 </td>
 <td style="text-align:right;">
 2.86
@@ -703,10 +829,10 @@ PS.match
 </tr>
 <tr>
 <td style="text-align:left;">
-G-comp
+G-comp (logistic)
 </td>
 <td style="text-align:right;">
-4.11
+2.90
 </td>
 <td style="text-align:right;">
 1.52
@@ -717,7 +843,7 @@ G-comp
 </tr>
 <tr>
 <td style="text-align:left;">
-G-comp-xgboost
+G-comp (xgboost)
 </td>
 <td style="text-align:right;">
 4.11
@@ -729,7 +855,7 @@ G-comp-xgboost
 </tr>
 <tr>
 <td style="text-align:left;">
-G-comp-lasso
+G-comp (lasso)
 </td>
 <td style="text-align:right;">
 2.72
@@ -741,7 +867,7 @@ G-comp-lasso
 </tr>
 <tr>
 <td style="text-align:left;">
-G-comp-SL
+G-comp (SL)
 </td>
 <td style="text-align:right;">
 1.91
@@ -753,7 +879,7 @@ G-comp-SL
 </tr>
 <tr>
 <td style="text-align:left;">
-IPW
+IPW (logistic)
 </td>
 <td style="text-align:right;">
 3.24
@@ -767,7 +893,7 @@ IPW
 </tr>
 <tr>
 <td style="text-align:left;">
-IPW-SL
+IPW (SL)
 </td>
 <td style="text-align:right;">
 4.34
@@ -781,21 +907,21 @@ IPW-SL
 </tr>
 <tr>
 <td style="text-align:left;">
-TMLE.step
+TMLE (9 steps)
 </td>
 <td style="text-align:right;">
-2.77
+2.73
 </td>
 <td style="text-align:right;">
-1.82
+1.59
 </td>
 <td style="text-align:right;">
-3.78
+3.87
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-tmle (package)
+TMLE (package)
 </td>
 <td style="text-align:right;">
 2.87
@@ -809,7 +935,7 @@ tmle (package)
 </tr>
 <tr>
 <td style="text-align:left;">
-sl3
+sl3 (package)
 </td>
 <td style="text-align:right;">
 5.33
@@ -822,8 +948,8 @@ sl3
 </tbody>
 </table>
 </div>
-<div id="other-packages" class="section level2" number="7.4">
-<h2><span class="header-section-number">7.4</span> Other packages</h2>
+<div id="other-packages" class="section level2" number="7.5">
+<h2><span class="header-section-number">7.5</span> Other packages</h2>
 <p>Other packages that may be useful:</p>
 <table>
 <colgroup>

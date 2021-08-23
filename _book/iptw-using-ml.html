@@ -21,6 +21,7 @@
   <meta name="twitter:description" content="Intro to R." />
   
 
+<meta name="author" content="Ehsan Karim &amp; Hanna Frank" />
 
 
 <meta name="date" content="2021-08-22" />
@@ -320,9 +321,10 @@ div.csl-indent {
 <li class="chapter" data-level="7" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>7</b> Pre-packaged software</a>
 <ul>
 <li class="chapter" data-level="7.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-2"><i class="fa fa-check"></i><b>7.1</b> tmle</a></li>
-<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3-optional"><i class="fa fa-check"></i><b>7.2</b> sl3 (optional)</a></li>
-<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.3</b> RHC results</a></li>
-<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.4</b> Other packages</a></li>
+<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-reduced-computation"><i class="fa fa-check"></i><b>7.2</b> tmle (reduced computation)</a></li>
+<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3-optional"><i class="fa fa-check"></i><b>7.3</b> sl3 (optional)</a></li>
+<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.4</b> RHC results</a></li>
+<li class="chapter" data-level="7.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.5</b> Other packages</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>8</b> Final Words</a>
 <ul>
@@ -365,12 +367,12 @@ div.csl-indent {
 <div id="iptw-using-ml" class="section level1" number="5">
 <h1><span class="header-section-number">Chapter 5</span> IPTW using ML</h1>
 <p>Similar to G-computation, we will try to use machine learning methods, particularly Superlearner in estimating IPW estimates</p>
-<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="iptw-using-ml.html#cb168-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
-<span id="cb168-2"><a href="iptw-using-ml.html#cb168-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span>
-<span id="cb168-3"><a href="iptw-using-ml.html#cb168-3" aria-hidden="true" tabindex="-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y)))</span>
-<span id="cb168-4"><a href="iptw-using-ml.html#cb168-4" aria-hidden="true" tabindex="-1"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;A ~&quot;</span>,</span>
-<span id="cb168-5"><a href="iptw-using-ml.html#cb168-5" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">paste</span>(baselinevars,</span>
-<span id="cb168-6"><a href="iptw-using-ml.html#cb168-6" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="iptw-using-ml.html#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
+<span id="cb169-2"><a href="iptw-using-ml.html#cb169-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span>
+<span id="cb169-3"><a href="iptw-using-ml.html#cb169-3" aria-hidden="true" tabindex="-1"></a>baselinevars <span class="ot">&lt;-</span> <span class="fu">names</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(A,Y)))</span>
+<span id="cb169-4"><a href="iptw-using-ml.html#cb169-4" aria-hidden="true" tabindex="-1"></a>ps.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;A ~&quot;</span>,</span>
+<span id="cb169-5"><a href="iptw-using-ml.html#cb169-5" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">paste</span>(baselinevars,</span>
+<span id="cb169-6"><a href="iptw-using-ml.html#cb169-6" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>)))</span></code></pre></div>
 <div id="iptw-steps-from-sl" class="section level2" number="5.1">
 <h2><span class="header-section-number">5.1</span> IPTW Steps from SL</h2>
 <p><strong>Modelling Steps</strong>:</p>
@@ -385,7 +387,7 @@ div.csl-indent {
 <div id="step-1-exposure-modelling-1" class="section level2" number="5.2">
 <h2><span class="header-section-number">5.2</span> Step 1: exposure modelling</h2>
 <p>This is the exposure model that we decided on:</p>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="iptw-using-ml.html#cb169-1" aria-hidden="true" tabindex="-1"></a>ps.formula</span></code></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="iptw-using-ml.html#cb170-1" aria-hidden="true" tabindex="-1"></a>ps.formula</span></code></pre></div>
 <pre><code>## A ~ Disease.category + Cancer + Cardiovascular + Congestive.HF + 
 ##     Dementia + Psychiatric + Pulmonary + Renal + Hepatic + GI.Bleed + 
 ##     Tumor + Immunosupperssion + Transfer.hx + MI + age + sex + 
@@ -402,20 +404,20 @@ div.csl-indent {
 <li>LASSO</li>
 <li>gradient boosting</li>
 </ul>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="iptw-using-ml.html#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(SuperLearner)</span>
-<span id="cb171-2"><a href="iptw-using-ml.html#cb171-2" aria-hidden="true" tabindex="-1"></a>ObsData.noYA <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(Y,A))</span>
-<span id="cb171-3"><a href="iptw-using-ml.html#cb171-3" aria-hidden="true" tabindex="-1"></a>PS.fit.SL <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>A, </span>
-<span id="cb171-4"><a href="iptw-using-ml.html#cb171-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noYA, </span>
-<span id="cb171-5"><a href="iptw-using-ml.html#cb171-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>),</span>
-<span id="cb171-6"><a href="iptw-using-ml.html#cb171-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, <span class="st">&quot;SL.glmnet&quot;</span>, <span class="st">&quot;SL.xgboost&quot;</span>), </span>
-<span id="cb171-7"><a href="iptw-using-ml.html#cb171-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span><span class="st">&quot;method.NNLS&quot;</span>,</span>
-<span id="cb171-8"><a href="iptw-using-ml.html#cb171-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="iptw-using-ml.html#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(SuperLearner)</span>
+<span id="cb172-2"><a href="iptw-using-ml.html#cb172-2" aria-hidden="true" tabindex="-1"></a>ObsData.noYA <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(Y,A))</span>
+<span id="cb172-3"><a href="iptw-using-ml.html#cb172-3" aria-hidden="true" tabindex="-1"></a>PS.fit.SL <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>A, </span>
+<span id="cb172-4"><a href="iptw-using-ml.html#cb172-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noYA, </span>
+<span id="cb172-5"><a href="iptw-using-ml.html#cb172-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>),</span>
+<span id="cb172-6"><a href="iptw-using-ml.html#cb172-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, <span class="st">&quot;SL.glmnet&quot;</span>, <span class="st">&quot;SL.xgboost&quot;</span>), </span>
+<span id="cb172-7"><a href="iptw-using-ml.html#cb172-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span><span class="st">&quot;method.NNLS&quot;</span>,</span>
+<span id="cb172-8"><a href="iptw-using-ml.html#cb172-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
 <p>Here, <code>method.AUC</code> is also possible to use instead of <code>method.NNLS</code> for binary response. We could use <code>cvControl = list(V = 3, stratifyCV = TRUE)</code> to make the splits be stratified by the binary response.</p>
 <p>Obtain the propesnity score (PS) values from the fit</p>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="iptw-using-ml.html#cb172-1" aria-hidden="true" tabindex="-1"></a>all.pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(PS.fit.SL, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
-<span id="cb172-2"><a href="iptw-using-ml.html#cb172-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>PS.SL <span class="ot">&lt;-</span> all.pred<span class="sc">$</span>pred</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="iptw-using-ml.html#cb173-1" aria-hidden="true" tabindex="-1"></a>all.pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(PS.fit.SL, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb173-2"><a href="iptw-using-ml.html#cb173-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>PS.SL <span class="ot">&lt;-</span> all.pred<span class="sc">$</span>pred</span></code></pre></div>
 <p>Check summaries:</p>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="iptw-using-ml.html#cb173-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>PS.SL)</span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="iptw-using-ml.html#cb174-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>PS.SL)</span></code></pre></div>
 <pre><code>##        V1          
 ##  Min.   :0.002981  
 ##  1st Qu.:0.151578  
@@ -423,7 +425,7 @@ div.csl-indent {
 ##  Mean   :0.380833  
 ##  3rd Qu.:0.591373  
 ##  Max.   :0.971231</code></pre>
-<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="iptw-using-ml.html#cb175-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>PS.SL, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="iptw-using-ml.html#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>PS.SL, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
 <pre><code>## $`0`
 ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 ## 0.002981 0.091153 0.192876 0.224573 0.332211 0.788300 
@@ -431,12 +433,12 @@ div.csl-indent {
 ## $`1`
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  0.0815  0.5107  0.6510  0.6349  0.7663  0.9712</code></pre>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="iptw-using-ml.html#cb177-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">0</span>]), </span>
-<span id="cb177-2"><a href="iptw-using-ml.html#cb177-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">main =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb177-3"><a href="iptw-using-ml.html#cb177-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">1</span>]), </span>
-<span id="cb177-4"><a href="iptw-using-ml.html#cb177-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb177-5"><a href="iptw-using-ml.html#cb177-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;No RHC&quot;</span>,<span class="st">&quot;RHC&quot;</span>), </span>
-<span id="cb177-6"><a href="iptw-using-ml.html#cb177-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;blue&quot;</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="iptw-using-ml.html#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">0</span>]), </span>
+<span id="cb178-2"><a href="iptw-using-ml.html#cb178-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">main =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb178-3"><a href="iptw-using-ml.html#cb178-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">1</span>]), </span>
+<span id="cb178-4"><a href="iptw-using-ml.html#cb178-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb178-5"><a href="iptw-using-ml.html#cb178-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;No RHC&quot;</span>,<span class="st">&quot;RHC&quot;</span>), </span>
+<span id="cb178-6"><a href="iptw-using-ml.html#cb178-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;blue&quot;</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span></code></pre></div>
 <p><img src="TMLEw_files/figure-html/ipw2psx2b-1.png" width="672" /></p>
 </div>
 <div id="step-2-convert-ps-to-ipw-1" class="section level2" number="5.3">
@@ -444,8 +446,8 @@ div.csl-indent {
 <ul>
 <li>Convert PS from SL to IPW using the formula (again, ATE formula).</li>
 </ul>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="iptw-using-ml.html#cb178-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>IPW.SL <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>A<span class="sc">/</span>ObsData<span class="sc">$</span>PS.SL <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>A)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>PS.SL)</span>
-<span id="cb178-2"><a href="iptw-using-ml.html#cb178-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>IPW.SL)</span></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="iptw-using-ml.html#cb179-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>IPW.SL <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>A<span class="sc">/</span>ObsData<span class="sc">$</span>PS.SL <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>A)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>PS.SL)</span>
+<span id="cb179-2"><a href="iptw-using-ml.html#cb179-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>IPW.SL)</span></code></pre></div>
 <pre><code>##        V1        
 ##  Min.   : 1.003  
 ##  1st Qu.: 1.149  
@@ -454,23 +456,24 @@ div.csl-indent {
 ##  3rd Qu.: 1.668  
 ##  Max.   :12.271</code></pre>
 <p>Output from pre-packged software packages to do the same (very similar estimates):</p>
-<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="iptw-using-ml.html#cb180-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(WeightIt)</span>
-<span id="cb180-2"><a href="iptw-using-ml.html#cb180-2" aria-hidden="true" tabindex="-1"></a>W.out <span class="ot">&lt;-</span> <span class="fu">weightit</span>(ps.formula, </span>
-<span id="cb180-3"><a href="iptw-using-ml.html#cb180-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> ObsData, </span>
-<span id="cb180-4"><a href="iptw-using-ml.html#cb180-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>,</span>
-<span id="cb180-5"><a href="iptw-using-ml.html#cb180-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> <span class="st">&quot;super&quot;</span>,</span>
-<span id="cb180-6"><a href="iptw-using-ml.html#cb180-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">SL.library =</span> <span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
-<span id="cb180-7"><a href="iptw-using-ml.html#cb180-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;SL.glmnet&quot;</span>, </span>
-<span id="cb180-8"><a href="iptw-using-ml.html#cb180-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;SL.xgboost&quot;</span>))</span>
-<span id="cb180-9"><a href="iptw-using-ml.html#cb180-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(W.out<span class="sc">$</span>weights)</span></code></pre></div>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="iptw-using-ml.html#cb181-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(WeightIt)</span>
+<span id="cb181-2"><a href="iptw-using-ml.html#cb181-2" aria-hidden="true" tabindex="-1"></a>W.out <span class="ot">&lt;-</span> <span class="fu">weightit</span>(ps.formula, </span>
+<span id="cb181-3"><a href="iptw-using-ml.html#cb181-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> ObsData, </span>
+<span id="cb181-4"><a href="iptw-using-ml.html#cb181-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>,</span>
+<span id="cb181-5"><a href="iptw-using-ml.html#cb181-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> <span class="st">&quot;super&quot;</span>,</span>
+<span id="cb181-6"><a href="iptw-using-ml.html#cb181-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">SL.library =</span> <span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
+<span id="cb181-7"><a href="iptw-using-ml.html#cb181-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;SL.glmnet&quot;</span>, </span>
+<span id="cb181-8"><a href="iptw-using-ml.html#cb181-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;SL.xgboost&quot;</span>))</span>
+<span id="cb181-9"><a href="iptw-using-ml.html#cb181-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(W.out<span class="sc">$</span>weights)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   1.002   1.141   1.321   1.471   1.626  12.435</code></pre>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="iptw-using-ml.html#cb183-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(W.out, <span class="at">file =</span> <span class="st">&quot;data/ipwslps.RDS&quot;</span>)</span></code></pre></div>
 <p>Alternatively, you can use the previously estimated PS</p>
-<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="iptw-using-ml.html#cb182-1" aria-hidden="true" tabindex="-1"></a>W.out2 <span class="ot">&lt;-</span> <span class="fu">weightit</span>(ps.formula, </span>
-<span id="cb182-2"><a href="iptw-using-ml.html#cb182-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> ObsData, </span>
-<span id="cb182-3"><a href="iptw-using-ml.html#cb182-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>,</span>
-<span id="cb182-4"><a href="iptw-using-ml.html#cb182-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ps =</span> ObsData<span class="sc">$</span>PS.SL)</span>
-<span id="cb182-5"><a href="iptw-using-ml.html#cb182-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(W.out2<span class="sc">$</span>weights)</span></code></pre></div>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="iptw-using-ml.html#cb184-1" aria-hidden="true" tabindex="-1"></a>W.out2 <span class="ot">&lt;-</span> <span class="fu">weightit</span>(ps.formula, </span>
+<span id="cb184-2"><a href="iptw-using-ml.html#cb184-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> ObsData, </span>
+<span id="cb184-3"><a href="iptw-using-ml.html#cb184-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>,</span>
+<span id="cb184-4"><a href="iptw-using-ml.html#cb184-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ps =</span> ObsData<span class="sc">$</span>PS.SL)</span>
+<span id="cb184-5"><a href="iptw-using-ml.html#cb184-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(W.out2<span class="sc">$</span>weights)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   1.003   1.149   1.339   1.508   1.668  12.271</code></pre>
 </div>
@@ -479,8 +482,8 @@ div.csl-indent {
 <ul>
 <li>We first check balance numerically for SMD = 0.1 as threshold for balance.</li>
 </ul>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="iptw-using-ml.html#cb184-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bal.tab</span>(W.out, <span class="at">un =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb184-2"><a href="iptw-using-ml.html#cb184-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> .<span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="iptw-using-ml.html#cb186-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bal.tab</span>(W.out, <span class="at">un =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb186-2"><a href="iptw-using-ml.html#cb186-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> .<span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## Call
 ##  weightit(formula = ps.formula, data = ObsData, method = &quot;super&quot;, 
 ##     estimand = &quot;ATE&quot;, SL.library = c(&quot;SL.glm&quot;, &quot;SL.glmnet&quot;, &quot;SL.xgboost&quot;))
@@ -643,35 +646,35 @@ div.csl-indent {
 <ul>
 <li>And also via plot</li>
 </ul>
-<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="iptw-using-ml.html#cb186-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(cobalt)</span>
-<span id="cb186-2"><a href="iptw-using-ml.html#cb186-2" aria-hidden="true" tabindex="-1"></a><span class="fu">love.plot</span>(W.out, <span class="at">binary =</span> <span class="st">&quot;std&quot;</span>,</span>
-<span id="cb186-3"><a href="iptw-using-ml.html#cb186-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> .<span class="dv">1</span>),</span>
-<span id="cb186-4"><a href="iptw-using-ml.html#cb186-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">abs =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb186-5"><a href="iptw-using-ml.html#cb186-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">var.order =</span> <span class="st">&quot;unadjusted&quot;</span>, </span>
-<span id="cb186-6"><a href="iptw-using-ml.html#cb186-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">line =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="iptw-using-ml.html#cb188-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(cobalt)</span>
+<span id="cb188-2"><a href="iptw-using-ml.html#cb188-2" aria-hidden="true" tabindex="-1"></a><span class="fu">love.plot</span>(W.out, <span class="at">binary =</span> <span class="st">&quot;std&quot;</span>,</span>
+<span id="cb188-3"><a href="iptw-using-ml.html#cb188-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> .<span class="dv">1</span>),</span>
+<span id="cb188-4"><a href="iptw-using-ml.html#cb188-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">abs =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb188-5"><a href="iptw-using-ml.html#cb188-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">var.order =</span> <span class="st">&quot;unadjusted&quot;</span>, </span>
+<span id="cb188-6"><a href="iptw-using-ml.html#cb188-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">line =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p><img src="TMLEw_files/figure-html/ipw2balp2-1.png" width="480" /></p>
 </div>
 <div id="step-4-outcome-modelling-1" class="section level2" number="5.5">
 <h2><span class="header-section-number">5.5</span> Step 4: outcome modelling</h2>
 <p>Estimate the effect of treatment on outcomes</p>
-<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="iptw-using-ml.html#cb187-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(Y <span class="sc">~</span> A)</span>
-<span id="cb187-2"><a href="iptw-using-ml.html#cb187-2" aria-hidden="true" tabindex="-1"></a>out.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(out.formula,</span>
-<span id="cb187-3"><a href="iptw-using-ml.html#cb187-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData,</span>
-<span id="cb187-4"><a href="iptw-using-ml.html#cb187-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">weights =</span> IPW.SL)</span>
-<span id="cb187-5"><a href="iptw-using-ml.html#cb187-5" aria-hidden="true" tabindex="-1"></a><span class="fu">publish</span>(out.fit)</span></code></pre></div>
+<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="iptw-using-ml.html#cb189-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(Y <span class="sc">~</span> A)</span>
+<span id="cb189-2"><a href="iptw-using-ml.html#cb189-2" aria-hidden="true" tabindex="-1"></a>out.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(out.formula,</span>
+<span id="cb189-3"><a href="iptw-using-ml.html#cb189-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData,</span>
+<span id="cb189-4"><a href="iptw-using-ml.html#cb189-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">weights =</span> IPW.SL)</span>
+<span id="cb189-5"><a href="iptw-using-ml.html#cb189-5" aria-hidden="true" tabindex="-1"></a><span class="fu">publish</span>(out.fit)</span></code></pre></div>
 <pre><code>##     Variable Units Coefficient         CI.95 p-value 
 ##  (Intercept)             20.21 [19.31;21.12] &lt; 1e-04 
 ##            A              4.24   [2.88;5.61] &lt; 1e-04</code></pre>
 <p>Also check the output when we used the weights from the package</p>
-<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="iptw-using-ml.html#cb189-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(Y <span class="sc">~</span> A)</span>
-<span id="cb189-2"><a href="iptw-using-ml.html#cb189-2" aria-hidden="true" tabindex="-1"></a>out.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(out.formula,</span>
-<span id="cb189-3"><a href="iptw-using-ml.html#cb189-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData,</span>
-<span id="cb189-4"><a href="iptw-using-ml.html#cb189-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">weights =</span> W.out<span class="sc">$</span>weights)</span>
-<span id="cb189-5"><a href="iptw-using-ml.html#cb189-5" aria-hidden="true" tabindex="-1"></a><span class="fu">publish</span>(out.fit)</span></code></pre></div>
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="iptw-using-ml.html#cb191-1" aria-hidden="true" tabindex="-1"></a>out.formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(Y <span class="sc">~</span> A)</span>
+<span id="cb191-2"><a href="iptw-using-ml.html#cb191-2" aria-hidden="true" tabindex="-1"></a>out.fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(out.formula,</span>
+<span id="cb191-3"><a href="iptw-using-ml.html#cb191-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData,</span>
+<span id="cb191-4"><a href="iptw-using-ml.html#cb191-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">weights =</span> W.out<span class="sc">$</span>weights)</span>
+<span id="cb191-5"><a href="iptw-using-ml.html#cb191-5" aria-hidden="true" tabindex="-1"></a><span class="fu">publish</span>(out.fit)</span></code></pre></div>
 <pre><code>##     Variable Units Coefficient         CI.95 p-value 
 ##  (Intercept)             20.15 [19.25;21.05] &lt; 1e-04 
 ##            A              4.34   [2.97;5.71] &lt; 1e-04</code></pre>
-<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="iptw-using-ml.html#cb191-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(out.fit, <span class="at">file =</span> <span class="st">&quot;data/ipwsl.RDS&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="iptw-using-ml.html#cb193-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(out.fit, <span class="at">file =</span> <span class="st">&quot;data/ipwsl.RDS&quot;</span>)</span></code></pre></div>
 
 </div>
 </div>

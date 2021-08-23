@@ -43,12 +43,13 @@ dim(ObsData)
 - Note also that the outcome $Y$ is required to be within the range of $[0,1]$ for this method as well, 
   - so we need to pass in the transformed data, then transform back the estimate.
 
-```{r tmlepkg, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+```{r tmlepkg, cache=cachex, message=FALSE, warning=FALSE}
 set.seed(1444) 
-
 # transform the outcome to fall within the range [0,1]
 min.Y <- min(ObsData$Y)
+min.Y
 max.Y <- max(ObsData$Y)
+max.Y
 ObsData$Y_transf <- (ObsData$Y-min.Y)/(max.Y-min.Y)
 
 # run tmle from the tmle package 
@@ -79,9 +80,9 @@ summary(tmle.fit)
 
 ```{r tmlepkgtr, cache=cachex, message=FALSE, warning=FALSE}
 tmle_est_tr <- tmle.fit$estimates$ATE$psi
+tmle_est_tr
 # transform back the ATE estimate
 tmle_est <- (max.Y-min.Y)*tmle_est_tr
-
 tmle_est
 ```
 
@@ -114,7 +115,28 @@ Most helpful resources:
 
 * [CRAN docs](https://cran.r-project.org/web/packages/tmle/tmle.pdf)
 * [tmle package paper](https://www.jstatsoft.org/article/view/v051i13)
-* Vignettes in R
+
+## tmle (reduced computation)
+
+We can use the previously calculated propensity score predictions from SL (calculated using `WeightIt` package) in the `tmle` to reduce some computing time.
+
+```{r tmlepkg33b, cache=cachex, message=FALSE, warning=FALSE}
+ps.obj <- readRDS(file = "data/ipwslps.RDS")
+ps.SL <- ps.obj$weights
+tmle.fit2 <- tmle::tmle(Y = ObsData$Y_transf, 
+                   A = ObsData$A, 
+                   W = ObsData.noYA, 
+                   family = "gaussian",
+                   V = 3,
+                   Q.SL.library = SL.library, 
+                   g1W = ps.SL)
+tmle.fit2
+```
+
+```{r tmlepkgtrb, cache=cachex, message=FALSE, warning=FALSE}
+# transform back ATE estimate
+(max.Y-min.Y)*tmle.fit2$estimates$ATE$psi
+```
 
 ## sl3 (optional)
 
@@ -325,6 +347,9 @@ cat("ATE from aipw package: ", aipw_est, aipw_ci, sep = "")
 
 Gathering previously saved results:
 ```{r summarytable0, cache=cachex, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+fit.reg <- readRDS(file = "data/adjreg.RDS")
+TEr <- fit.reg$coefficients[2]
+CIr <- as.numeric(confint(fit.reg, 'A'))
 fit.matched <- readRDS(file = "data/match.RDS")
 TEm <- fit.matched$coefficients[2]
 CIm <- as.numeric(confint(fit.matched, 'A'))
@@ -346,18 +371,24 @@ tmlesl <- readRDS(file = "data/tmle.RDS")
 tmlecisl <- readRDS(file = "data/tmleci.RDS")
 slp <- readRDS(file = "data/sl3.RDS")
 ci.b <- rep(NA,2)
-point <- as.numeric(c(TEm, TEg, TE1g, TE2g, TE3g, TEi, TEsli, tmleh, tmlesl, slp))
-CIs <- cbind(CIm, CIgc, ci.b, ci.b, ci.b, CIi, CIsli, tmlecih, tmlecisl, ci.b) 
+point <- as.numeric(c(TEr, TEm, TEg, TE1g, TE2g, 
+                      TE3g, TEi, TEsli, tmleh, 
+                      tmlesl, slp))
+CIs <- cbind(CIr, CIm, CIgc, ci.b, ci.b, ci.b, 
+             CIi, CIsli, tmlecih, tmlecisl, ci.b)  
 ```
 
 
 ```{r summarytable, cache=cachex, echo=FALSE}
-method.list <- c("PS.match", "G-comp","G-comp-xgboost",
-             "G-comp-lasso", "G-comp-SL","IPW", 
-             "IPW-SL", "TMLE.step", "tmle (package)", "sl3") 
+method.list <- c("Adj. Reg","PS match", 
+                 "G-comp (logistic)","G-comp (xgboost)",
+                 "G-comp (lasso)", "G-comp (SL)",
+                 "IPW (logistic)", "IPW (SL)", 
+                 "TMLE (9 steps)", "TMLE (package)", 
+                 "sl3 (package)") 
 results <- data.frame(method.list) 
 results$Estimate <- round(point,2)
-results$`2.5 %` <- CIs[1,]
+results$`2.5 %` <- CIs[1,] 
 results$`97.5 %` <- CIs[2,]
 kable(results,digits = 2)
 ```

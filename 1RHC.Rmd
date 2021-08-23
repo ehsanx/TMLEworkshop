@@ -147,6 +147,9 @@ fit1 <- lm(out.formula, data = ObsData)
 adj.fit <- publish(fit1, digits=1)$regressionTable[2,]
 ```
 
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(fit1, file = "data/adjreg.RDS")
+```
 
 ### Regression diagnostics
 

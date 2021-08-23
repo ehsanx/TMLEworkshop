@@ -21,6 +21,7 @@
   <meta name="twitter:description" content="Intro to R." />
   
 
+<meta name="author" content="Ehsan Karim &amp; Hanna Frank" />
 
 
 <meta name="date" content="2021-08-22" />
@@ -320,9 +321,10 @@ div.csl-indent {
 <li class="chapter" data-level="7" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html"><i class="fa fa-check"></i><b>7</b> Pre-packaged software</a>
 <ul>
 <li class="chapter" data-level="7.1" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-2"><i class="fa fa-check"></i><b>7.1</b> tmle</a></li>
-<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3-optional"><i class="fa fa-check"></i><b>7.2</b> sl3 (optional)</a></li>
-<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.3</b> RHC results</a></li>
-<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.4</b> Other packages</a></li>
+<li class="chapter" data-level="7.2" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#tmle-reduced-computation"><i class="fa fa-check"></i><b>7.2</b> tmle (reduced computation)</a></li>
+<li class="chapter" data-level="7.3" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#sl3-optional"><i class="fa fa-check"></i><b>7.3</b> sl3 (optional)</a></li>
+<li class="chapter" data-level="7.4" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#rhc-results"><i class="fa fa-check"></i><b>7.4</b> RHC results</a></li>
+<li class="chapter" data-level="7.5" data-path="pre-packaged-software.html"><a href="pre-packaged-software.html#other-packages"><i class="fa fa-check"></i><b>7.5</b> Other packages</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="final-words.html"><a href="final-words.html"><i class="fa fa-check"></i><b>8</b> Final Words</a>
 <ul>
@@ -371,11 +373,11 @@ div.csl-indent {
 <li>outcome models (e.g., G-computation) and</li>
 <li>exposure models (e.g., propensity score models),</li>
 </ul>
-<p>let us talk about Doubly robust (DR) estimators. DR has several important properties:</p>
+<p>let us talk about doubly robust (DR) estimators. DR has several important properties:</p>
 <ul>
-<li>They use information from
+<li>They use information from both
 <ul>
-<li>both the exposure and</li>
+<li>the exposure and</li>
 <li>the outcome models.</li>
 </ul></li>
 <li>They provide a <strong>consistent estimator</strong> if either of the above mentioned models is correctly specified.
@@ -456,54 +458,54 @@ div.csl-indent {
 <li>We will go through the steps of TMLE one-by-one, using the RHC dataset presented in previous chapters.</li>
 <li>As a reminder, the exposure we are considering is RHC (right heart catheterization) and the outcome of interest is length of stay in the hospital.</li>
 </ul>
-<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="tmle.html#cb192-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
-<span id="cb192-2"><a href="tmle.html#cb192-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="tmle.html#cb194-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
+<span id="cb194-2"><a href="tmle.html#cb194-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span></code></pre></div>
 </div>
 <div id="step-1-transformation-of-y" class="section level2" number="6.4">
 <h2><span class="header-section-number">6.4</span> Step 1: Transformation of Y</h2>
 <p>In our example, the outcome is continuous.</p>
-<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="tmle.html#cb193-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Y)</span></code></pre></div>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="tmle.html#cb195-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Y)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##    2.00    7.00   14.00   21.56   25.00  394.00</code></pre>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="tmle.html#cb195-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>Y), <span class="at">main =</span> <span class="st">&quot;Observed Y&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="tmle.html#cb197-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>Y), <span class="at">main =</span> <span class="st">&quot;Observed Y&quot;</span>)</span></code></pre></div>
 <p><img src="TMLEw_files/figure-html/transf1-1.png" width="672" /></p>
 <p>General recommendation is to <strong>transform</strong> continuous outcome to be within the range [0,1] <span class="citation">(<a href="#ref-gruber2010targeted" role="doc-biblioref">Susan Gruber and Laan 2010</a>)</span>.</p>
 <!--- However, it is recommended that even with continuous outcomes we use a log-likelihood loss function for the maximum likelihood estimation, as we would with a binary outcome.  --->
-<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="tmle.html#cb196-1" aria-hidden="true" tabindex="-1"></a>min.Y <span class="ot">&lt;-</span> <span class="fu">min</span>(ObsData<span class="sc">$</span>Y)</span>
-<span id="cb196-2"><a href="tmle.html#cb196-2" aria-hidden="true" tabindex="-1"></a>max.Y <span class="ot">&lt;-</span> <span class="fu">max</span>(ObsData<span class="sc">$</span>Y)</span>
-<span id="cb196-3"><a href="tmle.html#cb196-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Y.bounded <span class="ot">&lt;-</span> (ObsData<span class="sc">$</span>Y<span class="sc">-</span>min.Y)<span class="sc">/</span>(max.Y<span class="sc">-</span>min.Y)</span></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="tmle.html#cb198-1" aria-hidden="true" tabindex="-1"></a>min.Y <span class="ot">&lt;-</span> <span class="fu">min</span>(ObsData<span class="sc">$</span>Y)</span>
+<span id="cb198-2"><a href="tmle.html#cb198-2" aria-hidden="true" tabindex="-1"></a>max.Y <span class="ot">&lt;-</span> <span class="fu">max</span>(ObsData<span class="sc">$</span>Y)</span>
+<span id="cb198-3"><a href="tmle.html#cb198-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Y.bounded <span class="ot">&lt;-</span> (ObsData<span class="sc">$</span>Y<span class="sc">-</span>min.Y)<span class="sc">/</span>(max.Y<span class="sc">-</span>min.Y)</span></code></pre></div>
 <p>Check the range of our transformed outcome variable</p>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="tmle.html#cb197-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Y.bounded)</span></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="tmle.html#cb199-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Y.bounded)</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ## 0.00000 0.01276 0.03061 0.04990 0.05867 1.00000</code></pre>
 </div>
 <div id="step-2-initial-g-comp-estimate" class="section level2" number="6.5">
 <h2><span class="header-section-number">6.5</span> Step 2: Initial G-comp estimate</h2>
 <p>We construct our outcome model, and make our initial predictions. For this step, we will use <strong>SuperLearner</strong>. This requires no apriori assumptions about the structure of our outcome model.</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="tmle.html#cb199-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
-<span id="cb199-2"><a href="tmle.html#cb199-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb199-3"><a href="tmle.html#cb199-3" aria-hidden="true" tabindex="-1"></a>ObsData.noY <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(Y,Y.bounded))</span>
-<span id="cb199-4"><a href="tmle.html#cb199-4" aria-hidden="true" tabindex="-1"></a>Y.fit.sl <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>Y.bounded, </span>
-<span id="cb199-5"><a href="tmle.html#cb199-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noY, </span>
-<span id="cb199-6"><a href="tmle.html#cb199-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>),</span>
-<span id="cb199-7"><a href="tmle.html#cb199-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
-<span id="cb199-8"><a href="tmle.html#cb199-8" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.glmnet&quot;</span>, </span>
-<span id="cb199-9"><a href="tmle.html#cb199-9" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.xgboost&quot;</span>),</span>
-<span id="cb199-10"><a href="tmle.html#cb199-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span><span class="st">&quot;method.NNLS&quot;</span>,</span>
-<span id="cb199-11"><a href="tmle.html#cb199-11" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;gaussian&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="tmle.html#cb200-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>init.Pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(Y.fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
-<span id="cb200-2"><a href="tmle.html#cb200-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span>
-<span id="cb200-3"><a href="tmle.html#cb200-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-4"><a href="tmle.html#cb200-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>init.Pred)</span></code></pre></div>
-<pre><code>##        V1          
-##  Min.   :-0.06060  
-##  1st Qu.: 0.03775  
-##  Median : 0.05019  
-##  Mean   : 0.04990  
-##  3rd Qu.: 0.06188  
-##  Max.   : 0.19344</code></pre>
-<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="tmle.html#cb202-1" aria-hidden="true" tabindex="-1"></a><span class="co"># alternatively, we could write</span></span>
-<span id="cb202-2"><a href="tmle.html#cb202-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ObsData$init.Pred &lt;- Y.fit.sl$SL.predict</span></span></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="tmle.html#cb201-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
+<span id="cb201-2"><a href="tmle.html#cb201-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb201-3"><a href="tmle.html#cb201-3" aria-hidden="true" tabindex="-1"></a>ObsData.noY <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(Y,Y.bounded))</span>
+<span id="cb201-4"><a href="tmle.html#cb201-4" aria-hidden="true" tabindex="-1"></a>Y.fit.sl <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>Y.bounded, </span>
+<span id="cb201-5"><a href="tmle.html#cb201-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noY, </span>
+<span id="cb201-6"><a href="tmle.html#cb201-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>),</span>
+<span id="cb201-7"><a href="tmle.html#cb201-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
+<span id="cb201-8"><a href="tmle.html#cb201-8" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.glmnet&quot;</span>, </span>
+<span id="cb201-9"><a href="tmle.html#cb201-9" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.xgboost&quot;</span>),</span>
+<span id="cb201-10"><a href="tmle.html#cb201-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span><span class="st">&quot;method.CC_nloglik&quot;</span>, </span>
+<span id="cb201-11"><a href="tmle.html#cb201-11" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;gaussian&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="tmle.html#cb202-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>init.Pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(Y.fit.sl, <span class="at">newdata =</span> ObsData.noY, </span>
+<span id="cb202-2"><a href="tmle.html#cb202-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span>
+<span id="cb202-3"><a href="tmle.html#cb202-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb202-4"><a href="tmle.html#cb202-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>init.Pred)</span></code></pre></div>
+<pre><code>##        V1         
+##  Min.   :0.00100  
+##  1st Qu.:0.03723  
+##  Median :0.04948  
+##  Mean   :0.04877  
+##  3rd Qu.:0.06067  
+##  Max.   :0.13659</code></pre>
+<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="tmle.html#cb204-1" aria-hidden="true" tabindex="-1"></a><span class="co"># alternatively, we could write</span></span>
+<span id="cb204-2"><a href="tmle.html#cb204-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ObsData$init.Pred &lt;- Y.fit.sl$SL.predict</span></span></code></pre></div>
 <ul>
 <li>We will use these initial prediction values later.</li>
 <li><span class="math inline">\(Q^0(A,L)\)</span> is often used to represent the predictions from initial G-comp model.</li>
@@ -515,119 +517,119 @@ div.csl-indent {
 <li>We will need the <span class="math inline">\(Q^0(A=1,L)\)</span> and <span class="math inline">\(Q^0(A=0,L)\)</span> predictions later.</li>
 <li><span class="math inline">\(Q^0(A=1,L)\)</span> predictions:</li>
 </ul>
-<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="tmle.html#cb203-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb203-2"><a href="tmle.html#cb203-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(Y.fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
-<span id="cb203-3"><a href="tmle.html#cb203-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span>
-<span id="cb203-4"><a href="tmle.html#cb203-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
-<pre><code>##        V1          
-##  Min.   :-0.06060  
-##  1st Qu.: 0.04282  
-##  Median : 0.05488  
-##  Mean   : 0.05428  
-##  3rd Qu.: 0.06537  
-##  Max.   : 0.19344</code></pre>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="tmle.html#cb205-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb205-2"><a href="tmle.html#cb205-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(Y.fit.sl, <span class="at">newdata =</span> ObsData.noY, </span>
+<span id="cb205-3"><a href="tmle.html#cb205-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span>
+<span id="cb205-4"><a href="tmle.html#cb205-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
+<pre><code>##        V1         
+##  Min.   :0.00100  
+##  1st Qu.:0.04240  
+##  Median :0.05429  
+##  Mean   :0.05322  
+##  3rd Qu.:0.06446  
+##  Max.   :0.13659</code></pre>
 <ul>
 <li><span class="math inline">\(Q^0(A=0,L)\)</span> predictions:</li>
 </ul>
+<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="tmle.html#cb207-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb207-2"><a href="tmle.html#cb207-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(Y.fit.sl, <span class="at">newdata =</span> ObsData.noY, </span>
+<span id="cb207-3"><a href="tmle.html#cb207-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span>
+<span id="cb207-4"><a href="tmle.html#cb207-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
+<pre><code>##        V1         
+##  Min.   :0.00100  
+##  1st Qu.:0.03524  
+##  Median :0.04708  
+##  Mean   :0.04609  
+##  3rd Qu.:0.05734  
+##  Max.   :0.12652</code></pre>
 </div>
 <div id="get-initial-treatment-effect-estimate" class="section level3" number="6.5.2">
 <h3><span class="header-section-number">6.5.2</span> Get initial treatment effect estimate</h3>
-<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="tmle.html#cb205-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb205-2"><a href="tmle.html#cb205-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(Y.fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
-<span id="cb205-3"><a href="tmle.html#cb205-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span>
-<span id="cb205-4"><a href="tmle.html#cb205-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
-<pre><code>##        V1          
-##  Min.   :-0.06724  
-##  1st Qu.: 0.03598  
-##  Median : 0.04780  
-##  Mean   : 0.04722  
-##  3rd Qu.: 0.05821  
-##  Max.   : 0.18408</code></pre>
-<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="tmle.html#cb207-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
-<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="tmle.html#cb208-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
-<pre><code>##        V1          
-##  Min.   :0.003033  
-##  1st Qu.:0.006598  
-##  Median :0.006993  
-##  Mean   :0.007061  
-##  3rd Qu.:0.007468  
-##  Max.   :0.012404</code></pre>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="tmle.html#cb209-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0   </span></code></pre></div>
+<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="tmle.html#cb210-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE) </span></code></pre></div>
+<pre><code>##        V1           
+##  Min.   :-0.010333  
+##  1st Qu.: 0.006682  
+##  Median : 0.007071  
+##  Mean   : 0.007134  
+##  3rd Qu.: 0.007541  
+##  Max.   : 0.021592</code></pre>
 </div>
 </div>
 <div id="step-3-ps-model" class="section level2" number="6.6">
 <h2><span class="header-section-number">6.6</span> Step 3: PS model</h2>
 <p>At this point, we have our initial estimate and now want to perform our targeted improvement.</p>
-<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="tmle.html#cb210-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
-<span id="cb210-2"><a href="tmle.html#cb210-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">124</span>)</span>
-<span id="cb210-3"><a href="tmle.html#cb210-3" aria-hidden="true" tabindex="-1"></a>ObsData.noYA <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(Y,Y.bounded,</span>
-<span id="cb210-4"><a href="tmle.html#cb210-4" aria-hidden="true" tabindex="-1"></a>                                          A,init.Pred,</span>
-<span id="cb210-5"><a href="tmle.html#cb210-5" aria-hidden="true" tabindex="-1"></a>                                          Pred.Y1,Pred.Y0,</span>
-<span id="cb210-6"><a href="tmle.html#cb210-6" aria-hidden="true" tabindex="-1"></a>                                          Pred.TE))</span>
-<span id="cb210-7"><a href="tmle.html#cb210-7" aria-hidden="true" tabindex="-1"></a>PS.fit.SL <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>A, </span>
-<span id="cb210-8"><a href="tmle.html#cb210-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noYA, </span>
-<span id="cb210-9"><a href="tmle.html#cb210-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>),</span>
-<span id="cb210-10"><a href="tmle.html#cb210-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
-<span id="cb210-11"><a href="tmle.html#cb210-11" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.glmnet&quot;</span>, </span>
-<span id="cb210-12"><a href="tmle.html#cb210-12" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.xgboost&quot;</span>),</span>
-<span id="cb210-13"><a href="tmle.html#cb210-13" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span><span class="st">&quot;method.NNLS&quot;</span>,</span>
-<span id="cb210-14"><a href="tmle.html#cb210-14" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="tmle.html#cb211-1" aria-hidden="true" tabindex="-1"></a>all.pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(PS.fit.SL, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
-<span id="cb211-2"><a href="tmle.html#cb211-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>PS.SL <span class="ot">&lt;-</span> all.pred<span class="sc">$</span>pred</span></code></pre></div>
+<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="tmle.html#cb212-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
+<span id="cb212-2"><a href="tmle.html#cb212-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">124</span>)</span>
+<span id="cb212-3"><a href="tmle.html#cb212-3" aria-hidden="true" tabindex="-1"></a>ObsData.noYA <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ObsData, <span class="sc">!</span><span class="fu">c</span>(Y,Y.bounded,</span>
+<span id="cb212-4"><a href="tmle.html#cb212-4" aria-hidden="true" tabindex="-1"></a>                                          A,init.Pred,</span>
+<span id="cb212-5"><a href="tmle.html#cb212-5" aria-hidden="true" tabindex="-1"></a>                                          Pred.Y1,Pred.Y0,</span>
+<span id="cb212-6"><a href="tmle.html#cb212-6" aria-hidden="true" tabindex="-1"></a>                                          Pred.TE))</span>
+<span id="cb212-7"><a href="tmle.html#cb212-7" aria-hidden="true" tabindex="-1"></a>PS.fit.SL <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y=</span>ObsData<span class="sc">$</span>A, </span>
+<span id="cb212-8"><a href="tmle.html#cb212-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">X=</span>ObsData.noYA, </span>
+<span id="cb212-9"><a href="tmle.html#cb212-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">3</span>),</span>
+<span id="cb212-10"><a href="tmle.html#cb212-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library=</span><span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>, </span>
+<span id="cb212-11"><a href="tmle.html#cb212-11" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.glmnet&quot;</span>, </span>
+<span id="cb212-12"><a href="tmle.html#cb212-12" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&quot;SL.xgboost&quot;</span>),</span>
+<span id="cb212-13"><a href="tmle.html#cb212-13" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method=</span><span class="st">&quot;method.CC_nloglik&quot;</span>,</span>
+<span id="cb212-14"><a href="tmle.html#cb212-14" aria-hidden="true" tabindex="-1"></a>                       <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)  </span></code></pre></div>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="tmle.html#cb213-1" aria-hidden="true" tabindex="-1"></a>all.pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(PS.fit.SL, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb213-2"><a href="tmle.html#cb213-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>PS.SL <span class="ot">&lt;-</span> all.pred<span class="sc">$</span>pred </span></code></pre></div>
 <ul>
 <li>These propensity score predictions (<code>PS.SL</code>) are represented as <span class="math inline">\(g(A_i=1|L_i)\)</span>.</li>
 <li>We can estimate <span class="math inline">\(g(A_i=0|L_i)\)</span> as <span class="math inline">\(1 - g(A_i=1|L_i)\)</span> or <code>1 - PS.SL</code>.</li>
 </ul>
-<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="tmle.html#cb212-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>PS.SL)</span></code></pre></div>
-<pre><code>##        V1         
-##  Min.   :0.00269  
-##  1st Qu.:0.14870  
-##  Median :0.34699  
-##  Mean   :0.38083  
-##  3rd Qu.:0.59316  
-##  Max.   :0.97250</code></pre>
-<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="tmle.html#cb214-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>PS.SL, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="tmle.html#cb214-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>PS.SL)</span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :0.002806  
+##  1st Qu.:0.133409  
+##  Median :0.329181  
+##  Mean   :0.375143  
+##  3rd Qu.:0.596584  
+##  Max.   :0.983057</code></pre>
+<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="tmle.html#cb216-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>PS.SL, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
 <pre><code>## $`0`
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.00269 0.08870 0.18953 0.22227 0.32987 0.78919 
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## 0.002806 0.079637 0.177020 0.219962 0.327519 0.866585 
 ## 
 ## $`1`
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.08083 0.51406 0.65538 0.63865 0.77110 0.97250</code></pre>
-<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="tmle.html#cb216-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">0</span>]), </span>
-<span id="cb216-2"><a href="tmle.html#cb216-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">main =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb216-3"><a href="tmle.html#cb216-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">1</span>]), </span>
-<span id="cb216-4"><a href="tmle.html#cb216-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb216-5"><a href="tmle.html#cb216-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;No RHC&quot;</span>,<span class="st">&quot;RHC&quot;</span>), </span>
-<span id="cb216-6"><a href="tmle.html#cb216-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;blue&quot;</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span></code></pre></div>
+## 0.03745 0.49045 0.65384 0.62745 0.78263 0.98306</code></pre>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="tmle.html#cb218-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">0</span>]), </span>
+<span id="cb218-2"><a href="tmle.html#cb218-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">main =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb218-3"><a href="tmle.html#cb218-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(ObsData<span class="sc">$</span>PS.SL[ObsData<span class="sc">$</span>A<span class="sc">==</span><span class="dv">1</span>]), </span>
+<span id="cb218-4"><a href="tmle.html#cb218-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb218-5"><a href="tmle.html#cb218-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;No RHC&quot;</span>,<span class="st">&quot;RHC&quot;</span>), </span>
+<span id="cb218-6"><a href="tmle.html#cb218-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;blue&quot;</span>), <span class="at">lty=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) </span></code></pre></div>
 <p><img src="TMLEw_files/figure-html/ipw2psx2btmle-1.png" width="672" /></p>
 </div>
 <div id="step-4-estimate-h" class="section level2" number="6.7">
 <h2><span class="header-section-number">6.7</span> Step 4: Estimate <span class="math inline">\(H\)</span></h2>
 <p>Clever covariate <span class="math inline">\(H(A_i, L_i) = \frac{I(A_i=1)}{g(A_i=1|L_i)} - \frac{I(A_i=0)}{g(A_i=0|L_i)}\)</span> <span class="citation">(<a href="#ref-luque2018targeted" role="doc-biblioref">Luque-Fernandez et al. 2018</a>)</span></p>
-<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="tmle.html#cb217-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>H.A1L <span class="ot">&lt;-</span> (ObsData<span class="sc">$</span>A) <span class="sc">/</span> ObsData<span class="sc">$</span>PS.SL </span>
-<span id="cb217-2"><a href="tmle.html#cb217-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>H.A0L <span class="ot">&lt;-</span> (<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>A) <span class="sc">/</span> (<span class="dv">1</span><span class="sc">-</span> ObsData<span class="sc">$</span>PS.SL)</span>
-<span id="cb217-3"><a href="tmle.html#cb217-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>H.AL <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>H.A1L <span class="sc">-</span> ObsData<span class="sc">$</span>H.A0L</span>
-<span id="cb217-4"><a href="tmle.html#cb217-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>H.AL)</span></code></pre></div>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="tmle.html#cb219-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>H.A1L <span class="ot">&lt;-</span> (ObsData<span class="sc">$</span>A) <span class="sc">/</span> ObsData<span class="sc">$</span>PS.SL </span>
+<span id="cb219-2"><a href="tmle.html#cb219-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>H.A0L <span class="ot">&lt;-</span> (<span class="dv">1</span><span class="sc">-</span>ObsData<span class="sc">$</span>A) <span class="sc">/</span> (<span class="dv">1</span><span class="sc">-</span> ObsData<span class="sc">$</span>PS.SL)</span>
+<span id="cb219-3"><a href="tmle.html#cb219-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>H.AL <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>H.A1L <span class="sc">-</span> ObsData<span class="sc">$</span>H.A0L</span>
+<span id="cb219-4"><a href="tmle.html#cb219-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>H.AL)</span></code></pre></div>
 <pre><code>##        V1         
-##  Min.   :-4.7435  
-##  1st Qu.:-1.3075  
-##  Median :-1.0767  
-##  Mean   :-0.1826  
-##  3rd Qu.: 1.3778  
-##  Max.   :12.3720</code></pre>
-<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="tmle.html#cb219-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>H.AL, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
+##  Min.   :-7.4954  
+##  1st Qu.:-1.2922  
+##  Median :-1.0659  
+##  Mean   :-0.1378  
+##  3rd Qu.: 1.3662  
+##  Max.   :26.7017</code></pre>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="tmle.html#cb221-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(ObsData<span class="sc">$</span>H.AL, ObsData<span class="sc">$</span>A, summary)</span></code></pre></div>
 <pre><code>## $`0`
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##  -4.744  -1.492  -1.234  -1.359  -1.097  -1.003 
+##  -7.495  -1.487  -1.215  -1.377  -1.087  -1.003 
 ## 
 ## $`1`
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##   1.028   1.297   1.526   1.730   1.945  12.372</code></pre>
-<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="tmle.html#cb221-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(<span class="fu">apply</span>(<span class="fu">cbind</span>(<span class="sc">-</span>ObsData<span class="sc">$</span>H.A0L,ObsData<span class="sc">$</span>H.A1L), </span>
-<span id="cb221-2"><a href="tmle.html#cb221-2" aria-hidden="true" tabindex="-1"></a>      <span class="dv">2</span>, summary))</span></code></pre></div>
-<pre><code>##           Min.   1st Qu.    Median       Mean  3rd Qu.     Max.
-## [1,] -4.743533 -1.307494 -1.076741 -0.8414464 0.000000  0.00000
-## [2,]  0.000000  0.000000  0.000000  0.6588811 1.377787 12.37196</code></pre>
+##   1.017   1.278   1.529   1.878   2.039  26.702</code></pre>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="tmle.html#cb223-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(<span class="fu">apply</span>(<span class="fu">cbind</span>(<span class="sc">-</span>ObsData<span class="sc">$</span>H.A0L,ObsData<span class="sc">$</span>H.A1L), </span>
+<span id="cb223-2"><a href="tmle.html#cb223-2" aria-hidden="true" tabindex="-1"></a>      <span class="dv">2</span>, summary)) </span></code></pre></div>
+<pre><code>##           Min.   1st Qu.    Median       Mean  3rd Qu.    Max.
+## [1,] -7.495399 -1.292187 -1.065943 -0.8527551 0.000000  0.0000
+## [2,]  0.000000  0.000000  0.000000  0.7150032 1.366217 26.7017</code></pre>
 <p>Aggregated or individual clever covariate components show slight difference in their summaries.</p>
 </div>
 <div id="step-5-estimate-epsilon" class="section level2" number="6.8">
@@ -640,35 +642,35 @@ div.csl-indent {
 <li>a vector with 2 components <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span>.</li>
 </ul></li>
 <li><p>It is estimated through MLE, using a model with an offset based on the initial estimate, and clever covariates as independent variables <span class="citation">(<a href="#ref-gruber2009targeted" role="doc-biblioref">Susan Gruber and Van Der Laan 2009</a>)</span>:</p>
-<p><span class="math inline">\(E(Y=1|A,L)(\epsilon) = \frac{1}{1+\exp(-\log\frac{\bar Q^0(A,L)}{(1-\bar Q^0(A,L))}-\epsilon \times H(A,L))}\)</span></p></li>
+<p><span class="math inline">\(E(Y|A,L)(\epsilon) = \frac{1}{1+\exp(-\log\frac{\bar Q^0(A,L)}{(1-\bar Q^0(A,L))}-\epsilon \times H(A,L))}\)</span></p></li>
 </ul>
 <div id="hatepsilon-hatepsilon_0-and-hatepsilon_1" class="section level3" number="6.8.1">
 <h3><span class="header-section-number">6.8.1</span> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></h3>
-<p>This is more close to how how <code>tmle</code> package has implement clever covariates</p>
-<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="tmle.html#cb223-1" aria-hidden="true" tabindex="-1"></a>eps_mod <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y.bounded <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> H.A1L <span class="sc">+</span> H.A0L <span class="sc">+</span>  </span>
-<span id="cb223-2"><a href="tmle.html#cb223-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">offset</span>(<span class="fu">qlogis</span>(init.Pred)), </span>
-<span id="cb223-3"><a href="tmle.html#cb223-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
-<span id="cb223-4"><a href="tmle.html#cb223-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData)</span>
-<span id="cb223-5"><a href="tmle.html#cb223-5" aria-hidden="true" tabindex="-1"></a>epsilon <span class="ot">&lt;-</span> <span class="fu">coef</span>(eps_mod)  </span>
-<span id="cb223-6"><a href="tmle.html#cb223-6" aria-hidden="true" tabindex="-1"></a>epsilon[<span class="st">&quot;H.A1L&quot;</span>]</span></code></pre></div>
+<p>This is closer to how <code>tmle</code> package has implement clever covariates</p>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="tmle.html#cb225-1" aria-hidden="true" tabindex="-1"></a>eps_mod <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y.bounded <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> H.A1L <span class="sc">+</span> H.A0L <span class="sc">+</span>  </span>
+<span id="cb225-2"><a href="tmle.html#cb225-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">offset</span>(<span class="fu">qlogis</span>(init.Pred)), </span>
+<span id="cb225-3"><a href="tmle.html#cb225-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb225-4"><a href="tmle.html#cb225-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData)</span>
+<span id="cb225-5"><a href="tmle.html#cb225-5" aria-hidden="true" tabindex="-1"></a>epsilon <span class="ot">&lt;-</span> <span class="fu">coef</span>(eps_mod)  </span>
+<span id="cb225-6"><a href="tmle.html#cb225-6" aria-hidden="true" tabindex="-1"></a>epsilon[<span class="st">&quot;H.A1L&quot;</span>]</span></code></pre></div>
 <pre><code>##      H.A1L 
-## 0.00573477</code></pre>
-<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="tmle.html#cb225-1" aria-hidden="true" tabindex="-1"></a>epsilon[<span class="st">&quot;H.A0L&quot;</span>]</span></code></pre></div>
-<pre><code>##       H.A0L 
-## 0.003333366</code></pre>
-<p>Note that, if <code>init.Pred</code> includes -ve values, <code>NaNs</code> would be produced after applying <code>qlogis()</code>.</p>
+## 0.01568809</code></pre>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="tmle.html#cb227-1" aria-hidden="true" tabindex="-1"></a>epsilon[<span class="st">&quot;H.A0L&quot;</span>] </span></code></pre></div>
+<pre><code>##      H.A0L 
+## 0.02070037</code></pre>
+<p>Note that, if <code>init.Pred</code> includes negative values, <code>NaNs</code> would be produced after applying <code>qlogis()</code>.</p>
 </div>
 <div id="only-1-hatepsilon" class="section level3" number="6.8.2">
 <h3><span class="header-section-number">6.8.2</span> Only 1 <span class="math inline">\(\hat\epsilon\)</span></h3>
 <p>For demonstration purposes</p>
-<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="tmle.html#cb227-1" aria-hidden="true" tabindex="-1"></a>eps_mod1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y.bounded <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> H.AL <span class="sc">+</span></span>
-<span id="cb227-2"><a href="tmle.html#cb227-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">offset</span>(<span class="fu">qlogis</span>(init.Pred)),</span>
-<span id="cb227-3"><a href="tmle.html#cb227-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
-<span id="cb227-4"><a href="tmle.html#cb227-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData)</span>
-<span id="cb227-5"><a href="tmle.html#cb227-5" aria-hidden="true" tabindex="-1"></a>epsilon1 <span class="ot">&lt;-</span> <span class="fu">coef</span>(eps_mod1) </span>
-<span id="cb227-6"><a href="tmle.html#cb227-6" aria-hidden="true" tabindex="-1"></a>epsilon1</span></code></pre></div>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="tmle.html#cb229-1" aria-hidden="true" tabindex="-1"></a>eps_mod1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y.bounded <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> H.AL <span class="sc">+</span></span>
+<span id="cb229-2"><a href="tmle.html#cb229-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">offset</span>(<span class="fu">qlogis</span>(init.Pred)),</span>
+<span id="cb229-3"><a href="tmle.html#cb229-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb229-4"><a href="tmle.html#cb229-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> ObsData)</span>
+<span id="cb229-5"><a href="tmle.html#cb229-5" aria-hidden="true" tabindex="-1"></a>epsilon1 <span class="ot">&lt;-</span> <span class="fu">coef</span>(eps_mod1) </span>
+<span id="cb229-6"><a href="tmle.html#cb229-6" aria-hidden="true" tabindex="-1"></a>epsilon1 </span></code></pre></div>
 <pre><code>##        H.AL 
-## 0.001703316</code></pre>
+## 0.001845536</code></pre>
 <p>Alternative could be to use <code>H.AL</code> as weights (not shown here).</p>
 </div>
 </div>
@@ -677,55 +679,51 @@ div.csl-indent {
 <div id="hatepsilon-hatepsilon_0-and-hatepsilon_1-1" class="section level3" number="6.9.1">
 <h3><span class="header-section-number">6.9.1</span> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></h3>
 <p>We can use <code>epsilon["H.A1L"]</code> and <code>epsilon["H.A0L"]</code> to update</p>
-<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="tmle.html#cb229-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1.update <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y1) <span class="sc">+</span>  </span>
-<span id="cb229-2"><a href="tmle.html#cb229-2" aria-hidden="true" tabindex="-1"></a>                                   epsilon[<span class="st">&quot;H.A1L&quot;</span>]<span class="sc">*</span>ObsData<span class="sc">$</span>H.A1L)</span>
-<span id="cb229-3"><a href="tmle.html#cb229-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0.update <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y0) <span class="sc">+</span> </span>
-<span id="cb229-4"><a href="tmle.html#cb229-4" aria-hidden="true" tabindex="-1"></a>                                   epsilon[<span class="st">&quot;H.A0L&quot;</span>]<span class="sc">*</span>ObsData<span class="sc">$</span>H.A0L)</span>
-<span id="cb229-5"><a href="tmle.html#cb229-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1.update)</span></code></pre></div>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="tmle.html#cb231-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1.update <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y1) <span class="sc">+</span>  </span>
+<span id="cb231-2"><a href="tmle.html#cb231-2" aria-hidden="true" tabindex="-1"></a>                                   epsilon[<span class="st">&quot;H.A1L&quot;</span>]<span class="sc">*</span>ObsData<span class="sc">$</span>H.A1L)</span>
+<span id="cb231-3"><a href="tmle.html#cb231-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0.update <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y0) <span class="sc">+</span> </span>
+<span id="cb231-4"><a href="tmle.html#cb231-4" aria-hidden="true" tabindex="-1"></a>                                   epsilon[<span class="st">&quot;H.A0L&quot;</span>]<span class="sc">*</span>ObsData<span class="sc">$</span>H.A0L)</span>
+<span id="cb231-5"><a href="tmle.html#cb231-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1.update)</span></code></pre></div>
 <pre><code>##        V1          
-##  Min.   :0.001473  
-##  1st Qu.:0.043052  
-##  Median :0.055075  
-##  Mean   :0.054543  
-##  3rd Qu.:0.065632  
-##  Max.   :0.194681  
-##  NA&#39;s   :5</code></pre>
-<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="tmle.html#cb231-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0.update) </span></code></pre></div>
-<pre><code>##        V1          
-##  Min.   :0.000268  
-##  1st Qu.:0.036216  
-##  Median :0.047958  
-##  Mean   :0.047463  
-##  3rd Qu.:0.058348  
-##  Max.   :0.184080  
-##  NA&#39;s   :12</code></pre>
+##  Min.   :0.001031  
+##  1st Qu.:0.042745  
+##  Median :0.054882  
+##  Mean   :0.053810  
+##  3rd Qu.:0.065188  
+##  Max.   :0.139189</code></pre>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="tmle.html#cb233-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0.update)  </span></code></pre></div>
+<pre><code>##        V1         
+##  Min.   :0.00100  
+##  1st Qu.:0.03603  
+##  Median :0.04779  
+##  Mean   :0.04686  
+##  3rd Qu.:0.05809  
+##  Max.   :0.12652</code></pre>
 </div>
 <div id="only-1-hatepsilon-1" class="section level3" number="6.9.2">
 <h3><span class="header-section-number">6.9.2</span> Only 1 <span class="math inline">\(\hat\epsilon\)</span></h3>
 <p>Alternatively, we could use <code>epsilon</code> to from <code>H.AL</code> to update</p>
-<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="tmle.html#cb233-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1.update1 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y1) <span class="sc">+</span>  </span>
-<span id="cb233-2"><a href="tmle.html#cb233-2" aria-hidden="true" tabindex="-1"></a>                                   epsilon1<span class="sc">*</span>ObsData<span class="sc">$</span>H.AL)</span>
-<span id="cb233-3"><a href="tmle.html#cb233-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0.update1 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y0) <span class="sc">+</span> </span>
-<span id="cb233-4"><a href="tmle.html#cb233-4" aria-hidden="true" tabindex="-1"></a>                                   epsilon1<span class="sc">*</span>ObsData<span class="sc">$</span>H.AL)</span>
-<span id="cb233-5"><a href="tmle.html#cb233-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1.update1)</span></code></pre></div>
-<pre><code>##        V1         
-##  Min.   :0.00147  
-##  1st Qu.:0.04292  
-##  Median :0.05491  
-##  Mean   :0.05433  
-##  3rd Qu.:0.06540  
-##  Max.   :0.19381  
-##  NA&#39;s   :5</code></pre>
-<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="tmle.html#cb235-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0.update1)  </span></code></pre></div>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="tmle.html#cb235-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1.update1 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y1) <span class="sc">+</span>  </span>
+<span id="cb235-2"><a href="tmle.html#cb235-2" aria-hidden="true" tabindex="-1"></a>                                   epsilon1<span class="sc">*</span>ObsData<span class="sc">$</span>H.AL)</span>
+<span id="cb235-3"><a href="tmle.html#cb235-3" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0.update1 <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(ObsData<span class="sc">$</span>Pred.Y0) <span class="sc">+</span> </span>
+<span id="cb235-4"><a href="tmle.html#cb235-4" aria-hidden="true" tabindex="-1"></a>                                   epsilon1<span class="sc">*</span>ObsData<span class="sc">$</span>H.AL)</span>
+<span id="cb235-5"><a href="tmle.html#cb235-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1.update1)</span></code></pre></div>
 <pre><code>##        V1          
-##  Min.   :0.000266  
-##  1st Qu.:0.036073  
-##  Median :0.047785  
-##  Mean   :0.047330  
-##  3rd Qu.:0.058238  
-##  Max.   :0.184433  
-##  NA&#39;s   :12</code></pre>
-<p>Note that, if <code>Pred.Y1</code> and <code>Pred.Y0</code> include -ve values, <code>NaNs</code> would be produced after applying <code>qlogis()</code>.</p>
+##  Min.   :0.001004  
+##  1st Qu.:0.042323  
+##  Median :0.054282  
+##  Mean   :0.053210  
+##  3rd Qu.:0.064424  
+##  Max.   :0.136895</code></pre>
+<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="tmle.html#cb237-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0.update1)   </span></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :0.001004  
+##  1st Qu.:0.035254  
+##  Median :0.047066  
+##  Mean   :0.046077  
+##  3rd Qu.:0.057296  
+##  Max.   :0.126804</code></pre>
+<p>Note that, if <code>Pred.Y1</code> and <code>Pred.Y0</code> include negative values, <code>NaNs</code> would be produced after applying <code>qlogis()</code>.</p>
 </div>
 </div>
 <div id="step-7-effect-estimate" class="section level2" number="6.10">
@@ -733,40 +731,38 @@ div.csl-indent {
 <p>Now that the updated predictions of our outcome models are calculated, we can calculate the ATE.</p>
 <div id="hatepsilon-hatepsilon_0-and-hatepsilon_1-2" class="section level3" number="6.10.1">
 <h3><span class="header-section-number">6.10.1</span> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></h3>
-<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="tmle.html#cb237-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded.vector <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1.update <span class="sc">-</span>  </span>
-<span id="cb237-2"><a href="tmle.html#cb237-2" aria-hidden="true" tabindex="-1"></a>                           ObsData<span class="sc">$</span>Pred.Y0.update</span>
-<span id="cb237-3"><a href="tmle.html#cb237-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ATE.TMLE.bounded.vector) </span></code></pre></div>
-<pre><code>##        V1          
-##  Min.   :0.002861  
-##  1st Qu.:0.006585  
-##  Median :0.007051  
-##  Mean   :0.007141  
-##  3rd Qu.:0.007626  
-##  Max.   :0.013738  
-##  NA&#39;s   :12</code></pre>
-<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="tmle.html#cb239-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded <span class="ot">&lt;-</span> <span class="fu">mean</span>(ATE.TMLE.bounded.vector, </span>
-<span id="cb239-2"><a href="tmle.html#cb239-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">na.rm =</span> <span class="cn">TRUE</span>) </span>
-<span id="cb239-3"><a href="tmle.html#cb239-3" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded</span></code></pre></div>
-<pre><code>## [1] 0.007140618</code></pre>
+<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="tmle.html#cb239-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded.vector <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1.update <span class="sc">-</span>  </span>
+<span id="cb239-2"><a href="tmle.html#cb239-2" aria-hidden="true" tabindex="-1"></a>                           ObsData<span class="sc">$</span>Pred.Y0.update</span>
+<span id="cb239-3"><a href="tmle.html#cb239-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ATE.TMLE.bounded.vector) </span></code></pre></div>
+<pre><code>##        V1           
+##  Min.   :-0.011371  
+##  1st Qu.: 0.005740  
+##  Median : 0.006569  
+##  Mean   : 0.006954  
+##  3rd Qu.: 0.008228  
+##  Max.   : 0.031895</code></pre>
+<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="tmle.html#cb241-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded <span class="ot">&lt;-</span> <span class="fu">mean</span>(ATE.TMLE.bounded.vector, </span>
+<span id="cb241-2"><a href="tmle.html#cb241-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">na.rm =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb241-3"><a href="tmle.html#cb241-3" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded </span></code></pre></div>
+<pre><code>## [1] 0.006953925</code></pre>
 </div>
 <div id="only-1-hatepsilon-2" class="section level3" number="6.10.2">
 <h3><span class="header-section-number">6.10.2</span> Only 1 <span class="math inline">\(\hat\epsilon\)</span></h3>
 <p>Alternatively, using <code>H.AL</code>:</p>
-<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="tmle.html#cb241-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded.vector1 <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1.update1 <span class="sc">-</span>  </span>
-<span id="cb241-2"><a href="tmle.html#cb241-2" aria-hidden="true" tabindex="-1"></a>                           ObsData<span class="sc">$</span>Pred.Y0.update1</span>
-<span id="cb241-3"><a href="tmle.html#cb241-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ATE.TMLE.bounded.vector1) </span></code></pre></div>
-<pre><code>##        V1          
-##  Min.   :0.003029  
-##  1st Qu.:0.006599  
-##  Median :0.006994  
-##  Mean   :0.007060  
-##  3rd Qu.:0.007466  
-##  Max.   :0.012427  
-##  NA&#39;s   :12</code></pre>
-<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="tmle.html#cb243-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(ATE.TMLE.bounded.vector1, </span>
-<span id="cb243-2"><a href="tmle.html#cb243-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">na.rm =</span> <span class="cn">TRUE</span>) </span>
-<span id="cb243-3"><a href="tmle.html#cb243-3" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded1</span></code></pre></div>
-<pre><code>## [1] 0.007059689</code></pre>
+<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="tmle.html#cb243-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded.vector1 <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1.update1 <span class="sc">-</span>  </span>
+<span id="cb243-2"><a href="tmle.html#cb243-2" aria-hidden="true" tabindex="-1"></a>                           ObsData<span class="sc">$</span>Pred.Y0.update1</span>
+<span id="cb243-3"><a href="tmle.html#cb243-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ATE.TMLE.bounded.vector1) </span></code></pre></div>
+<pre><code>##        V1           
+##  Min.   :-0.010315  
+##  1st Qu.: 0.006681  
+##  Median : 0.007066  
+##  Mean   : 0.007133  
+##  3rd Qu.: 0.007540  
+##  Max.   : 0.021637</code></pre>
+<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="tmle.html#cb245-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(ATE.TMLE.bounded.vector1, </span>
+<span id="cb245-2"><a href="tmle.html#cb245-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">na.rm =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb245-3"><a href="tmle.html#cb245-3" aria-hidden="true" tabindex="-1"></a>ATE.TMLE.bounded1 </span></code></pre></div>
+<pre><code>## [1] 0.007132696</code></pre>
 </div>
 </div>
 <div id="step-8-rescale-effect-estimate" class="section level2" number="6.11">
@@ -774,16 +770,16 @@ div.csl-indent {
 <p>We make sure to transform back to our original scale.</p>
 <div id="hatepsilon-hatepsilon_0-and-hatepsilon_1-3" class="section level3" number="6.11.1">
 <h3><span class="header-section-number">6.11.1</span> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></h3>
-<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="tmle.html#cb245-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>ATE.TMLE.bounded   </span>
-<span id="cb245-2"><a href="tmle.html#cb245-2" aria-hidden="true" tabindex="-1"></a>ATE.TMLE</span></code></pre></div>
-<pre><code>## [1] 2.799122</code></pre>
+<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="tmle.html#cb247-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>ATE.TMLE.bounded   </span>
+<span id="cb247-2"><a href="tmle.html#cb247-2" aria-hidden="true" tabindex="-1"></a>ATE.TMLE </span></code></pre></div>
+<pre><code>## [1] 2.725938</code></pre>
 </div>
 <div id="only-1-hatepsilon-3" class="section level3" number="6.11.2">
 <h3><span class="header-section-number">6.11.2</span> Only 1 <span class="math inline">\(\hat\epsilon\)</span></h3>
 <p>Alternatively, using <code>H.AL</code>:</p>
-<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="tmle.html#cb247-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE1 <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>ATE.TMLE.bounded1</span>
-<span id="cb247-2"><a href="tmle.html#cb247-2" aria-hidden="true" tabindex="-1"></a>ATE.TMLE1</span></code></pre></div>
-<pre><code>## [1] 2.767398</code></pre>
+<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="tmle.html#cb249-1" aria-hidden="true" tabindex="-1"></a>ATE.TMLE1 <span class="ot">&lt;-</span> (max.Y<span class="sc">-</span>min.Y)<span class="sc">*</span>ATE.TMLE.bounded1</span>
+<span id="cb249-2"><a href="tmle.html#cb249-2" aria-hidden="true" tabindex="-1"></a>ATE.TMLE1 </span></code></pre></div>
+<pre><code>## [1] 2.796017</code></pre>
 </div>
 </div>
 <div id="step-9-confidence-interval-estimation" class="section level2" number="6.12">
@@ -793,65 +789,65 @@ div.csl-indent {
 <li>Based on semi-parametric theory, closed form variance formula is already derived <span class="citation">(<a href="#ref-van2012targeted" role="doc-biblioref">Laan and Petersen 2012</a>)</span>.</li>
 <li>Time-consuming bootstrap procedure is not necessary.</li>
 </ul>
-<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="tmle.html#cb249-1" aria-hidden="true" tabindex="-1"></a>ci.estimate <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">data =</span> ObsData, <span class="at">H.AL.components =</span> <span class="dv">1</span>){</span>
-<span id="cb249-2"><a href="tmle.html#cb249-2" aria-hidden="true" tabindex="-1"></a>  min.Y <span class="ot">&lt;-</span> <span class="fu">min</span>(data<span class="sc">$</span>Y)</span>
-<span id="cb249-3"><a href="tmle.html#cb249-3" aria-hidden="true" tabindex="-1"></a>  max.Y <span class="ot">&lt;-</span> <span class="fu">max</span>(data<span class="sc">$</span>Y)</span>
-<span id="cb249-4"><a href="tmle.html#cb249-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># transform predicted outcomes back to original scale</span></span>
-<span id="cb249-5"><a href="tmle.html#cb249-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">2</span>){</span>
-<span id="cb249-6"><a href="tmle.html#cb249-6" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y1.update.rescaled <span class="ot">&lt;-</span> </span>
-<span id="cb249-7"><a href="tmle.html#cb249-7" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y1.update <span class="sc">+</span> min.Y</span>
-<span id="cb249-8"><a href="tmle.html#cb249-8" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y0.update.rescaled <span class="ot">&lt;-</span> </span>
-<span id="cb249-9"><a href="tmle.html#cb249-9" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y0.update <span class="sc">+</span> min.Y</span>
-<span id="cb249-10"><a href="tmle.html#cb249-10" aria-hidden="true" tabindex="-1"></a>  } </span>
-<span id="cb249-11"><a href="tmle.html#cb249-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb249-12"><a href="tmle.html#cb249-12" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y1.update.rescaled <span class="ot">&lt;-</span> </span>
-<span id="cb249-13"><a href="tmle.html#cb249-13" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y1.update1 <span class="sc">+</span> min.Y</span>
-<span id="cb249-14"><a href="tmle.html#cb249-14" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y0.update.rescaled <span class="ot">&lt;-</span> </span>
-<span id="cb249-15"><a href="tmle.html#cb249-15" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y0.update1 <span class="sc">+</span> min.Y</span>
-<span id="cb249-16"><a href="tmle.html#cb249-16" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb249-17"><a href="tmle.html#cb249-17" aria-hidden="true" tabindex="-1"></a>  EY1_TMLE1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(data<span class="sc">$</span>Pred.Y1.update.rescaled, </span>
-<span id="cb249-18"><a href="tmle.html#cb249-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb249-19"><a href="tmle.html#cb249-19" aria-hidden="true" tabindex="-1"></a>  EY0_TMLE1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(data<span class="sc">$</span>Pred.Y0.update.rescaled, </span>
-<span id="cb249-20"><a href="tmle.html#cb249-20" aria-hidden="true" tabindex="-1"></a>                    <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb249-21"><a href="tmle.html#cb249-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ATE efficient influence curve</span></span>
-<span id="cb249-22"><a href="tmle.html#cb249-22" aria-hidden="true" tabindex="-1"></a>  D1 <span class="ot">&lt;-</span> data<span class="sc">$</span>A<span class="sc">/</span>data<span class="sc">$</span>PS.SL<span class="sc">*</span></span>
-<span id="cb249-23"><a href="tmle.html#cb249-23" aria-hidden="true" tabindex="-1"></a>    (data<span class="sc">$</span>Y <span class="sc">-</span> data<span class="sc">$</span>Pred.Y1.update.rescaled) <span class="sc">+</span> </span>
-<span id="cb249-24"><a href="tmle.html#cb249-24" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y1.update.rescaled <span class="sc">-</span> EY1_TMLE1</span>
-<span id="cb249-25"><a href="tmle.html#cb249-25" aria-hidden="true" tabindex="-1"></a>  D0 <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> data<span class="sc">$</span>A)<span class="sc">/</span>(<span class="dv">1</span> <span class="sc">-</span> data<span class="sc">$</span>PS.SL)<span class="sc">*</span></span>
-<span id="cb249-26"><a href="tmle.html#cb249-26" aria-hidden="true" tabindex="-1"></a>    (data<span class="sc">$</span>Y <span class="sc">-</span> data<span class="sc">$</span>Pred.Y0.update.rescaled) <span class="sc">+</span> </span>
-<span id="cb249-27"><a href="tmle.html#cb249-27" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y0.update.rescaled <span class="sc">-</span> EY0_TMLE1</span>
-<span id="cb249-28"><a href="tmle.html#cb249-28" aria-hidden="true" tabindex="-1"></a>  EIC <span class="ot">&lt;-</span> D1 <span class="sc">-</span> D0</span>
-<span id="cb249-29"><a href="tmle.html#cb249-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ATE variance</span></span>
-<span id="cb249-30"><a href="tmle.html#cb249-30" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(data)</span>
-<span id="cb249-31"><a href="tmle.html#cb249-31" aria-hidden="true" tabindex="-1"></a>  varHat.IC <span class="ot">&lt;-</span> <span class="fu">var</span>(EIC, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)<span class="sc">/</span>n</span>
-<span id="cb249-32"><a href="tmle.html#cb249-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ATE 95% CI</span></span>
-<span id="cb249-33"><a href="tmle.html#cb249-33" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">2</span>) {</span>
-<span id="cb249-34"><a href="tmle.html#cb249-34" aria-hidden="true" tabindex="-1"></a>    ATE.TMLE.CI <span class="ot">&lt;-</span> <span class="fu">c</span>(ATE.TMLE <span class="sc">-</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC), </span>
-<span id="cb249-35"><a href="tmle.html#cb249-35" aria-hidden="true" tabindex="-1"></a>                   ATE.TMLE <span class="sc">+</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC))</span>
-<span id="cb249-36"><a href="tmle.html#cb249-36" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb249-37"><a href="tmle.html#cb249-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb249-38"><a href="tmle.html#cb249-38" aria-hidden="true" tabindex="-1"></a>    ATE.TMLE.CI <span class="ot">&lt;-</span> <span class="fu">c</span>(ATE.TMLE1 <span class="sc">-</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC), </span>
-<span id="cb249-39"><a href="tmle.html#cb249-39" aria-hidden="true" tabindex="-1"></a>                   ATE.TMLE1 <span class="sc">+</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC))</span>
-<span id="cb249-40"><a href="tmle.html#cb249-40" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb249-41"><a href="tmle.html#cb249-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ATE.TMLE.CI)</span>
-<span id="cb249-42"><a href="tmle.html#cb249-42" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb251-1"><a href="tmle.html#cb251-1" aria-hidden="true" tabindex="-1"></a>ci.estimate <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">data =</span> ObsData, <span class="at">H.AL.components =</span> <span class="dv">1</span>){</span>
+<span id="cb251-2"><a href="tmle.html#cb251-2" aria-hidden="true" tabindex="-1"></a>  min.Y <span class="ot">&lt;-</span> <span class="fu">min</span>(data<span class="sc">$</span>Y)</span>
+<span id="cb251-3"><a href="tmle.html#cb251-3" aria-hidden="true" tabindex="-1"></a>  max.Y <span class="ot">&lt;-</span> <span class="fu">max</span>(data<span class="sc">$</span>Y)</span>
+<span id="cb251-4"><a href="tmle.html#cb251-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># transform predicted outcomes back to original scale</span></span>
+<span id="cb251-5"><a href="tmle.html#cb251-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">2</span>){</span>
+<span id="cb251-6"><a href="tmle.html#cb251-6" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y1.update.rescaled <span class="ot">&lt;-</span> </span>
+<span id="cb251-7"><a href="tmle.html#cb251-7" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y1.update <span class="sc">+</span> min.Y</span>
+<span id="cb251-8"><a href="tmle.html#cb251-8" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y0.update.rescaled <span class="ot">&lt;-</span> </span>
+<span id="cb251-9"><a href="tmle.html#cb251-9" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y0.update <span class="sc">+</span> min.Y</span>
+<span id="cb251-10"><a href="tmle.html#cb251-10" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb251-11"><a href="tmle.html#cb251-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb251-12"><a href="tmle.html#cb251-12" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y1.update.rescaled <span class="ot">&lt;-</span> </span>
+<span id="cb251-13"><a href="tmle.html#cb251-13" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y1.update1 <span class="sc">+</span> min.Y</span>
+<span id="cb251-14"><a href="tmle.html#cb251-14" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y0.update.rescaled <span class="ot">&lt;-</span> </span>
+<span id="cb251-15"><a href="tmle.html#cb251-15" aria-hidden="true" tabindex="-1"></a>      (max.Y<span class="sc">-</span> min.Y)<span class="sc">*</span>data<span class="sc">$</span>Pred.Y0.update1 <span class="sc">+</span> min.Y</span>
+<span id="cb251-16"><a href="tmle.html#cb251-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb251-17"><a href="tmle.html#cb251-17" aria-hidden="true" tabindex="-1"></a>  EY1_TMLE1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(data<span class="sc">$</span>Pred.Y1.update.rescaled, </span>
+<span id="cb251-18"><a href="tmle.html#cb251-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb251-19"><a href="tmle.html#cb251-19" aria-hidden="true" tabindex="-1"></a>  EY0_TMLE1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(data<span class="sc">$</span>Pred.Y0.update.rescaled, </span>
+<span id="cb251-20"><a href="tmle.html#cb251-20" aria-hidden="true" tabindex="-1"></a>                    <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb251-21"><a href="tmle.html#cb251-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ATE efficient influence curve</span></span>
+<span id="cb251-22"><a href="tmle.html#cb251-22" aria-hidden="true" tabindex="-1"></a>  D1 <span class="ot">&lt;-</span> data<span class="sc">$</span>A<span class="sc">/</span>data<span class="sc">$</span>PS.SL<span class="sc">*</span></span>
+<span id="cb251-23"><a href="tmle.html#cb251-23" aria-hidden="true" tabindex="-1"></a>    (data<span class="sc">$</span>Y <span class="sc">-</span> data<span class="sc">$</span>Pred.Y1.update.rescaled) <span class="sc">+</span> </span>
+<span id="cb251-24"><a href="tmle.html#cb251-24" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y1.update.rescaled <span class="sc">-</span> EY1_TMLE1</span>
+<span id="cb251-25"><a href="tmle.html#cb251-25" aria-hidden="true" tabindex="-1"></a>  D0 <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> data<span class="sc">$</span>A)<span class="sc">/</span>(<span class="dv">1</span> <span class="sc">-</span> data<span class="sc">$</span>PS.SL)<span class="sc">*</span></span>
+<span id="cb251-26"><a href="tmle.html#cb251-26" aria-hidden="true" tabindex="-1"></a>    (data<span class="sc">$</span>Y <span class="sc">-</span> data<span class="sc">$</span>Pred.Y0.update.rescaled) <span class="sc">+</span> </span>
+<span id="cb251-27"><a href="tmle.html#cb251-27" aria-hidden="true" tabindex="-1"></a>    data<span class="sc">$</span>Pred.Y0.update.rescaled <span class="sc">-</span> EY0_TMLE1</span>
+<span id="cb251-28"><a href="tmle.html#cb251-28" aria-hidden="true" tabindex="-1"></a>  EIC <span class="ot">&lt;-</span> D1 <span class="sc">-</span> D0</span>
+<span id="cb251-29"><a href="tmle.html#cb251-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ATE variance</span></span>
+<span id="cb251-30"><a href="tmle.html#cb251-30" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(data)</span>
+<span id="cb251-31"><a href="tmle.html#cb251-31" aria-hidden="true" tabindex="-1"></a>  varHat.IC <span class="ot">&lt;-</span> <span class="fu">var</span>(EIC, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)<span class="sc">/</span>n</span>
+<span id="cb251-32"><a href="tmle.html#cb251-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ATE 95% CI</span></span>
+<span id="cb251-33"><a href="tmle.html#cb251-33" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">2</span>) {</span>
+<span id="cb251-34"><a href="tmle.html#cb251-34" aria-hidden="true" tabindex="-1"></a>    ATE.TMLE.CI <span class="ot">&lt;-</span> <span class="fu">c</span>(ATE.TMLE <span class="sc">-</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC), </span>
+<span id="cb251-35"><a href="tmle.html#cb251-35" aria-hidden="true" tabindex="-1"></a>                   ATE.TMLE <span class="sc">+</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC))</span>
+<span id="cb251-36"><a href="tmle.html#cb251-36" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb251-37"><a href="tmle.html#cb251-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (H.AL.components <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb251-38"><a href="tmle.html#cb251-38" aria-hidden="true" tabindex="-1"></a>    ATE.TMLE.CI <span class="ot">&lt;-</span> <span class="fu">c</span>(ATE.TMLE1 <span class="sc">-</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC), </span>
+<span id="cb251-39"><a href="tmle.html#cb251-39" aria-hidden="true" tabindex="-1"></a>                   ATE.TMLE1 <span class="sc">+</span> <span class="fl">1.96</span><span class="sc">*</span><span class="fu">sqrt</span>(varHat.IC))</span>
+<span id="cb251-40"><a href="tmle.html#cb251-40" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb251-41"><a href="tmle.html#cb251-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ATE.TMLE.CI) </span>
+<span id="cb251-42"><a href="tmle.html#cb251-42" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <div id="hatepsilon-hatepsilon_0-and-hatepsilon_1-4" class="section level3" number="6.12.1">
 <h3><span class="header-section-number">6.12.1</span> <span class="math inline">\(\hat\epsilon\)</span> = <span class="math inline">\(\hat\epsilon_0\)</span> and <span class="math inline">\(\hat\epsilon_1\)</span></h3>
-<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="tmle.html#cb250-1" aria-hidden="true" tabindex="-1"></a>CI2 <span class="ot">&lt;-</span> <span class="fu">ci.estimate</span>(<span class="at">data =</span> ObsData, <span class="at">H.AL.components =</span> <span class="dv">2</span>)</span>
-<span id="cb250-2"><a href="tmle.html#cb250-2" aria-hidden="true" tabindex="-1"></a>CI2</span></code></pre></div>
-<pre><code>## [1] 1.818815 3.779430</code></pre>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="tmle.html#cb252-1" aria-hidden="true" tabindex="-1"></a>CI2 <span class="ot">&lt;-</span> <span class="fu">ci.estimate</span>(<span class="at">data =</span> ObsData, <span class="at">H.AL.components =</span> <span class="dv">2</span>) </span>
+<span id="cb252-2"><a href="tmle.html#cb252-2" aria-hidden="true" tabindex="-1"></a>CI2</span></code></pre></div>
+<pre><code>## [1] 1.585188 3.866689</code></pre>
 </div>
 <div id="only-1-hatepsilon-4" class="section level3" number="6.12.2">
 <h3><span class="header-section-number">6.12.2</span> Only 1 <span class="math inline">\(\hat\epsilon\)</span></h3>
-<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="tmle.html#cb252-1" aria-hidden="true" tabindex="-1"></a>CI1 <span class="ot">&lt;-</span> <span class="fu">ci.estimate</span>(<span class="at">data =</span> ObsData, <span class="at">H.AL.components =</span> <span class="dv">1</span>)</span>
-<span id="cb252-2"><a href="tmle.html#cb252-2" aria-hidden="true" tabindex="-1"></a>CI1</span></code></pre></div>
-<pre><code>## [1] 1.786472 3.748324</code></pre>
-<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb254-1"><a href="tmle.html#cb254-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(ATE.TMLE1, <span class="at">file =</span> <span class="st">&quot;data/tmlepointh.RDS&quot;</span>)</span>
-<span id="cb254-2"><a href="tmle.html#cb254-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(CI2, <span class="at">file =</span> <span class="st">&quot;data/tmlecih.RDS&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb254-1"><a href="tmle.html#cb254-1" aria-hidden="true" tabindex="-1"></a>CI1 <span class="ot">&lt;-</span> <span class="fu">ci.estimate</span>(<span class="at">data =</span> ObsData, <span class="at">H.AL.components =</span> <span class="dv">1</span>) </span>
+<span id="cb254-2"><a href="tmle.html#cb254-2" aria-hidden="true" tabindex="-1"></a>CI1</span></code></pre></div>
+<pre><code>## [1] 1.654637 3.937396</code></pre>
+<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="tmle.html#cb256-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(ATE.TMLE, <span class="at">file =</span> <span class="st">&quot;data/tmlepointh.RDS&quot;</span>) </span>
+<span id="cb256-2"><a href="tmle.html#cb256-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(CI2, <span class="at">file =</span> <span class="st">&quot;data/tmlecih.RDS&quot;</span>)</span></code></pre></div>
 
-<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb255-1"><a href="tmle.html#cb255-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
-<span id="cb255-2"><a href="tmle.html#cb255-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span>
-<span id="cb255-3"><a href="tmle.html#cb255-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ObsData)</span></code></pre></div>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="tmle.html#cb257-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the data saved at the last chapter</span></span>
+<span id="cb257-2"><a href="tmle.html#cb257-2" aria-hidden="true" tabindex="-1"></a>ObsData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="st">&quot;data/rhcAnalytic.RDS&quot;</span>)</span>
+<span id="cb257-3"><a href="tmle.html#cb257-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ObsData)</span></code></pre></div>
 <pre><code>## [1] 5735   51</code></pre>
 </div>
 </div>

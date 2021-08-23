@@ -487,6 +487,9 @@ fit.sl4 <- recombineSL(fit.sl, Y = Y, method = "method.CC_nloglik")
 fit.sl4$coef
 ```
 
+- `method.CC_LS` is [suggested](https://si.biostat.washington.edu/sites/default/files/modules/lab1_0.pdf) as a good method for continuous outcome
+- `method.CC_nloglik` is [suggested](https://si.biostat.washington.edu/sites/default/files/modules/lab1_0.pdf) as a good method for binary outcome
+
 ```{r, cache=TRUE, echo = TRUE}
 saveRDS(TE1, file = "data/gcompxg.RDS")
 saveRDS(TE2, file = "data/gcompls.RDS")
