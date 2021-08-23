@@ -20,10 +20,10 @@ Now that we have covered
 - outcome models (e.g., G-computation) and 
 - exposure models (e.g., propensity score models), 
 
-let us talk about Doubly robust (DR) estimators. DR has several important properties: 
+let us talk about doubly robust (DR) estimators. DR has several important properties: 
 
-* They use information from 
-  - both the exposure and 
+* They use information from both 
+  - the exposure and 
   - the outcome models. 
 * They provide a **consistent estimator** if either of the above mentioned models is correctly specified.
   - consistent estimator means as the sample size increases, distribution of the estimates gets concentrated near the true parameter
@@ -108,7 +108,7 @@ Y.fit.sl <- SuperLearner(Y=ObsData$Y.bounded,
                        SL.library=c("SL.glm", 
                                     "SL.glmnet", 
                                     "SL.xgboost"),
-                       method="method.NNLS",
+                       method="method.CC_nloglik",
                        family="gaussian")
 ```
 
@@ -139,14 +139,14 @@ summary(ObsData$Pred.Y1)
 
 -  $Q^0(A=0,L)$ predictions:
 
-### Get initial treatment effect estimate
-
 ```{r SL_out02, cache=TRUE}
 ObsData.noY$A <- 0
 ObsData$Pred.Y0 <- predict(Y.fit.sl, newdata = ObsData.noY,
                            type = "response")$pred
 summary(ObsData$Pred.Y0)
 ```
+
+### Get initial treatment effect estimate
 
 ```{r SL_out03, cache=cachex, echo = TRUE}
 ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
@@ -201,7 +201,7 @@ PS.fit.SL <- SuperLearner(Y=ObsData$A,
                        SL.library=c("SL.glm", 
                                     "SL.glmnet", 
                                     "SL.xgboost"),
-                       method="method.NNLS",
+                       method="method.CC_nloglik",
                        family="binomial")
 ```
 
@@ -269,11 +269,11 @@ Aggregated or individual clever covariate components show slight difference in t
   - a vector with 2 components $\hat\epsilon_0$ and $\hat\epsilon_1$. 
 - It  is estimated through MLE, using a model with an offset based on the initial estimate, and clever covariates as independent variables [@gruber2009targeted]:
 
-  $E(Y=1|A,L)(\epsilon) = \frac{1}{1+\exp(-\log\frac{\bar Q^0(A,L)}{(1-\bar Q^0(A,L))}-\epsilon \times H(A,L))}$ 
+  $E(Y|A,L)(\epsilon) = \frac{1}{1+\exp(-\log\frac{\bar Q^0(A,L)}{(1-\bar Q^0(A,L))}-\epsilon \times H(A,L))}$ 
 
 ### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
 
-This is more close to how how `tmle` package has implement clever covariates
+This is closer to how `tmle` package has implement clever covariates
 
 ```{r eestimate, cache=TRUE, warning=FALSE}
 eps_mod <- glm(Y.bounded ~ -1 + H.A1L + H.A0L +  
@@ -285,7 +285,7 @@ epsilon["H.A1L"]
 epsilon["H.A0L"]
 ```
 
-Note that, if `init.Pred` includes -ve values, `NaNs` would be produced after applying `qlogis()`.
+Note that, if `init.Pred` includes negative values, `NaNs` would be produced after applying `qlogis()`.
 
 ### Only 1 $\hat\epsilon$
 
@@ -330,7 +330,7 @@ summary(ObsData$Pred.Y1.update1)
 summary(ObsData$Pred.Y0.update1)  
 ```
 
-Note that, if `Pred.Y1` and `Pred.Y0` include -ve values, `NaNs` would be produced after applying `qlogis()`.
+Note that, if `Pred.Y1` and `Pred.Y0` include negative values, `NaNs` would be produced after applying `qlogis()`.
 
 ```{r hestimate, cache=TRUE, warning=FALSE, include = FALSE}
 # # clever covariates
