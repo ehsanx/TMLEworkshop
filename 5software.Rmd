@@ -60,7 +60,7 @@ SL.library = c("SL.glm",
 ```
 
 
-```{r tmlepkg33, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+```{r tmlepkg33, cache=cachex, message=FALSE, warning=FALSE}
 tmle.fit <- tmle::tmle(Y = ObsData$Y_transf, 
                    A = ObsData$A, 
                    W = ObsData.noYA, 
@@ -72,15 +72,17 @@ tmle.fit
 ```
 
 
-```{r tmlepkgtr2, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+```{r tmlepkgtr2, cache=cachex, message=FALSE, warning=FALSE}
 summary(tmle.fit)
 ```
 
 
-```{r tmlepkgtr, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+```{r tmlepkgtr, cache=cachex, message=FALSE, warning=FALSE}
 tmle_est_tr <- tmle.fit$estimates$ATE$psi
 # transform back the ATE estimate
 tmle_est <- (max.Y-min.Y)*tmle_est_tr
+
+tmle_est
 ```
 
 ```{r, cache=TRUE, echo = TRUE}
@@ -107,7 +109,6 @@ Notes about the _tmle_ package:
 * does not scale the outcome for you
 * can give some error messages when dealing with variable types it is not expecting
 * practically all steps are nicely packed up in one function, very easy to use but need to dig a little to truly understand what it does
-* at first was not straightforward to figure out how to use with a continuous outcome and log-likelihood loss function as the difference between several parameters relating to variable type and loss function was unclear
 
 Most helpful resources: 
 
@@ -188,7 +189,7 @@ sl_disc <- Lrnr_sl$new(
 
 The SuperLearner is then trained on the sl3 task we created at the start and then it can be used to make predictions.
 
-```{r sl305, cache=cachexy, results='hide', message=FALSE, warning=FALSE}
+```{r sl305, cache=cachexy, message=FALSE, warning=FALSE}
 set.seed(1444)
 
 # train SL
@@ -202,6 +203,8 @@ sl3_data$sl_preds <- sl_fit$predict()
 
 sl3_est <- mean(sl3_data$sl_preds[sl3_data$A == 1]) - 
   mean(sl3_data$sl_preds[sl3_data$A == 0])
+
+sl3_est
 ```
 
 ```{r, cache=TRUE, echo = TRUE}
