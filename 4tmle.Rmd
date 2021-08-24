@@ -77,7 +77,9 @@ summary(ObsData$Y)
 plot(density(ObsData$Y), main = "Observed Y")
 ```
 
+```{block, type='rmdcomment'}
 General recommendation is to **transform** continuous outcome to be within the range [0,1] [@gruber2010targeted].
+```
 
 <!--- However, it is recommended that even with continuous outcomes we use a log-likelihood loss function for the maximum likelihood estimation, as we would with a binary outcome.  --->
 
@@ -96,7 +98,11 @@ summary(ObsData$Y.bounded)
 
 ## Step 2: Initial G-comp estimate
 
-We construct our outcome model, and make our initial predictions. For this step, we will use **SuperLearner**. This requires no apriori assumptions about the structure of our outcome model. 
+```{block, type='rmdcomment'}
+We construct our outcome model, and make our initial predictions. 
+```
+
+For this step, we will use **SuperLearner**. This requires no apriori assumptions about the structure of our outcome model. 
 
 ```{r SL_out0, cache=TRUE, message=FALSE, warning=FALSE}
 library(SuperLearner)
@@ -122,7 +128,10 @@ summary(ObsData$init.Pred)
 ```
 
 - We will use these initial prediction values later. 
-- $Q^0(A,L)$ is often used to represent the predictions from initial G-comp model.
+
+```{block, type='rmdcomment'}
+$Q^0(A,L)$ is often used to represent the predictions from initial G-comp model.
+```
 
 ### Get predictions under both treatments $A = 0$ and $1$
 
@@ -211,7 +220,10 @@ all.pred <- predict(PS.fit.SL, type = "response")
 ObsData$PS.SL <- all.pred$pred 
 ```
 
-- These propensity score predictions (`PS.SL`) are represented as $g(A_i=1|L_i)$.
+```{block, type='rmdcomment'}
+These propensity score predictions (`PS.SL`) are represented as $g(A_i=1|L_i)$.
+```
+
 - We can estimate $g(A_i=0|L_i)$ as $1 - g(A_i=1|L_i)$ or `1 - PS.SL`.
 
 ```{r ipw2psx2btmle, cache=TRUE, echo = TRUE}
@@ -247,7 +259,9 @@ legend("topright", c("No RHC","RHC"),
 
 ## Step 4: Estimate $H$ 
 
+```{block, type='rmdcomment'}
 Clever covariate $H(A_i, L_i) = \frac{I(A_i=1)}{g(A_i=1|L_i)} - \frac{I(A_i=0)}{g(A_i=0|L_i)}$ [@luque2018targeted]
+```
 
 ```{r hestimate2, cache=TRUE, warning=FALSE}
 ObsData$H.A1L <- (ObsData$A) / ObsData$PS.SL 
@@ -263,7 +277,10 @@ Aggregated or individual clever covariate components show slight difference in t
 
 ## Step 5: Estimate $\epsilon$
 
-- Fluctuation parameter $\epsilon$, representing **how large of an adjustment we will make** to the initial estimate. 
+```{block, type='rmdcomment'}
+Fluctuation parameter $\epsilon$, representing **how large of an adjustment we will make** to the initial estimate. 
+```
+
 - The fluctuation parameter $\hat\epsilon$ could be 
   - a scalar or 
   - a vector with 2 components $\hat\epsilon_0$ and $\hat\epsilon_1$. 
@@ -398,7 +415,11 @@ ATE.TMLE1
 ## Step 9: Confidence interval estimation
 
 - Since the machine learning algorithms were used only in intermediary steps, rather than estimating our parameter of interest directly, 95% confidence intervals can be calculated directly [@luque2018targeted]. 
-- Based on semi-parametric theory, closed form variance formula is already derived [@van2012targeted]. 
+
+```{block, type='rmdcomment'}
+Based on semi-parametric theory, closed form variance formula is already derived [@van2012targeted]. 
+```
+
 - Time-consuming bootstrap procedure is not necessary.
 
 ```{r tmleinf2, cache=TRUE}

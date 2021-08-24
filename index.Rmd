@@ -7,6 +7,7 @@ output:
   bookdown::html_document2:
     includes:
       in_header: header.html
+      css: [style.css]
   bookdown::gitbook:
     includes:
       in_header: header.html
@@ -19,7 +20,19 @@ biblio-style: apalike
 link-citations: yes
 github-repo: ehsanx/intro2R
 description: "Intro to R."
+header-includes: 
+  - \usepackage{tcolorbox}
+  - \newtcolorbox{blackbox}{colback=black,colframe=orange,coltext=white,boxsep=5pt,arc=4pt}
+  - \usepackage{color}
+  - \usepackage{framed}
+  - \setlength{\fboxsep}{.8em}
 ---
+
+\newenvironment{blackbox}{
+  \definecolor{shadecolor}{rgb}{0, 0, 0}  % black
+  \color{white}
+  \begin{shaded}}
+ {\end{shaded}}
 
 # Preface {-}
 
@@ -29,15 +42,31 @@ In comparative effectiveness studies, researchers typically use propensity score
 
 ## Goal  {-}
 
-In this workshop we will present an <ins>introductory tutorial explaining an overview of TMLE using one real epidemiological data</ins>, the steps to use the method in R, and a demonstration of relevant R packages. 
+In this workshop we will present an introductory tutorial explaining an overview of 
+
+- TMLE and 
+- some of the relevant methods 
+  - G-computation and 
+  - IPW 
+
+using one real epidemiological data, 
+
+- the steps to use the methods in R, and 
+- a demonstration of relevant R packages. 
 
 ## Philosophy  {-}
 
-Code-first philosophy is adopted for this workshop; demonstrating the analyses through one real data analysis problem used in the literature. This workshop is not theory-focused, nor utilizes simulated data to explain the ideas. Given the focus on implementation, theory is beyond the scope of this workshop. At the end of the workshop, we will provide key references where the theories are well explained (given the adequate background of the readers).
+Code-first philosophy is adopted for this workshop; demonstrating the analyses through one real data analysis problem used in the literature. 
+
+- This workshop is not theory-focused, nor utilizes simulated data to explain the ideas. Given the focus on implementation, theory is beyond the scope of this workshop. 
+- At the end of the workshop, we will provide key references where the theories are well explained.
 
 ## Pre-requisites {-}
 
-Basic understanding of *R* language is required. A general understanding of *multiple regression* is expected. Familiarity with *machine learning* and *epidemiological* core concepts would be helpful, but not required. Deep understanding of *causal inference* or *advanced statistical inference* knowledge is not expected. 
+- Basic understanding of *R* language is required. 
+- A general understanding of *multiple regression* is expected. 
+- Familiarity with *machine learning* and *epidemiological* core concepts would be helpful, but not required. 
+- Deep understanding of *causal inference* or *advanced statistical inference* knowledge is not expected. 
 
 ## Version history {-}
 
@@ -58,9 +87,8 @@ knitr::include_graphics("images/by-nc-sa.png")
 
 The online version of this book is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) International License. You may share, adapt the content and may distribute your contributions under the same license (CC BY-NC-SA 4.0), but you have to give appropriate credit, and cannot use material for the commercial purposes.
 
----
+```{block, type='rmdcomment'}
 **How to cite**
 
 Karim, ME and Frank, H (2021) "R Guide for TMLE in Medical Research", URL: [ehsanx.github.io/TMLEworkshop/](https://ehsanx.github.io/TMLEworkshop/)
----
-
+```

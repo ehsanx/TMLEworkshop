@@ -1,6 +1,8 @@
 # IPTW
 
-In this chapter, we are not only interested in outcome modelling, but also **exposure modelling**.
+```{block, type='rmdcomment'}
+In this chapter, we are primarily interested about **exposure modelling** (e.g., fixing imbalance first, before doing outcome analysis).
+```
 
 ```{r setup01i, include=FALSE}
 require(knitr)
@@ -34,10 +36,14 @@ According to @austin2011tutorial, we need to follow 4 steps:
 |-|-|
 |Step 1| exposure modelling: $PS = Prob(A=1|L)$|
 |Step 2| Convert $PS$ to $IPW$  = $\frac{A}{PS} + \frac{1-A}{1-PS}$|
-|Step 3| Assess balance in weighted sample and overlap ($PS$ and $L$)|
-|Step 4| outcome modelling: $Prob(Y=1|A=1)$ to obtain treatment effect estimate  |
+|Step 3| Assess balance in weighted sample ($PS$ and $L$)|
+|Step 4| outcome modelling: $E(Y|A=1)$ to obtain treatment effect estimate  |
 
 ## Step 1: exposure modelling
+
+```{block, type='rmdcomment'}
+Exposure modelling: $PS = Prob(A=1|L)$
+```
 
 ```{r ps1, cache=cachex, echo = TRUE}
 ps.formula <- as.formula(paste("A ~",
@@ -90,6 +96,10 @@ legend("topright", c("No RHC","RHC"),
 
 ## Step 2: Convert PS to IPW 
 
+```{block, type='rmdcomment'}
+Convert $PS$ to $IPW$  = $\frac{A}{PS} + \frac{1-A}{1-PS}$
+```
+
 - Convert PS to IPW using the formula. We are using the formula for average treatment effect (ATE). 
 - It is possible to use alternative formulas, but we are using ATE formula for our illustration.
 
@@ -111,6 +121,10 @@ summary(W.out$weights)
 
 
 ## Step 3: Balance checking
+
+```{block, type='rmdcomment'}
+Assess balance in weighted sample ($PS$ and $L$)
+```
 
 We can check balance numerically. 
 
@@ -134,7 +148,15 @@ love.plot(W.out, binary = "std",
           line = TRUE)
 ```
 
+```{block, type='rmdcomment'}
+All covariates are balanced! Reverse engineered an RCT!?!
+```
+
 ## Step 4: outcome modelling 
+
+```{block, type='rmdcomment'}
+Outcome modelling: $E(Y|A=1)$ to obtain treatment effect estimate
+```
 
 Estimate the effect of treatment on outcomes 
 

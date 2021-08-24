@@ -32,10 +32,13 @@ dim(ObsData)
   - continuous outcomes, and 
   - uses the _SuperLearner_ package to construct both models just like we did in the steps above.
 - The default SuperLearner library for estimating the outcome includes [@tmlePkgDocs] 
-  - generalized linear models (GLMs), 
-  - GLM with lasso regularization, and 
-  - gradient boosting. 
-- The default library for estimating the propensity scores also include the same 
+  - `SL.glm`: generalized linear models (GLMs)
+  - `SL.glmnet`: LASSO
+  - `tmle.SL.dbarts2`: modeling and prediction using BART
+- The default library for estimating the propensity scores includes
+  - `SL.glm`: generalized linear models (GLMs)
+  - `tmle.SL.dbarts.k.5`: SL wrappers for modeling and prediction using BART
+  - `SL.gam`: generalized additive models: (GAMs)  
 - It is certainly possible to use different set of learners
   - More methods can be added by 
     - specifying lists of models in the _Q.SL.library_ (for the outcome model) and 
@@ -47,9 +50,7 @@ dim(ObsData)
 set.seed(1444) 
 # transform the outcome to fall within the range [0,1]
 min.Y <- min(ObsData$Y)
-min.Y
 max.Y <- max(ObsData$Y)
-max.Y
 ObsData$Y_transf <- (ObsData$Y-min.Y)/(max.Y-min.Y)
 
 # run tmle from the tmle package 
@@ -346,7 +347,7 @@ cat("ATE from aipw package: ", aipw_est, aipw_ci, sep = "")
 ## RHC results
 
 Gathering previously saved results:
-```{r summarytable0, cache=cachex, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+```{r summarytable0, cache=cachex, echo=TRUE, results='hold', warning=FALSE, message=FALSE}
 fit.reg <- readRDS(file = "data/adjreg.RDS")
 TEr <- fit.reg$coefficients[2]
 CIr <- as.numeric(confint(fit.reg, 'A'))
@@ -371,26 +372,34 @@ tmlesl <- readRDS(file = "data/tmle.RDS")
 tmlecisl <- readRDS(file = "data/tmleci.RDS")
 slp <- readRDS(file = "data/sl3.RDS")
 ci.b <- rep(NA,2)
-point <- as.numeric(c(TEr, TEm, TEg, TE1g, TE2g, 
+ks <- 2.01
+ci.ks <- c(0.6,3.41)
+point <- as.numeric(c(TEr, TEm, TEg, TE1g, TE2g,  
                       TE3g, TEi, TEsli, tmleh, 
-                      tmlesl, slp))
+                      tmlesl, slp, ks))
 CIs <- cbind(CIr, CIm, CIgc, ci.b, ci.b, ci.b, 
-             CIi, CIsli, tmlecih, tmlecisl, ci.b)  
+             CIi, CIsli, tmlecih, tmlecisl, 
+             ci.b, ci.ks)    
 ```
 
 
-```{r summarytable, cache=cachex, echo=FALSE}
+```{r summarytable, cache=cachex, echo=TRUE}
 method.list <- c("Adj. Reg","PS match", 
-                 "G-comp (logistic)","G-comp (xgboost)",
-                 "G-comp (lasso)", "G-comp (SL)",
+                 "G-comp (logistic)","G-comp (xgboost)", 
+                 "G-comp (lasso)", "G-comp (SL)", 
                  "IPW (logistic)", "IPW (SL)", 
                  "TMLE (9 steps)", "TMLE (package)", 
-                 "sl3 (package)") 
+                 "sl3 (package)", "Keele and Small (2021) paper") 
 results <- data.frame(method.list) 
 results$Estimate <- round(point,2)
 results$`2.5 %` <- CIs[1,] 
-results$`97.5 %` <- CIs[2,]
-kable(results,digits = 2)
+results$`97.5 %` <- CIs[2,] 
+kable(results,digits = 2)%>%
+  row_spec(10, bold = TRUE, color = "white", background = "#D7261E")  
+```
+
+```{block, type='rmdcomment'}
+@keele2021comparing used superlearner based on an ensemble of 3 different learners: (1) GLM, (2) random forests, and (3) LASSO.
 ```
 
 ## Other packages

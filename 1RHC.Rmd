@@ -14,7 +14,10 @@ There is a widespread belief among cardiologists that the right heart catheteriz
 
 ## Data download
 
+```{block, type='rmdcomment'}
 Data is freely available from [Vanderbilt Biostatistics](https://hbiostat.org/data/).
+```
+
 
 ```{r, cache=TRUE}
 # load the dataset
@@ -23,6 +26,8 @@ saveRDS(ObsData, file = "data/rhc.RDS")
 ```
 
 ## Analytic data
+
+Below we show the process of creating the analytic data (optional).
 
 ```{r, warning=FALSE}
 # add column for outcome Y: length of stay 
@@ -84,8 +89,6 @@ saveRDS(ObsData, file = "data/rhcAnalytic.RDS")
 |---|---|
 |$A$: Exposure status  | RHC |  
 |$Y$: Observed outcome  | length of stay  |  
-|$Y(A=1)$ = potential outcome when exposed  | length of stay when RHC used  |  
-|$Y(A=0)$ = potential outcome when not exposed  | length of stay when RHC not used  |  
 |$L$: Covariates  | See below |  
 
 ## Variables
@@ -98,7 +101,10 @@ baselinevars
 
 ## Table 1 stratified by RHC exposure
 
+```{block, type='rmdcomment'}
 Only for some demographic and co-morbidity variables; match with Table 1 in @connors1996effectiveness.
+```
+
 
 ```{r tab0, cache=TRUE, echo = TRUE}
 require(tableone)
@@ -109,7 +115,9 @@ tab0 <- CreateTableOne(vars = c("age", "sex", "race", "Disease.category", "Cance
 print(tab0, showAllLevels = FALSE, )
 ```
 
+```{block, type='rmdcomment'}
 Only outcome variable (Length of stay); slightly different than Table 2 in @connors1996effectiveness (means 20.5 vs. 25.7; and medians 13 vs. 17).
+```
 
 ```{r tab1, cache=TRUE, echo = TRUE}
 tab1 <- CreateTableOne(vars = c("Y"),
@@ -151,62 +159,77 @@ adj.fit <- publish(fit1, digits=1)$regressionTable[2,]
 saveRDS(fit1, file = "data/adjreg.RDS")
 ```
 
-### Regression diagnostics
-
 ```{r reg2a, cache=TRUE, echo = TRUE}
 out.formula
-adj.fit 
+adj.fit
+```
+
+### Regression diagnostics
+
+```{r reg2a578, cache=TRUE, echo = TRUE}
 plot(fit1)
 ```
 
+```{block, type='rmdcomment'}
 Diagnostics do not necessarily look so good. 
+```
+
 
 ## Comparison with literature
 
-@connors1996effectiveness conducted a propensity score matching analysis. Table 5 in @connors1996effectiveness showed that, after propensity score pair (1-to-1) matching, means of length of stay ($Y$), when stratified by RHC ($A$) was significantly different. 
+```{block, type='rmdcomment'}
+@connors1996effectiveness conducted a propensity score matching analysis. 
+```
+
+Table 5 in @connors1996effectiveness showed that, after propensity score pair (1-to-1) matching, means of length of stay ($Y$), when stratified by RHC ($A$) were not significantly different ($p = 0.14$). 
 
 ### PSM in RHC data
 
 We also conduct propensity score pair matching analysis, as follows. 
 
+```{block, type='rmdcomment'}
 **Note**: In this workshop, we will not cover Propensity Score Matching (PSM) in this workshop. If you want to learn more about this, feel free to check out this other workshop: [Understanding Propensity Score Matching](https://ehsanx.github.io/psw/).
+```
 
 ```{r ps16854, cache=TRUE, echo = TRUE}
-set.seed(123)
+set.seed(111)
 require(MatchIt)
 ps.formula <- as.formula(paste("A~", 
                 paste(baselinevars, collapse = "+")))
 PS.fit <- glm(ps.formula,family="binomial", 
               data=ObsData)
 ObsData$PS <- predict(PS.fit, 
-                      newdata = ObsData, type="response")
+                      newdata = ObsData, type="response") 
 ```
 
 
 
 ```{r ps2, cache=TRUE, echo = TRUE}
-logitPS <-  -log(1/ObsData$PS - 1) 
+logitPS <-  -log(1/ObsData$PS - 1)  
 match.obj <- matchit(ps.formula, data =ObsData,
                      distance = ObsData$PS,
                      method = "nearest", replace=FALSE,
-                     ratio = 1, caliper = .1*sd(logitPS))
+                     ratio = 1,
+                     caliper = .2*sd(logitPS))
 ```
 
 #### PSM diagnostics
 
 ```{r ps2x, cache=TRUE, echo = TRUE}
 require(cobalt)
-bal.plot(match.obj, 
+bal.plot(match.obj,  
          var.name = "distance", 
-         which = "both",
-         type = "histogram", 
+         which = "both", 
+         type = "histogram",  
          mirror = TRUE)
+bal.tab(match.obj, un = TRUE, 
+        thresholds = c(m = .1))
 ```
 
 
 ```{r ps2b, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
-love.plot(match.obj, binary = "std",
-          thresholds = c(m = .1))
+love.plot(match.obj, binary = "std", 
+          thresholds = c(m = .1))  
 ```
 
 The love plot suggests satisfactory propensity score matching (all SMD < 0.1).
@@ -214,7 +237,7 @@ The love plot suggests satisfactory propensity score matching (all SMD < 0.1).
 #### PSM results
 
 ```{r ps3, cache=TRUE, echo = TRUE}
-matched.data <- match.data(match.obj)
+matched.data <- match.data(match.obj)   
 tab1y <- CreateTableOne(vars = c("Y"),
                data = matched.data, strata = "A", 
                test = TRUE)
@@ -222,20 +245,31 @@ print(tab1y, showAllLevels = FALSE,
       test = TRUE)
 ```
 
-- Hence, we also find the same conclusion based on propensity score pair matched data.
+```{block, type='rmdcomment'}
+Hence, our conclusion based on propensity score pair matched data ($p  \lt 0.001$) is different than Table 5 in @connors1996effectiveness ($p = 0.14$). Variability in results for 1-to-1 matching is possible, and modelling choices may be different (we used caliper option here).
+```
+
 - We can also estimate the effect of `RHC` on `length of stay` using propensity score-matched sample:
 
 ```{r ps12ryy, cache=TRUE, echo = TRUE}
 fit.matched <- glm(Y~A,
-            family=gaussian, 
-            data = matched.data)
+            family=gaussian,  
+            data = matched.data)  
 publish(fit.matched)
 ```
 
 ```{r, cache=TRUE, echo = TRUE}
-saveRDS(fit.matched, file = "data/match.RDS")
+saveRDS(fit.matched, file = "data/match.RDS")   
 ```
 
 ### TMLE in RHC data
 
-There are other papers that have used RHC data [@keele2021comparing;@keele2018pre]. Particularly, @keele2021comparing used TMLE (with super learner) method in estimating the impact of RHC on length of stay, and found point estimate $2.01 (95\% CI: 0.6-3.41)$. In today's workshop, we will learn about TMLE method.
+There are other papers that have used RHC data [@keele2021comparing;@keele2018pre]. 
+
+```{block, type='rmdcomment'}
+@keele2021comparing used TMLE (with super learner) method in estimating the impact of RHC on length of stay, and found point estimate $2.01 (95\% CI: 0.6-3.41)$.  
+```
+
+In today's workshop, we will learn about TMLE-SL methods.
+
+

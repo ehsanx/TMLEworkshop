@@ -31,12 +31,13 @@ ps.formula <- as.formula(paste("A ~",
 **Modelling Steps**:
 
 We will still follow the same steps
+
 |  |  |
 |-|-|
 |Step 1| exposure modelling: $PS = Prob(A=1|L)$|
 |Step 2| Convert $PS$ to $IPW$  = $\frac{A}{PS} + \frac{1-A}{1-PS}$|
 |Step 3| Assess balance in weighted sample and overlap ($PS$ and $L$)|
-|Step 4| outcome modelling: $Prob(Y=1|A=1)$ to obtain treatment effect estimate  |
+|Step 4| outcome modelling: $Prob(Y=1|A=1)$ to obtain treatment effect estimate|
 
 ## Step 1: exposure modelling
 
@@ -144,9 +145,15 @@ love.plot(W.out, binary = "std",
           line = TRUE)
 ```
 
+```{block, type='rmdcomment'}
+Some covariates have SMD > 0.1 (sign of imbalance). This phenomenon is common when we use strong ML methods to obtain PS [@alam2019should].
+```
+
 ## Step 4: outcome modelling 
 
 Estimate the effect of treatment on outcomes 
+
+### Crude
 
 ```{r ipw2psx4, cache=TRUE, echo = TRUE}
 out.formula <- as.formula(Y ~ A)
@@ -156,16 +163,43 @@ out.fit <- glm(out.formula,
 publish(out.fit)
 ```
 
+### Adjusted
+
+```{block, type='rmdcomment'}
+Adjusting for all covariates to deal with potential residual confounding (as was indicated by imbalance). Alternatively, could adjust for selected covariates believed to be the reasons for potential imbalance [@nguyen2017double].
+```
+
+Estimate the effect of treatment on outcomes (after adjustment)
+
+```{r ipw2psx4adj, cache=TRUE, echo = TRUE, results='hide'}
+out.formula2 <- as.formula(paste("Y~ A +", 
+                               paste(baselinevars, 
+                                     collapse = "+")))
+out.fit2 <- glm(out.formula2,
+               data = ObsData,
+               weights = IPW.SL)
+res2 <- publish(out.fit2, digits=1)$regressionTable[2,]
+```
+
+```{r ipw2psx4adj2, cache=TRUE, echo = TRUE}
+res2
+```
+
+### Adjusted (from package)
+
 Also check the output when we used the weights from the package
 
-```{r ipw2psx4b, cache=TRUE, echo = TRUE}
-out.formula <- as.formula(Y ~ A)
-out.fit <- glm(out.formula,
+```{r ipw2psx4b, cache=TRUE, echo = TRUE, results='hide'}
+out.fit3 <- glm(out.formula2,
                data = ObsData,
                weights = W.out$weights)
-publish(out.fit)
+res3 <- publish(out.fit3, digits=1)$regressionTable[2,]
+```
+
+```{r ipw2psx4adj3, cache=TRUE, echo = TRUE}
+res3
 ```
 
 ```{r, cache=TRUE, echo = TRUE}
-saveRDS(out.fit, file = "data/ipwsl.RDS")
+saveRDS(out.fit3, file = "data/ipwsl.RDS") 
 ```

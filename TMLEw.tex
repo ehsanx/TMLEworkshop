@@ -133,6 +133,11 @@ function toggle_R() {
 document.write('<input onclick="toggle_R();" type="button" value="Hide Global" id="myButton1" style="position: absolute; top: 10%; right: 2%; z-index: 200"></input>')
 
 </script>
+\usepackage{tcolorbox}
+\newtcolorbox{blackbox}{colback=black,colframe=orange,coltext=white,boxsep=5pt,arc=4pt}
+\usepackage{color}
+\usepackage{framed}
+\setlength{\fboxsep}{.8em}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -147,6 +152,14 @@ document.write('<input onclick="toggle_R();" type="button" value="Hide Global" i
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{xcolor}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{hhline}
+\usepackage{calc}
+\usepackage{tabularx}
+\usepackage{adjustbox}
+\usepackage{hyperref}
 \ifluatex
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
@@ -175,7 +188,7 @@ document.write('<input onclick="toggle_R();" type="button" value="Hide Global" i
 
 \title{R Guide for TMLE in Medical Research}
 \author{Ehsan Karim \& Hanna Frank}
-\date{2021-08-22}
+\date{2021-08-24}
 
 \begin{document}
 \maketitle
@@ -184,6 +197,12 @@ document.write('<input onclick="toggle_R();" type="button" value="Hide Global" i
 \setcounter{tocdepth}{1}
 \tableofcontents
 }
+\newenvironment{blackbox}{
+  \definecolor{shadecolor}{rgb}{0, 0, 0}  % black
+  \color{white}
+  \begin{shaded}}
+ {\end{shaded}}
+
 \hypertarget{preface}{%
 \chapter*{Preface}\label{preface}}
 \addcontentsline{toc}{chapter}{Preface}
@@ -198,19 +217,63 @@ In comparative effectiveness studies, researchers typically use propensity score
 \section*{Goal}\label{goal}}
 \addcontentsline{toc}{section}{Goal}
 
-In this workshop we will present an introductory tutorial explaining an overview of TMLE using one real epidemiological data, the steps to use the method in R, and a demonstration of relevant R packages.~
+In this workshop we will present an introductory tutorial explaining an overview of
+
+\begin{itemize}
+\tightlist
+\item
+  TMLE and
+\item
+  some of the relevant methods
+
+  \begin{itemize}
+  \tightlist
+  \item
+    G-computation and
+  \item
+    IPW
+  \end{itemize}
+\end{itemize}
+
+using one real epidemiological data,
+
+\begin{itemize}
+\tightlist
+\item
+  the steps to use the methods in R, and
+\item
+  a demonstration of relevant R packages.~
+\end{itemize}
 
 \hypertarget{philosophy}{%
 \section*{Philosophy}\label{philosophy}}
 \addcontentsline{toc}{section}{Philosophy}
 
-Code-first philosophy is adopted for this workshop; demonstrating the analyses through one real data analysis problem used in the literature. This workshop is not theory-focused, nor utilizes simulated data to explain the ideas. Given the focus on implementation, theory is beyond the scope of this workshop. At the end of the workshop, we will provide key references where the theories are well explained (given the adequate background of the readers).
+Code-first philosophy is adopted for this workshop; demonstrating the analyses through one real data analysis problem used in the literature.
+
+\begin{itemize}
+\tightlist
+\item
+  This workshop is not theory-focused, nor utilizes simulated data to explain the ideas. Given the focus on implementation, theory is beyond the scope of this workshop.
+\item
+  At the end of the workshop, we will provide key references where the theories are well explained.
+\end{itemize}
 
 \hypertarget{pre-requisites}{%
 \section*{Pre-requisites}\label{pre-requisites}}
 \addcontentsline{toc}{section}{Pre-requisites}
 
-Basic understanding of \emph{R} language is required. A general understanding of \emph{multiple regression} is expected. Familiarity with \emph{machine learning} and \emph{epidemiological} core concepts would be helpful, but not required. Deep understanding of \emph{causal inference} or \emph{advanced statistical inference} knowledge is not expected.
+\begin{itemize}
+\tightlist
+\item
+  Basic understanding of \emph{R} language is required.
+\item
+  A general understanding of \emph{multiple regression} is expected.
+\item
+  Familiarity with \emph{machine learning} and \emph{epidemiological} core concepts would be helpful, but not required.
+\item
+  Deep understanding of \emph{causal inference} or \emph{advanced statistical inference} knowledge is not expected.
+\end{itemize}
 
 \hypertarget{version-history}{%
 \section*{Version history}\label{version-history}}
@@ -238,17 +301,13 @@ Virtual Conference} 2021, August 24th; title: `An Introductory R Guide for Targe
 
 The online version of this book is licensed under the \href{https://creativecommons.org/licenses/by-nc-sa/4.0/}{Creative Commons Attribution-NonCommercial-ShareAlike 4.0} International License. You may share, adapt the content and may distribute your contributions under the same license (CC BY-NC-SA 4.0), but you have to give appropriate credit, and cannot use material for the commercial purposes.
 
-\begin{longtable}[]{@{}l@{}}
-\toprule
-\endhead
-\begin{minipage}[t]{(\columnwidth - 0\tabcolsep) * \real{0.06}}\raggedright
-\textbf{How to cite}\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{(\columnwidth - 0\tabcolsep) * \real{0.06}}\raggedright
-Karim, ME and Frank, H (2021) ``R Guide for TMLE in Medical Research'', URL: \href{https://ehsanx.github.io/TMLEworkshop/}{ehsanx.github.io/TMLEworkshop/}\strut
-\end{minipage}\tabularnewline
-\bottomrule
-\end{longtable}
+\begin{rmdcomment}
+\textbf{How to cite}
+
+Karim, ME and Frank, H (2021) ``R Guide for TMLE in Medical Research'',
+URL:
+\href{https://ehsanx.github.io/TMLEworkshop/}{ehsanx.github.io/TMLEworkshop/}
+\end{rmdcomment}
 
 \hypertarget{rhc-data-description}{%
 \chapter{RHC data description}\label{rhc-data-description}}
@@ -266,7 +325,10 @@ There is a widespread belief among cardiologists that the right heart catheteriz
 \hypertarget{data-download}{%
 \section{Data download}\label{data-download}}
 
-Data is freely available from \href{https://hbiostat.org/data/}{Vanderbilt Biostatistics}.
+\begin{rmdcomment}
+Data is freely available from
+\href{https://hbiostat.org/data/}{Vanderbilt Biostatistics}.
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -278,6 +340,8 @@ Data is freely available from \href{https://hbiostat.org/data/}{Vanderbilt Biost
 
 \hypertarget{analytic-data}{%
 \section{Analytic data}\label{analytic-data}}
+
+Below we show the process of creating the analytic data (optional).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -340,38 +404,12 @@ Data is freely available from \href{https://hbiostat.org/data/}{Vanderbilt Biost
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule
-\begin{minipage}[b]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-Notations\strut
-\end{minipage} & \begin{minipage}[b]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-Example in RHC study\strut
-\end{minipage}\tabularnewline
+Notations & Example in RHC study\tabularnewline
 \midrule
 \endhead
-\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-\(A\): Exposure status\strut
-\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-RHC\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-\(Y\): Observed outcome\strut
-\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-length of stay\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-\(Y(A=1)\) = potential outcome when exposed\strut
-\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-length of stay when RHC used\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-\(Y(A=0)\) = potential outcome when not exposed\strut
-\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-length of stay when RHC not used\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-\(L\): Covariates\strut
-\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-See below\strut
-\end{minipage}\tabularnewline
+\(A\): Exposure status & RHC\tabularnewline
+\(Y\): Observed outcome & length of stay\tabularnewline
+\(L\): Covariates & See below\tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -409,7 +447,10 @@ See below\strut
 \hypertarget{table-1-stratified-by-rhc-exposure}{%
 \section{Table 1 stratified by RHC exposure}\label{table-1-stratified-by-rhc-exposure}}
 
-Only for some demographic and co-morbidity variables; match with Table 1 in \citet{connors1996effectiveness}.
+\begin{rmdcomment}
+Only for some demographic and co-morbidity variables; match with Table 1
+in @connors1996effectiveness.
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -448,7 +489,11 @@ Only for some demographic and co-morbidity variables; match with Table 1 in \cit
 ##      Metastatic         261 ( 7.4)   123 ( 5.6)
 \end{verbatim}
 
-Only outcome variable (Length of stay); slightly different than Table 2 in \citet{connors1996effectiveness} (means 20.5 vs.~25.7; and medians 13 vs.~17).
+\begin{rmdcomment}
+Only outcome variable (Length of stay); slightly different than Table 2
+in @connors1996effectiveness (means 20.5 vs.~25.7; and medians 13
+vs.~17).
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -527,9 +572,6 @@ Only outcome variable (Length of stay); slightly different than Table 2 in \cite
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{regression-diagnostics}{%
-\subsection{Regression diagnostics}\label{regression-diagnostics}}
-
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{out.formula}
@@ -551,7 +593,7 @@ Only outcome variable (Length of stay); slightly different than Table 2 in \cite
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{adj.fit }
+\NormalTok{adj.fit}
 \end{Highlighting}
 \end{Shaded}
 
@@ -560,48 +602,65 @@ Only outcome variable (Length of stay); slightly different than Table 2 in \cite
 ## 2        A               2.9 [1.4;4.4]    <0.1
 \end{verbatim}
 
+\hypertarget{regression-diagnostics}{%
+\subsection{Regression diagnostics}\label{regression-diagnostics}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{plot}\NormalTok{(fit1)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{TMLEw_files/figure-latex/reg2a-1.pdf} \includegraphics{TMLEw_files/figure-latex/reg2a-2.pdf} \includegraphics{TMLEw_files/figure-latex/reg2a-3.pdf} \includegraphics{TMLEw_files/figure-latex/reg2a-4.pdf}
+\includegraphics{TMLEw_files/figure-latex/reg2a578-1.pdf} \includegraphics{TMLEw_files/figure-latex/reg2a578-2.pdf} \includegraphics{TMLEw_files/figure-latex/reg2a578-3.pdf} \includegraphics{TMLEw_files/figure-latex/reg2a578-4.pdf}
 
+\begin{rmdcomment}
 Diagnostics do not necessarily look so good.
+\end{rmdcomment}
 
 \hypertarget{comparison-with-literature}{%
 \section{Comparison with literature}\label{comparison-with-literature}}
 
-\citet{connors1996effectiveness} conducted a propensity score matching analysis. Table 5 in \citet{connors1996effectiveness} showed that, after propensity score pair (1-to-1) matching, means of length of stay (\(Y\)), when stratified by RHC (\(A\)) was significantly different.
+\begin{rmdcomment}
+@connors1996effectiveness conducted a propensity score matching
+analysis.
+\end{rmdcomment}
+
+Table 5 in \citet{connors1996effectiveness} showed that, after propensity score pair (1-to-1) matching, means of length of stay (\(Y\)), when stratified by RHC (\(A\)) were not significantly different (\(p = 0.14\)).
 
 \hypertarget{psm-in-rhc-data}{%
 \subsection{PSM in RHC data}\label{psm-in-rhc-data}}
 
 We also conduct propensity score pair matching analysis, as follows.
 
-\textbf{Note}: In this workshop, we will not cover Propensity Score Matching (PSM) in this workshop. If you want to learn more about this, feel free to check out this other workshop: \href{https://ehsanx.github.io/psw/}{Understanding Propensity Score Matching}.
+\begin{rmdcomment}
+\textbf{Note}: In this workshop, we will not cover Propensity Score
+Matching (PSM) in this workshop. If you want to learn more about this,
+feel free to check out this other workshop:
+\href{https://ehsanx.github.io/psw/}{Understanding Propensity Score
+Matching}.
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{111}\NormalTok{)}
 \FunctionTok{require}\NormalTok{(MatchIt)}
 \NormalTok{ps.formula }\OtherTok{\textless{}{-}} \FunctionTok{as.formula}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"A\textasciitilde{}"}\NormalTok{, }
                 \FunctionTok{paste}\NormalTok{(baselinevars, }\AttributeTok{collapse =} \StringTok{"+"}\NormalTok{)))}
 \NormalTok{PS.fit }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(ps.formula,}\AttributeTok{family=}\StringTok{"binomial"}\NormalTok{, }
               \AttributeTok{data=}\NormalTok{ObsData)}
 \NormalTok{ObsData}\SpecialCharTok{$}\NormalTok{PS }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(PS.fit, }
-                      \AttributeTok{newdata =}\NormalTok{ ObsData, }\AttributeTok{type=}\StringTok{"response"}\NormalTok{)}
+                      \AttributeTok{newdata =}\NormalTok{ ObsData, }\AttributeTok{type=}\StringTok{"response"}\NormalTok{) }
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{logitPS }\OtherTok{\textless{}{-}}  \SpecialCharTok{{-}}\FunctionTok{log}\NormalTok{(}\DecValTok{1}\SpecialCharTok{/}\NormalTok{ObsData}\SpecialCharTok{$}\NormalTok{PS }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{) }
+\NormalTok{logitPS }\OtherTok{\textless{}{-}}  \SpecialCharTok{{-}}\FunctionTok{log}\NormalTok{(}\DecValTok{1}\SpecialCharTok{/}\NormalTok{ObsData}\SpecialCharTok{$}\NormalTok{PS }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{)  }
 \NormalTok{match.obj }\OtherTok{\textless{}{-}} \FunctionTok{matchit}\NormalTok{(ps.formula, }\AttributeTok{data =}\NormalTok{ObsData,}
                      \AttributeTok{distance =}\NormalTok{ ObsData}\SpecialCharTok{$}\NormalTok{PS,}
                      \AttributeTok{method =} \StringTok{"nearest"}\NormalTok{, }\AttributeTok{replace=}\ConstantTok{FALSE}\NormalTok{,}
-                     \AttributeTok{ratio =} \DecValTok{1}\NormalTok{, }\AttributeTok{caliper =}\NormalTok{ .}\DecValTok{1}\SpecialCharTok{*}\FunctionTok{sd}\NormalTok{(logitPS))}
+                     \AttributeTok{ratio =} \DecValTok{1}\NormalTok{,}
+                     \AttributeTok{caliper =}\NormalTok{ .}\DecValTok{2}\SpecialCharTok{*}\FunctionTok{sd}\NormalTok{(logitPS))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -611,10 +670,10 @@ We also conduct propensity score pair matching analysis, as follows.
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{require}\NormalTok{(cobalt)}
-\FunctionTok{bal.plot}\NormalTok{(match.obj, }
+\FunctionTok{bal.plot}\NormalTok{(match.obj,  }
          \AttributeTok{var.name =} \StringTok{"distance"}\NormalTok{, }
-         \AttributeTok{which =} \StringTok{"both"}\NormalTok{,}
-         \AttributeTok{type =} \StringTok{"histogram"}\NormalTok{, }
+         \AttributeTok{which =} \StringTok{"both"}\NormalTok{, }
+         \AttributeTok{type =} \StringTok{"histogram"}\NormalTok{,  }
          \AttributeTok{mirror =} \ConstantTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -623,8 +682,109 @@ We also conduct propensity score pair matching analysis, as follows.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{love.plot}\NormalTok{(match.obj, }\AttributeTok{binary =} \StringTok{"std"}\NormalTok{,}
-          \AttributeTok{thresholds =} \FunctionTok{c}\NormalTok{(}\AttributeTok{m =}\NormalTok{ .}\DecValTok{1}\NormalTok{))}
+\FunctionTok{bal.tab}\NormalTok{(match.obj, }\AttributeTok{un =} \ConstantTok{TRUE}\NormalTok{, }
+        \AttributeTok{thresholds =} \FunctionTok{c}\NormalTok{(}\AttributeTok{m =}\NormalTok{ .}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Call
+##  matchit(formula = ps.formula, data = ObsData, method = "nearest", 
+##     distance = ObsData$PS, replace = FALSE, caliper = 0.2 * sd(logitPS), 
+##     ratio = 1)
+## 
+## Balance Measures
+##                                           Type Diff.Un Diff.Adj    M.Threshold
+## distance                              Distance  1.1558   0.1820               
+## Disease.category_ARF                    Binary -0.0290  -0.0178 Balanced, <0.1
+## Disease.category_CHF                    Binary  0.0261  -0.0006 Balanced, <0.1
+## Disease.category_Other                  Binary -0.1737  -0.0092 Balanced, <0.1
+## Disease.category_MOSF                   Binary  0.1766   0.0276 Balanced, <0.1
+## Cancer_None                             Binary  0.0439   0.0075 Balanced, <0.1
+## Cancer_Localized (Yes)                  Binary -0.0267  -0.0109 Balanced, <0.1
+## Cancer_Metastatic                       Binary -0.0172   0.0035 Balanced, <0.1
+## Cardiovascular                          Binary  0.0445  -0.0104 Balanced, <0.1
+## Congestive.HF                           Binary  0.0268   0.0012 Balanced, <0.1
+## Dementia                                Binary -0.0472  -0.0023 Balanced, <0.1
+## Psychiatric                             Binary -0.0348  -0.0081 Balanced, <0.1
+## Pulmonary                               Binary -0.0737  -0.0138 Balanced, <0.1
+## Renal                                   Binary  0.0066  -0.0058 Balanced, <0.1
+## Hepatic                                 Binary -0.0124  -0.0023 Balanced, <0.1
+## GI.Bleed                                Binary -0.0122  -0.0006 Balanced, <0.1
+## Tumor                                   Binary -0.0423  -0.0052 Balanced, <0.1
+## Immunosupperssion                       Binary  0.0358  -0.0046 Balanced, <0.1
+## Transfer.hx                             Binary  0.0554   0.0115 Balanced, <0.1
+## MI                                      Binary  0.0139  -0.0012 Balanced, <0.1
+## age_[-Inf,50)                           Binary -0.0017   0.0063 Balanced, <0.1
+## age_[50,60)                             Binary  0.0161   0.0104 Balanced, <0.1
+## age_[60,70)                             Binary  0.0355   0.0006 Balanced, <0.1
+## age_[70,80)                             Binary  0.0144  -0.0132 Balanced, <0.1
+## age_[80, Inf)                           Binary -0.0643  -0.0040 Balanced, <0.1
+## sex_Female                              Binary -0.0462  -0.0092 Balanced, <0.1
+## edu                                    Contin.  0.0910   0.0293 Balanced, <0.1
+## DASIndex                               Contin.  0.0654   0.0263 Balanced, <0.1
+## APACHE.score                           Contin.  0.4837   0.0813 Balanced, <0.1
+## Glasgow.Coma.Score                     Contin. -0.1160  -0.0147 Balanced, <0.1
+## blood.pressure                         Contin. -0.4869  -0.0680 Balanced, <0.1
+## WBC                                    Contin.  0.0799  -0.0096 Balanced, <0.1
+## Heart.rate                             Contin.  0.1460  -0.0005 Balanced, <0.1
+## Respiratory.rate                       Contin. -0.1641  -0.0361 Balanced, <0.1
+## Temperature                            Contin. -0.0209  -0.0219 Balanced, <0.1
+## PaO2vs.FIO2                            Contin. -0.4566  -0.0560 Balanced, <0.1
+## Albumin                                Contin. -0.2010  -0.0281 Balanced, <0.1
+## Hematocrit                             Contin. -0.2954  -0.0293 Balanced, <0.1
+## Bilirubin                              Contin.  0.1329   0.0319 Balanced, <0.1
+## Creatinine                             Contin.  0.2678   0.0339 Balanced, <0.1
+## Sodium                                 Contin. -0.0927  -0.0218 Balanced, <0.1
+## Potassium                              Contin. -0.0274   0.0064 Balanced, <0.1
+## PaCo2                                  Contin. -0.2880  -0.0456 Balanced, <0.1
+## PH                                     Contin. -0.1163  -0.0228 Balanced, <0.1
+## Weight                                 Contin.  0.2640   0.0241 Balanced, <0.1
+## DNR.status_Yes                          Binary -0.0696   0.0006 Balanced, <0.1
+## Medical.insurance_Medicaid              Binary -0.0395  -0.0035 Balanced, <0.1
+## Medical.insurance_Medicare              Binary -0.0327  -0.0075 Balanced, <0.1
+## Medical.insurance_Medicare & Medicaid   Binary -0.0144  -0.0058 Balanced, <0.1
+## Medical.insurance_No insurance          Binary  0.0099   0.0046 Balanced, <0.1
+## Medical.insurance_Private               Binary  0.0624   0.0259 Balanced, <0.1
+## Medical.insurance_Private & Medicare    Binary  0.0143  -0.0138 Balanced, <0.1
+## Respiratory.Diag_Yes                    Binary -0.1277  -0.0299 Balanced, <0.1
+## Cardiovascular.Diag_Yes                 Binary  0.1395   0.0236 Balanced, <0.1
+## Neurological.Diag_Yes                   Binary -0.1079  -0.0098 Balanced, <0.1
+## Gastrointestinal.Diag_Yes               Binary  0.0453   0.0052 Balanced, <0.1
+## Renal.Diag_Yes                          Binary  0.0264   0.0040 Balanced, <0.1
+## Metabolic.Diag_Yes                      Binary -0.0059   0.0017 Balanced, <0.1
+## Hematologic.Diag_Yes                    Binary -0.0146  -0.0035 Balanced, <0.1
+## Sepsis.Diag_Yes                         Binary  0.0912   0.0138 Balanced, <0.1
+## Trauma.Diag_Yes                         Binary  0.0105   0.0017 Balanced, <0.1
+## Orthopedic.Diag_Yes                     Binary  0.0010   0.0012 Balanced, <0.1
+## race_white                              Binary  0.0063   0.0069 Balanced, <0.1
+## race_black                              Binary -0.0114  -0.0081 Balanced, <0.1
+## race_other                              Binary  0.0050   0.0012 Balanced, <0.1
+## income_$11-$25k                         Binary  0.0062  -0.0104 Balanced, <0.1
+## income_$25-$50k                         Binary  0.0391   0.0173 Balanced, <0.1
+## income_> $50k                           Binary  0.0165   0.0086 Balanced, <0.1
+## income_Under $11k                       Binary -0.0618  -0.0155 Balanced, <0.1
+## 
+## Balance tally for mean differences
+##                    count
+## Balanced, <0.1        68
+## Not Balanced, >0.1     0
+## 
+## Variable with the greatest mean difference
+##      Variable Diff.Adj    M.Threshold
+##  APACHE.score   0.0813 Balanced, <0.1
+## 
+## Sample sizes
+##           Control Treated
+## All          3551    2184
+## Matched      1739    1739
+## Unmatched    1812     445
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{love.plot}\NormalTok{(match.obj, }\AttributeTok{binary =} \StringTok{"std"}\NormalTok{, }
+          \AttributeTok{thresholds =} \FunctionTok{c}\NormalTok{(}\AttributeTok{m =}\NormalTok{ .}\DecValTok{1}\NormalTok{))  }
 \end{Highlighting}
 \end{Shaded}
 
@@ -637,7 +797,7 @@ The love plot suggests satisfactory propensity score matching (all SMD \textless
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{matched.data }\OtherTok{\textless{}{-}} \FunctionTok{match.data}\NormalTok{(match.obj)}
+\NormalTok{matched.data }\OtherTok{\textless{}{-}} \FunctionTok{match.data}\NormalTok{(match.obj)   }
 \NormalTok{tab1y }\OtherTok{\textless{}{-}} \FunctionTok{CreateTableOne}\NormalTok{(}\AttributeTok{vars =} \FunctionTok{c}\NormalTok{(}\StringTok{"Y"}\NormalTok{),}
                \AttributeTok{data =}\NormalTok{ matched.data, }\AttributeTok{strata =} \StringTok{"A"}\NormalTok{, }
                \AttributeTok{test =} \ConstantTok{TRUE}\NormalTok{)}
@@ -649,14 +809,19 @@ The love plot suggests satisfactory propensity score matching (all SMD \textless
 \begin{verbatim}
 ##                Stratified by A
 ##                 0             1             p      test
-##   n              1628          1628                    
-##   Y (mean (SD)) 21.20 (25.58) 24.05 (27.49)  0.002
+##   n              1739          1739                    
+##   Y (mean (SD)) 21.22 (25.36) 24.47 (28.79) <0.001
 \end{verbatim}
+
+\begin{rmdcomment}
+Hence, our conclusion based on propensity score pair matched data
+(\(p \lt 0.001\)) is different than Table 5 in @connors1996effectiveness
+(\(p = 0.14\)). Variability in results for 1-to-1 matching is possible,
+and modelling choices may be different (we used caliper option here).
+\end{rmdcomment}
 
 \begin{itemize}
 \tightlist
-\item
-  Hence, we also find the same conclusion based on propensity score pair matched data.
 \item
   We can also estimate the effect of \texttt{RHC} on \texttt{length\ of\ stay} using propensity score-matched sample:
 \end{itemize}
@@ -664,28 +829,36 @@ The love plot suggests satisfactory propensity score matching (all SMD \textless
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{fit.matched }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(Y}\SpecialCharTok{\textasciitilde{}}\NormalTok{A,}
-            \AttributeTok{family=}\NormalTok{gaussian, }
-            \AttributeTok{data =}\NormalTok{ matched.data)}
+            \AttributeTok{family=}\NormalTok{gaussian,  }
+            \AttributeTok{data =}\NormalTok{ matched.data)  }
 \FunctionTok{publish}\NormalTok{(fit.matched)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##     Variable Units Coefficient         CI.95    p-value 
-##  (Intercept)             21.20 [19.91;22.49]    < 1e-04 
-##            A              2.86   [1.03;4.68]   0.002172
+##     Variable Units Coefficient         CI.95     p-value 
+##  (Intercept)             21.22 [19.94;22.49]     < 1e-04 
+##            A              3.25   [1.45;5.05]   0.0004145
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{saveRDS}\NormalTok{(fit.matched, }\AttributeTok{file =} \StringTok{"data/match.RDS"}\NormalTok{)}
+\FunctionTok{saveRDS}\NormalTok{(fit.matched, }\AttributeTok{file =} \StringTok{"data/match.RDS"}\NormalTok{)   }
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{tmle-in-rhc-data}{%
 \subsection{TMLE in RHC data}\label{tmle-in-rhc-data}}
 
-There are other papers that have used RHC data \citep{keele2021comparing, keele2018pre}. Particularly, \citet{keele2021comparing} used TMLE (with super learner) method in estimating the impact of RHC on length of stay, and found point estimate \(2.01 (95\% CI: 0.6-3.41)\). In today's workshop, we will learn about TMLE method.
+There are other papers that have used RHC data \citep{keele2021comparing, keele2018pre}.
+
+\begin{rmdcomment}
+@keele2021comparing used TMLE (with super learner) method in estimating
+the impact of RHC on length of stay, and found point estimate
+\(2.01 (95\% CI: 0.6-3.41)\).
+\end{rmdcomment}
+
+In today's workshop, we will learn about TMLE-SL methods.
 
 \hypertarget{g-computation}{%
 \chapter{G-computation}\label{g-computation}}
@@ -722,7 +895,9 @@ In this dataset, we have
 \hypertarget{view-data-from-6-participants}{%
 \subsection{View data from 6 participants}\label{view-data-from-6-participants}}
 
+\begin{rmdcomment}
 Let's focus on only first 6 columns, with only 3 variables.
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -748,6 +923,83 @@ Male & 1 & 2\\
 Female & 0 & 7\\
 \hline
 \end{tabular}
+
+\hypertarget{new-notations}{%
+\subsection{New notations}\label{new-notations}}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+\begin{minipage}[b]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Notations\strut
+\end{minipage} & \begin{minipage}[b]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Example in RHC study\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+\(A\): Exposure status\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+RHC\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+\(Y\): Observed outcome\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+length of stay\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+\(Y(A=1)\) = potential outcome when exposed\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+length of stay when RHC used\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+\(Y(A=0)\) = potential outcome when not exposed\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+length of stay when RHC not used\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+\(L\): covariates\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+\(49\) covariates\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{rmdcomment}
+For explaining the concepts in this chapter, we will convert our data
+representation
+\end{rmdcomment}
+
+\begin{itemize}
+\tightlist
+\item
+  from
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+Covariate & Exposure & Observed outcome\tabularnewline
+\midrule
+\endhead
+\(L\) & \(A\) & \(Y\)\tabularnewline
+sex & \texttt{RHC} & length of stay\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  to the following representation:
+\end{itemize}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+Covariate & Exposure & Outcome under exposed & Outcome under unexposed\tabularnewline
+\midrule
+\endhead
+\(L\) & \(A\) & \(Y(A=1)\) & \(Y(A=0)\)\tabularnewline
+sex & \texttt{RHC} & length of stay under \texttt{RHC} & length of stay under \texttt{no\ RHC}\tabularnewline
+\bottomrule
+\end{longtable}
 
 \hypertarget{restructure-the-data-to-estimate-treatment-effect}{%
 \subsection{Restructure the data to estimate treatment effect}\label{restructure-the-data-to-estimate-treatment-effect}}
@@ -809,6 +1061,10 @@ and the difference between these two means is the \textbf{treatment effect}.
 \hypertarget{treat-the-problem-as-a-missing-value-problem}{%
 \subsection{Treat the problem as a missing value problem}\label{treat-the-problem-as-a-missing-value-problem}}
 
+\begin{rmdcomment}
+Restructure the problem as a missing data problem.
+\end{rmdcomment}
+
 Instead of just estimating treatment effect on an average level, an alternate could be to
 
 \begin{itemize}
@@ -830,12 +1086,53 @@ Instead of just estimating treatment effect on an average level, an alternate co
 \NormalTok{small.data}\SpecialCharTok{$}\NormalTok{Y0[}\FunctionTok{is.na}\NormalTok{(small.data}\SpecialCharTok{$}\NormalTok{Y0)] }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(m.Y0)}
 \NormalTok{small.data}\SpecialCharTok{$}\NormalTok{TE }\OtherTok{\textless{}{-}}\NormalTok{ small.data}\SpecialCharTok{$}\NormalTok{Y1 }\SpecialCharTok{{-}}\NormalTok{ small.data}\SpecialCharTok{$}\NormalTok{Y0}
 \NormalTok{m.Y1 }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(small.data}\SpecialCharTok{$}\NormalTok{Y1)}
+\NormalTok{m.Y1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 35.83333
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{m.Y0 }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(small.data}\SpecialCharTok{$}\NormalTok{Y0)}
+\NormalTok{m.Y0}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 17.83333
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{m.TE }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(small.data}\SpecialCharTok{$}\NormalTok{TE)}
 \NormalTok{mean.values }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\ConstantTok{NA}\NormalTok{,}\ConstantTok{NA}\NormalTok{, }\ConstantTok{NA}\NormalTok{, m.Y1, m.Y0, m.TE),}\DecValTok{0}\NormalTok{)}
 \NormalTok{small.data2 }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(small.data, mean.values)}
-\FunctionTok{kable}\NormalTok{(small.data2, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{digits=}\DecValTok{1}\NormalTok{,}
-             \AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"Subject ID"}\NormalTok{,}\StringTok{"Sex"}\NormalTok{,}
+\NormalTok{small.data2}\SpecialCharTok{$}\NormalTok{Y1[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{cell\_spec}\NormalTok{(small.data2}\SpecialCharTok{$}\NormalTok{Y1[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{], }
+                            \AttributeTok{color =} \FunctionTok{ifelse}\NormalTok{(small.data2}\SpecialCharTok{$}\NormalTok{Y1[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{] }
+                                           \SpecialCharTok{==} \FunctionTok{round}\NormalTok{(m.Y1), }
+                                           \StringTok{"red"}\NormalTok{, }\StringTok{"black"}\NormalTok{),}
+                            \AttributeTok{background =} \FunctionTok{ifelse}\NormalTok{(small.data2}\SpecialCharTok{$}\NormalTok{Y1[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{] }
+                                           \SpecialCharTok{==} \FunctionTok{round}\NormalTok{(m.Y1), }
+                                           \StringTok{"yellow"}\NormalTok{, }\StringTok{"white"}\NormalTok{),}
+                            \AttributeTok{bold =} \FunctionTok{ifelse}\NormalTok{(small.data2}\SpecialCharTok{$}\NormalTok{Y1[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{] }
+                                           \SpecialCharTok{==} \FunctionTok{round}\NormalTok{(m.Y1), }
+                                           \ConstantTok{TRUE}\NormalTok{, }\ConstantTok{FALSE}\NormalTok{))}
+\NormalTok{small.data2}\SpecialCharTok{$}\NormalTok{Y0[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{cell\_spec}\NormalTok{(small.data2}\SpecialCharTok{$}\NormalTok{Y0[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{], }
+                            \AttributeTok{color =} \FunctionTok{ifelse}\NormalTok{(small.data2}\SpecialCharTok{$}\NormalTok{Y0[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{] }
+                                           \SpecialCharTok{==} \FunctionTok{round}\NormalTok{(m.Y0), }
+                                           \StringTok{"red"}\NormalTok{, }\StringTok{"black"}\NormalTok{),}
+                            \AttributeTok{background =} \FunctionTok{ifelse}\NormalTok{(small.data2}\SpecialCharTok{$}\NormalTok{Y0[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{] }
+                                           \SpecialCharTok{==} \FunctionTok{round}\NormalTok{(m.Y0), }
+                                           \StringTok{"yellow"}\NormalTok{, }\StringTok{"white"}\NormalTok{),}
+                            \AttributeTok{bold =} \FunctionTok{ifelse}\NormalTok{(small.data2}\SpecialCharTok{$}\NormalTok{Y0[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{] }
+                                           \SpecialCharTok{==} \FunctionTok{round}\NormalTok{(m.Y0), }
+                                           \ConstantTok{TRUE}\NormalTok{, }\ConstantTok{FALSE}\NormalTok{))}
+\FunctionTok{kable}\NormalTok{(small.data2, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }
+      \AttributeTok{digits=}\DecValTok{1}\NormalTok{, }\AttributeTok{escape =} \ConstantTok{FALSE}\NormalTok{,}
+      \AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"Subject ID"}\NormalTok{,}\StringTok{"Sex"}\NormalTok{,}
                            \StringTok{"RHC status (A)"}\NormalTok{, }
                            \StringTok{"Y when A=1 (RHC)"}\NormalTok{, }
                            \StringTok{"Y when A=0 (no RHC)"}\NormalTok{, }
@@ -845,17 +1142,17 @@ Instead of just estimating treatment effect on an average level, an alternate co
 \end{Highlighting}
 \end{Shaded}
 
-\begin{tabular}{llrrrr}
+\begin{tabular}{llrllr}
 \toprule
 Subject ID & Sex & RHC status (A) & Y when A=1 (RHC) & Y when A=0 (no RHC) & Treatment Effect\\
 \midrule
-John & Male & 0 & 36 & 9 & 27\\
-Emma & Female & 1 & 45 & 18 & 27\\
-Isabella & Female & 1 & 60 & 18 & 42\\
-Sophia & Female & 0 & 36 & 37 & -1\\
-Luke & Male & 1 & 2 & 18 & -16\\
+John & Male & 0 & \cellcolor{yellow}{\textcolor{red}{\textbf{36}}} & \cellcolor{white}{\textcolor{black}{9}} & 27\\
+Emma & Female & 1 & \cellcolor{white}{\textcolor{black}{45}} & \cellcolor{yellow}{\textcolor{red}{\textbf{18}}} & 27\\
+Isabella & Female & 1 & \cellcolor{white}{\textcolor{black}{60}} & \cellcolor{yellow}{\textcolor{red}{\textbf{18}}} & 42\\
+Sophia & Female & 0 & \cellcolor{yellow}{\textcolor{red}{\textbf{36}}} & \cellcolor{white}{\textcolor{black}{37}} & -1\\
+Luke & Male & 1 & \cellcolor{white}{\textcolor{black}{2}} & \cellcolor{yellow}{\textcolor{red}{\textbf{18}}} & -16\\
 \addlinespace
-Mia & Female & 0 & 36 & 7 & 29\\
+Mia & Female & 0 & \cellcolor{yellow}{\textcolor{red}{\textbf{36}}} & \cellcolor{white}{\textcolor{black}{7}} & 29\\
 \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{36}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{18}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{18}}}\\
 \bottomrule
 \end{tabular}
@@ -863,7 +1160,11 @@ Mia & Female & 0 & 36 & 7 & 29\\
 \hypertarget{impute-better-value}{%
 \subsection{Impute better value?}\label{impute-better-value}}
 
-However, assume that the effect of the treatment for \textbf{male} and \textbf{female} are not the same. Then, it might make more sense to
+\begin{rmdcomment}
+Assume that \texttt{sex} variable is acting as a \textbf{confounder}.
+Then, it might make more sense to restrict imputing outcome values
+specific to \textbf{male} and \textbf{female} participants.
+\end{rmdcomment}
 
 \begin{itemize}
 \tightlist
@@ -877,9 +1178,49 @@ However, assume that the effect of the treatment for \textbf{male} and \textbf{f
 \begin{Highlighting}[]
 \NormalTok{small.data }\OtherTok{\textless{}{-}}\NormalTok{ small.data0}
 \NormalTok{m.Y1m }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(small.data}\SpecialCharTok{$}\NormalTok{Y1[small.data}\SpecialCharTok{$}\NormalTok{sex }\SpecialCharTok{==} \StringTok{"Male"}\NormalTok{], }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{m.Y1m}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{m.Y1f }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(small.data}\SpecialCharTok{$}\NormalTok{Y1[small.data}\SpecialCharTok{$}\NormalTok{sex }\SpecialCharTok{==} \StringTok{"Female"}\NormalTok{], }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{m.Y1f}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 52.5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{m.Y0m }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(small.data}\SpecialCharTok{$}\NormalTok{Y0[small.data}\SpecialCharTok{$}\NormalTok{sex }\SpecialCharTok{==} \StringTok{"Male"}\NormalTok{], }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{m.Y0m}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 9
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{m.Y0f }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(small.data}\SpecialCharTok{$}\NormalTok{Y0[small.data}\SpecialCharTok{$}\NormalTok{sex }\SpecialCharTok{==} \StringTok{"Female"}\NormalTok{], }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{m.Y0f}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 22
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{m.TE.m }\OtherTok{\textless{}{-}}\NormalTok{ m.Y1m}\SpecialCharTok{{-}}\NormalTok{m.Y0m}
 \NormalTok{m.TE.f }\OtherTok{\textless{}{-}}\NormalTok{ m.Y1f}\SpecialCharTok{{-}}\NormalTok{m.Y0f}
 \NormalTok{mean.values.m }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\ConstantTok{NA}\NormalTok{,}\StringTok{"Mean for males"}\NormalTok{, }\ConstantTok{NA}\NormalTok{, }\FunctionTok{round}\NormalTok{(}\FunctionTok{c}\NormalTok{(m.Y1m, m.Y0m, m.TE.m),}\DecValTok{1}\NormalTok{))}
@@ -898,12 +1239,21 @@ However, assume that the effect of the treatment for \textbf{male} and \textbf{f
                                                 \StringTok{"Female"}\NormalTok{])] }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(m.Y0f,}\DecValTok{1}\NormalTok{)}
 \NormalTok{small.data}\SpecialCharTok{$}\NormalTok{TE }\OtherTok{\textless{}{-}}\NormalTok{ small.data}\SpecialCharTok{$}\NormalTok{Y1 }\SpecialCharTok{{-}}\NormalTok{ small.data}\SpecialCharTok{$}\NormalTok{Y0}
 \NormalTok{small.data2 }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(small.data, mean.values.m,mean.values.f)}
-\FunctionTok{kable}\NormalTok{(small.data2, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{digits=}\DecValTok{1}\NormalTok{,}
-             \AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"Subject ID"}\NormalTok{,}\StringTok{"Sex"}\NormalTok{,}\StringTok{"RHC status (A)"}\NormalTok{, }
+\NormalTok{small.data2}\SpecialCharTok{$}\NormalTok{Y1[}\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{cell\_spec}\NormalTok{(}\FunctionTok{round}\NormalTok{(m.Y1m,}\DecValTok{1}\NormalTok{), }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{,}
+                            \AttributeTok{color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{background =} \StringTok{"yellow"}\NormalTok{)}
+\NormalTok{small.data2}\SpecialCharTok{$}\NormalTok{Y0[}\DecValTok{5}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{cell\_spec}\NormalTok{(}\FunctionTok{round}\NormalTok{(m.Y0m,}\DecValTok{1}\NormalTok{), }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{,}
+                            \AttributeTok{color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{background =} \StringTok{"yellow"}\NormalTok{)}
+\NormalTok{small.data2}\SpecialCharTok{$}\NormalTok{Y1[}\FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\DecValTok{6}\NormalTok{)] }\OtherTok{\textless{}{-}} \FunctionTok{cell\_spec}\NormalTok{(}\FunctionTok{round}\NormalTok{(m.Y1f,}\DecValTok{1}\NormalTok{), }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{,}
+                            \AttributeTok{color =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{background =} \StringTok{"yellow"}\NormalTok{)}
+\NormalTok{small.data2}\SpecialCharTok{$}\NormalTok{Y0[}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{)] }\OtherTok{\textless{}{-}} \FunctionTok{cell\_spec}\NormalTok{(}\FunctionTok{round}\NormalTok{(m.Y0f,}\DecValTok{1}\NormalTok{), }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{,}
+                            \AttributeTok{color =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{background =} \StringTok{"yellow"}\NormalTok{)}
+\FunctionTok{kable}\NormalTok{(small.data2, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }
+      \AttributeTok{digits=}\DecValTok{1}\NormalTok{, }\AttributeTok{escape =} \ConstantTok{FALSE}\NormalTok{, }
+      \AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"Subject ID"}\NormalTok{,}\StringTok{"Sex"}\NormalTok{,}\StringTok{"RHC status (A)"}\NormalTok{, }
                            \StringTok{"Y when A=1 (RHC)"}\NormalTok{, }\StringTok{"Y when A=0 (no RHC)"}\NormalTok{, }
                            \StringTok{"Treatment Effect"}\NormalTok{))}\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{row\_spec}\NormalTok{(}\DecValTok{7}\NormalTok{, }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{color =} \StringTok{"white"}\NormalTok{, }\AttributeTok{background =} \StringTok{"\#D7261E"}\NormalTok{)}\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{row\_spec}\NormalTok{(}\DecValTok{8}\NormalTok{, }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{color =} \StringTok{"white"}\NormalTok{, }\AttributeTok{background =} \StringTok{"\#D7261E"}\NormalTok{)}
+  \FunctionTok{row\_spec}\NormalTok{(}\DecValTok{7}\NormalTok{, }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{color =} \StringTok{"white"}\NormalTok{, }\AttributeTok{background =} \StringTok{"red"}\NormalTok{)}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{row\_spec}\NormalTok{(}\DecValTok{8}\NormalTok{, }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{color =} \StringTok{"white"}\NormalTok{, }\AttributeTok{background =} \StringTok{"blue"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -911,15 +1261,15 @@ However, assume that the effect of the treatment for \textbf{male} and \textbf{f
 \toprule
 Subject ID & Sex & RHC status (A) & Y when A=1 (RHC) & Y when A=0 (no RHC) & Treatment Effect\\
 \midrule
-John & Male & 0 & 2 & 9 & -7\\
-Emma & Female & 1 & 45 & 22 & 23\\
-Isabella & Female & 1 & 60 & 22 & 38\\
-Sophia & Female & 0 & 52.5 & 37 & 15.5\\
-Luke & Male & 1 & 2 & 9 & -7\\
+John & Male & 0 & \cellcolor{yellow}{\textcolor{red}{\textbf{2}}} & 9 & -7\\
+Emma & Female & 1 & 45 & \cellcolor{yellow}{\textcolor{blue}{\textbf{22}}} & 23\\
+Isabella & Female & 1 & 60 & \cellcolor{yellow}{\textcolor{blue}{\textbf{22}}} & 38\\
+Sophia & Female & 0 & \cellcolor{yellow}{\textcolor{blue}{\textbf{52.5}}} & 37 & 15.5\\
+Luke & Male & 1 & 2 & \cellcolor{yellow}{\textcolor{red}{\textbf{9}}} & -7\\
 \addlinespace
-Mia & Female & 0 & 52.5 & 7 & 45.5\\
-\cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{Mean for males}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{2}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{9}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{-7}}}\\
-\cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{Mean for females}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{52.5}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{22}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{30.5}}}\\
+Mia & Female & 0 & \cellcolor{yellow}{\textcolor{blue}{\textbf{52.5}}} & 7 & 45.5\\
+\cellcolor{red}{\textcolor{white}{\textbf{}}} & \cellcolor{red}{\textcolor{white}{\textbf{Mean for males}}} & \cellcolor{red}{\textcolor{white}{\textbf{}}} & \cellcolor{red}{\textcolor{white}{\textbf{2}}} & \cellcolor{red}{\textcolor{white}{\textbf{9}}} & \cellcolor{red}{\textcolor{white}{\textbf{-7}}}\\
+\cellcolor{blue}{\textcolor{white}{\textbf{}}} & \cellcolor{blue}{\textcolor{white}{\textbf{Mean for females}}} & \cellcolor{blue}{\textcolor{white}{\textbf{}}} & \cellcolor{blue}{\textcolor{white}{\textbf{52.5}}} & \cellcolor{blue}{\textcolor{white}{\textbf{22}}} & \cellcolor{blue}{\textcolor{white}{\textbf{30.5}}}\\
 \bottomrule
 \end{tabular}
 
@@ -927,9 +1277,12 @@ Mia & Female & 0 & 52.5 & 7 & 45.5\\
 \tightlist
 \item
   Extending the problem to \textbf{other covariates}, you can see that we could condition on rest of the covariates (such as age, income, race, disease category) to get better imputation values.
-\item
-  \textbf{Regression} is a generalized method to take mean conditional on many covariates.
 \end{itemize}
+
+\begin{rmdcomment}
+\textbf{Regression} is a generalized method to take mean conditional on
+many covariates.
+\end{rmdcomment}
 
 \hypertarget{use-regression-for-predicting-outcome}{%
 \section{Use Regression for predicting outcome}\label{use-regression-for-predicting-outcome}}
@@ -1161,7 +1514,7 @@ Mia & 0 & 22.6\\
 \NormalTok{m.Y1 }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(small.data01}\SpecialCharTok{$}\NormalTok{Pred.Y1)}
 \NormalTok{m.Y0 }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(small.data01}\SpecialCharTok{$}\NormalTok{Pred.Y0)}
 \NormalTok{mean.values }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\ConstantTok{NA}\NormalTok{,}\ConstantTok{NA}\NormalTok{, m.Y1, m.Y0, m.Y1 }\SpecialCharTok{{-}}\NormalTok{m.Y0),}\DecValTok{1}\NormalTok{)}
-\NormalTok{small.data2 }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(small.data01, mean.values)}
+\NormalTok{small.data2 }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(small.data01, mean.values) }
 \FunctionTok{kable}\NormalTok{(small.data2, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{digits=}\DecValTok{1}\NormalTok{,}
              \AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"id"}\NormalTok{,}\StringTok{"RHC status (A)"}\NormalTok{,}
                            \StringTok{"Y.hat when A=1 (RHC)"}\NormalTok{,}
@@ -1186,7 +1539,12 @@ Mia & 0 & 25.5 & 22.6 & 2.9\\
 \bottomrule
 \end{tabular}
 
-From this table, it is easy to calculate treatment effect estimate. The process we just went through, is a version of \textbf{parametric G-computation}!
+From this table, it is easy to calculate treatment effect estimate.
+
+\begin{rmdcomment}
+The process we just went through, is a version of \textbf{parametric
+G-computation}!
+\end{rmdcomment}
 
 \hypertarget{parametric-g-computation}{%
 \section{Parametric G-computation}\label{parametric-g-computation}}
@@ -1198,37 +1556,81 @@ From this table, it is easy to calculate treatment effect estimate. The process 
 \hypertarget{steps}{%
 \subsection{Steps}\label{steps}}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  Fit the outcome regression on the exposure and covariates
-\item
-  Extract outcome prediction by setting all \(A=1\)
-\item
-  Extract outcome prediction by setting all \(A=0\)
-\item
-  Substract these two outcome predictions to get treatment effect estimate
-\end{enumerate}
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Step 1\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Fit the outcome regression on the exposure and covariates: \(Y \sim A + L\)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Step 2\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Extract outcome prediction for treated \(\hat{Y}_{A=1}\) by setting all \(A=1\)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Step 3\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Extract outcome prediction for untreated \(\hat{Y}_{A=0}\) by setting all \(A=0\)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Step 4\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Subtract the mean of these two outcome predictions to get treatment effect estimate: \(TE = E(\hat{Y}_{A=1}) - E(\hat{Y}_{A=0})\)\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{step-1}{%
+\subsubsection{Step 1}\label{step-1}}
+
+Fit the outcome regression on the exposure and covariates: \(Y \sim A + L\)
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{out.formula }\OtherTok{\textless{}{-}} \FunctionTok{as.formula}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Y\textasciitilde{} A +"}\NormalTok{,}
                                \FunctionTok{paste}\NormalTok{(baselinevars,}
                                      \AttributeTok{collapse =} \StringTok{"+"}\NormalTok{)))}
-\CommentTok{\# Step 1}
 \NormalTok{fit1 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(out.formula, }\AttributeTok{data =}\NormalTok{ ObsData)}
-\CommentTok{\# Step 2}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{step-2}{%
+\subsubsection{Step 2}\label{step-2}}
+
+Extract outcome prediction for treated \(\hat{Y}_{A=1}\) by setting all \(A=1\)\textbar{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{ObsData}\SpecialCharTok{$}\NormalTok{Pred.Y1 }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(fit1, }
                            \AttributeTok{newdata =} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{A =} \DecValTok{1}\NormalTok{, }
 \NormalTok{                                                dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(ObsData, }\SpecialCharTok{!}\NormalTok{A)), }
                            \AttributeTok{type =} \StringTok{"response"}\NormalTok{)}
-\CommentTok{\# Step 3}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{step-3}{%
+\subsubsection{Step 3}\label{step-3}}
+
+Extract outcome prediction for untreated \(\hat{Y}_{A=0}\) by setting all \(A=0\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{ObsData}\SpecialCharTok{$}\NormalTok{Pred.Y0 }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(fit1, }
                            \AttributeTok{newdata =} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{A =} \DecValTok{0}\NormalTok{, }
 \NormalTok{                                                dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(ObsData, }\SpecialCharTok{!}\NormalTok{A)), }
                            \AttributeTok{type =} \StringTok{"response"}\NormalTok{)}
-\CommentTok{\# Step 4}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{step-4}{%
+\subsubsection{Step 4}\label{step-4}}
+
+Subtract the mean of these two outcome predictions to get treatment effect estimate: \(TE = E(\hat{Y}_{A=1}) - E(\hat{Y}_{A=0})\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{ObsData}\SpecialCharTok{$}\NormalTok{Pred.TE }\OtherTok{\textless{}{-}}\NormalTok{ ObsData}\SpecialCharTok{$}\NormalTok{Pred.Y1 }\SpecialCharTok{{-}}\NormalTok{ ObsData}\SpecialCharTok{$}\NormalTok{Pred.Y0  }
 \end{Highlighting}
 \end{Shaded}
@@ -1299,7 +1701,12 @@ We already have an idea about the point estimate of the treatment effect:
 ## [1] 2.90203
 \end{verbatim}
 
-However, for confidence interval estimates, bootstrap would be necessary. In the following example, we use \(R = 250\).
+\begin{rmdcomment}
+For confidence interval estimates for G-computation, bootstrap would be
+necessary.
+\end{rmdcomment}
+
+In the following example, we use \(R = 250\).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1397,14 +1804,18 @@ Below are two versions of confidence interval.
 \hypertarget{g-computation-using-ml}{%
 \chapter{G-computation using ML}\label{g-computation-using-ml}}
 
+\begin{rmdcomment}
+G-computation is highly sensitive to on \textbf{model misspecification};
+and when model is \textbf{not correctly specified}, result is subject to
+bias.
+\end{rmdcomment}
+
 \begin{itemize}
 \tightlist
 \item
-  G-computation is highly sensitive to on \textbf{model misspecification}; and when model is not correctly specified, result is subject to bias.
-\item
   Therefore, it can be a good idea to use \textbf{machine learning} methods, that are more flexible, than parametric methods to estimate the treatment effect.
 \item
-  Although ML methods are powerful in point estimation, the coverage probabilities are usually poor when more flexible methods are used, if inference is one of the goals. Hence we are focusing on \textbf{point estimation} here.
+  Although ML methods are powerful in point estimation, the \textbf{coverage probabilities} are usually poor when more flexible methods are used, if inference is one of the goals. Hence we are focusing on \textbf{point estimation} here.
 \end{itemize}
 
 \hypertarget{g-comp-using-regression-tree}{%
@@ -1479,8 +1890,16 @@ XGBoost is a fast version of gradient boosting algorithm. Let us use this one to
 \tightlist
 \item
   What we have done here is we have used the \texttt{ObsData.matrix} data to train our model, and we have used \texttt{newdata\ =\ ObsData.matrix} to obtain prediction.
-\item
-  When we use same model for training and obtaining prediction, often the predictions are highly optimistic (RMSE is unrealistically low for future predictions), and we call this a \textbf{over-fitting} problem.
+\end{itemize}
+
+\begin{rmdcomment}
+When we use same model for training and obtaining prediction, often the
+predictions are highly optimistic (RMSE is unrealistically low for
+future predictions), and we call this a \textbf{over-fitting} problem.
+\end{rmdcomment}
+
+\begin{itemize}
+\tightlist
 \item
   One way to deal with this problem is called Cross-validation.
 \end{itemize}
@@ -1502,51 +1921,27 @@ Cross-validation means
   \item
     testing data
   \end{itemize}
-\item
-  fitting models in training data
-\item
-  obtaining prediction \(\hat{Y}\) in test data
 \end{itemize}
+
+\begin{rmdcomment}
+In each iteration: (1) Fitting models in training data (2) obtaining
+prediction \(\hat{Y}\) in test data (3) obtain all RMSEs from each
+iteration, and (4) average all RMSEs.
+\end{rmdcomment}
 
 \textbackslash begin\{figure\}
 \includegraphics[width=650px]{images/CV} \textbackslash caption\{Cross validation from \href{https://en.wikipedia.org/wiki/Cross-validation_(statistics)}{wiki}; training data = used for building model; test data = used for prediction from the model that was built using training data; each iteration = fold\}\label{fig:cvpic}
 \textbackslash end\{figure\}
 
-\begin{itemize}
-\tightlist
-\item
-  simplest cross-validation splits the data into \(K=2\) parts, but can go higher.
+\hypertarget{cross-validation-using-caret}{%
+\subsubsection{Cross-validation using caret}\label{cross-validation-using-caret}}
 
-  \begin{itemize}
-  \tightlist
-  \item
-    select \(K\) judiciously
+We use \texttt{caret} package to do cross-validation.
 
-    \begin{itemize}
-    \tightlist
-    \item
-      large sample size means small \(K\) may be adequate
-
-      \begin{itemize}
-      \tightlist
-      \item
-        for \(n \lt 10,000\) consider \(K=3\)
-      \item
-        for \(n \lt 500\) consider \(K=20\)
-      \end{itemize}
-    \item
-      smaller sample size means larger \(K\) may be necessary
-
-      \begin{itemize}
-      \tightlist
-      \item
-        for \(n \lt 30\) consider leave 1 out
-      \end{itemize}
-    \end{itemize}
-  \end{itemize}
-\end{itemize}
-
-We use \texttt{caret} package to do cross-validation. This is a general framework package for machine learning that can also incorporate other ML approaches such as \texttt{xgboost}.
+\begin{rmdcomment}
+\texttt{caret} is a general framework package for machine learning that
+can also incorporate other ML approaches such as \texttt{xgboost}.
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1557,7 +1952,7 @@ We use \texttt{caret} package to do cross-validation. This is a general framewor
 \end{Highlighting}
 \end{Shaded}
 
-Below we define \(K = 3\) for cross-valudation. Ideally for a sample size close to \(n=5,000\), we would select \(K=10\), but for learning / demonstration / computational time-saving purposes, we just use \(K = 3\).
+Below we define \(K = 3\) for cross-validation. Ideally for a sample size close to \(n=5,000\), we would select \(K=10\), but for learning / demonstration / computational time-saving purposes, we just use \(K = 3\).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1571,14 +1966,23 @@ Below we define \(K = 3\) for cross-valudation. Ideally for a sample size close 
 \end{Highlighting}
 \end{Shaded}
 
-One of the advantages of \texttt{caret} framework is that, it also allows checking the impact of various parameters. For example,
+\hypertarget{fine-tuning}{%
+\subsubsection{Fine tuning}\label{fine-tuning}}
+
+\begin{rmdcomment}
+One of the advantages of \texttt{caret} framework is that, it also
+allows checking the impact of various parameters (can do \textbf{fine
+tuning}).
+\end{rmdcomment}
+
+For example,
 
 \begin{itemize}
 \tightlist
 \item
-  for interaction dept, we previously use \texttt{max.depth\ =\ 10}. That means \(covariate^{10}\) polynomial.
+  for interaction depth, we previously use \texttt{max.depth\ =\ 10}. That means \(covariate^{10}\) polynomial.
 \item
-  We could also check if other interaction dept choices (such as \(covariate^{2}\) or \(covariate^{4}\)) would be better in terms of honest predictions.
+  We could also check if other interaction depth choices (such as \(covariate^{2}\) or \(covariate^{4}\)) would be better in terms of honest predictions.
 \end{itemize}
 
 \begin{Shaded}
@@ -1595,7 +1999,10 @@ One of the advantages of \texttt{caret} framework is that, it also allows checki
 \end{Highlighting}
 \end{Shaded}
 
-one we set
+\hypertarget{fit-model-with-cv}{%
+\subsubsection{Fit model with CV}\label{fit-model-with-cv}}
+
+once we set
 
 \begin{itemize}
 \tightlist
@@ -1672,7 +2079,7 @@ Based on the loss function (say, RMSE) it automatically chose the best tuning pa
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{TMLEw_files/figure-latex/unnamed-chunk-7-1.pdf}
+\includegraphics{TMLEw_files/figure-latex/unnamed-chunk-28-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1684,8 +2091,8 @@ Based on the loss function (say, RMSE) it automatically chose the best tuning pa
 ## [1] 24.35099
 \end{verbatim}
 
-\hypertarget{extract-outcome-prediction-as-if-everyone-is-treated}{%
-\subsection{Extract outcome prediction as if everyone is treated}\label{extract-outcome-prediction-as-if-everyone-is-treated}}
+\hypertarget{g-comp-step-2-extract-outcome-prediction-as-if-everyone-is-treated}{%
+\subsection{G-comp step 2: Extract outcome prediction as if everyone is treated}\label{g-comp-step-2-extract-outcome-prediction-as-if-everyone-is-treated}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1701,8 +2108,8 @@ Based on the loss function (say, RMSE) it automatically chose the best tuning pa
 ##  -33.15   14.87   23.09   23.89   31.78  131.48
 \end{verbatim}
 
-\hypertarget{extract-outcome-prediction-as-if-everyone-is-untreated}{%
-\subsection{Extract outcome prediction as if everyone is untreated}\label{extract-outcome-prediction-as-if-everyone-is-untreated}}
+\hypertarget{g-comp-step-3-extract-outcome-prediction-as-if-everyone-is-untreated}{%
+\subsection{G-comp step 3: Extract outcome prediction as if everyone is untreated}\label{g-comp-step-3-extract-outcome-prediction-as-if-everyone-is-untreated}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1718,8 +2125,8 @@ Based on the loss function (say, RMSE) it automatically chose the best tuning pa
 ##  -37.31   10.72   18.96   19.78   27.69  127.31
 \end{verbatim}
 
-\hypertarget{treatment-effect-estimate-1}{%
-\subsection{Treatment effect estimate}\label{treatment-effect-estimate-1}}
+\hypertarget{g-comp-step-4-treatment-effect-estimate}{%
+\subsection{G-comp step 4: Treatment effect estimate}\label{g-comp-step-4-treatment-effect-estimate}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1759,7 +2166,12 @@ Notice that the mean is slightly different than the parametric G-computation met
 \hypertarget{a-regularized-model}{%
 \subsection{A regularized model}\label{a-regularized-model}}
 
-LASSO is a regularized method. One of the use of these methods is variable selection. Let us use this method to fit our data.
+\begin{rmdcomment}
+LASSO is a regularized method. One of the uses of these methods is
+``variable selection'' or addressing concerns of multicollinearity.
+\end{rmdcomment}
+
+Let us use this method to fit our data.
 
 \begin{itemize}
 \tightlist
@@ -1780,8 +2192,8 @@ LASSO is a regularized method. One of the use of these methods is variable selec
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{extract-outcome-prediction-as-if-everyone-is-treated-1}{%
-\subsection{Extract outcome prediction as if everyone is treated}\label{extract-outcome-prediction-as-if-everyone-is-treated-1}}
+\hypertarget{g-comp-step-2-extract-outcome-prediction-as-if-everyone-is-treated-1}{%
+\subsection{G-comp step 2: Extract outcome prediction as if everyone is treated}\label{g-comp-step-2-extract-outcome-prediction-as-if-everyone-is-treated-1}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1803,8 +2215,8 @@ LASSO is a regularized method. One of the use of these methods is variable selec
 ##  Max.   : 38.14
 \end{verbatim}
 
-\hypertarget{extract-outcome-prediction-as-if-everyone-is-untreated-1}{%
-\subsection{Extract outcome prediction as if everyone is untreated}\label{extract-outcome-prediction-as-if-everyone-is-untreated-1}}
+\hypertarget{g-comp-step-3-extract-outcome-prediction-as-if-everyone-is-untreated-1}{%
+\subsection{G-comp step 3: Extract outcome prediction as if everyone is untreated}\label{g-comp-step-3-extract-outcome-prediction-as-if-everyone-is-untreated-1}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1826,8 +2238,8 @@ LASSO is a regularized method. One of the use of these methods is variable selec
 ##  Max.   : 35.42
 \end{verbatim}
 
-\hypertarget{treatment-effect-estimate-2}{%
-\subsection{Treatment effect estimate}\label{treatment-effect-estimate-2}}
+\hypertarget{g-comp-step-3-treatment-effect-estimate}{%
+\subsection{G-comp step 3: Treatment effect estimate}\label{g-comp-step-3-treatment-effect-estimate}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1869,10 +2281,14 @@ Notice that the mean is very similar to the parametric G-computation method.
 \hypertarget{g-comp-using-superlearner}{%
 \section{G-comp using SuperLearner}\label{g-comp-using-superlearner}}
 
+\begin{rmdcomment}
+SuperLearner is an ensemble MLtechnique, that uses
+\textbf{cross-validation} to find a weighted combination of estimates
+provided by different \textbf{candidate learners} (that help predict).
+\end{rmdcomment}
+
 \begin{itemize}
 \tightlist
-\item
-  SuperLearner is an ensemble MLtechnique, that uses \textbf{cross-validation} to find a weighted combination of estimates provided by different \textbf{candidate learners} (that help predict).
 \item
   There exists many candidate learners. Here we are using a combination of
 
@@ -1890,12 +2306,18 @@ Notice that the mean is very similar to the parametric G-computation method.
 \hypertarget{steps-1}{%
 \subsection{Steps}\label{steps-1}}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  \textbf{Identify candidate learners}
-\end{enumerate}
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+\endhead
+Step 1 & Identify candidate learners\tabularnewline
+Step 2 & Choose Cross-validation K\tabularnewline
+Step 3 & Select loss function for meta learner\tabularnewline
+Step 4 & Find SL prediction: (1) Discrete SL (2) Ensamble SL\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{identify-candidate-learners}{%
+\subsubsection{Identify candidate learners}\label{identify-candidate-learners}}
 
 \begin{itemize}
 \tightlist
@@ -1941,13 +2363,8 @@ Notice that the mean is very similar to the parametric G-computation method.
 
 \textbf{SuperLearner} is an ensemble learning method. Let us use this one to fit the data first.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\tightlist
-\item
-  \textbf{Cross-validation}:
-\end{enumerate}
+\hypertarget{choose-cross-validation-k}{%
+\subsubsection{Choose Cross-validation K}\label{choose-cross-validation-k}}
 
 To combat against optimism, we use cross-validation. SuperLearner first \textbf{splits} the data according to chosen \(K\) fold for the cross-validation.
 
@@ -1957,27 +2374,15 @@ To combat against optimism, we use cross-validation. SuperLearner first \textbf{
 \end{Highlighting}
 \end{Shaded}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\tightlist
-\item
-  \textbf{Estimate risk}:
-\end{enumerate}
+\hypertarget{select-loss-function-for-meta-learner-and-estimate-risk}{%
+\subsubsection{Select loss function for meta learner and estimate risk}\label{select-loss-function-for-meta-learner-and-estimate-risk}}
 
-The goal is to minimize the estimated risk (i.e., minimize the difference of \(Y\) and \(\hat{Y}\)) that comes out of a model. For each fold, estimate a \textbf{measure of performance} (could be RMSE) in test sets based on models that was built using training sets
+\begin{rmdcomment}
+The goal is to minimize the estimated risk (i.e., minimize the
+difference of \(Y\) and \(\hat{Y}\)) that comes out of a model.
+\end{rmdcomment}
 
-\(RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^n (Y - \hat{Y})^2}\) for continuous \(Y\)
-
-\begin{itemize}
-\tightlist
-\item
-  we obtain risk estimate in each fold (from test data)
-\item
-  we average all the estimates risks
-\end{itemize}
-
-We also chose a (non-negative) least squares loss function for the meta learner (explained below):
+We can chose a (non-negative) least squares loss function for the meta learner (explained below):
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1985,13 +2390,8 @@ We also chose a (non-negative) least squares loss function for the meta learner 
 \end{Highlighting}
 \end{Shaded}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{3}
-\tightlist
-\item
-  \textbf{Find SL prediction}
-\end{enumerate}
+\hypertarget{find-sl-prediction}{%
+\subsubsection{Find SL prediction}\label{find-sl-prediction}}
 
 We first fit the super learner:
 
@@ -2007,19 +2407,6 @@ We first fit the super learner:
                        \AttributeTok{family=}\StringTok{"gaussian"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-We can obtain the \(K\)-fold cross-validated risk estimates for each candidate learners.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{fit.sl}\SpecialCharTok{$}\NormalTok{cvRisk}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
-##       634.4393       622.8681       737.5505
-\end{verbatim}
 
 We can also obtain the predictions from each candidate learners.
 
@@ -2041,14 +2428,29 @@ We can also obtain the predictions from each candidate learners.
 ## 6   22.56895      21.60971      11.892698
 \end{verbatim}
 
+We can obtain the \(K\)-fold cross-validated risk estimates for each candidate learners.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit.sl}\SpecialCharTok{$}\NormalTok{cvRisk}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
+##       634.4393       622.8681       737.5505
+\end{verbatim}
+
 Once we have the performance measures and predictions from candidate learners, we could go one of \textbf{two routes} here
 
-\begin{enumerate}
-\def\labelenumi{\alph{enumi}.}
-\tightlist
-\item
-  \textbf{Discrete SL}: measure of performance from all folds are averaged, and choose the \textbf{best} one. The prediction from the chosen learners are then used.
-\end{enumerate}
+\hypertarget{discrete-sl}{%
+\paragraph{Discrete SL}\label{discrete-sl}}
+
+\begin{rmdcomment}
+Get measure of performance from all folds are averaged, and choose the
+\textbf{best} one. The prediction from the chosen learners are then
+used.
+\end{rmdcomment}
 
 \texttt{glmnet} has the lowest cross-validated risk
 
@@ -2081,13 +2483,8 @@ Once we have the performance measures and predictions from candidate learners, w
 ## 6 21.60971
 \end{verbatim}
 
-\begin{enumerate}
-\def\labelenumi{\alph{enumi}.}
-\setcounter{enumi}{1}
-\tightlist
-\item
-  \textbf{Ensamble SL}:
-\end{enumerate}
+\hypertarget{ensamble-sl}{%
+\paragraph{Ensamble SL}\label{ensamble-sl}}
 
 Here are the first 6 rows from the candidate learner predictions:
 
@@ -2107,9 +2504,14 @@ Here are the first 6 rows from the candidate learner predictions:
 ## 6   22.56895      21.60971      11.892698
 \end{verbatim}
 
+\begin{rmdcomment}
+fit a \textbf{meta learner} (optimal weighted combination; below is a
+simplified description)
+\end{rmdcomment}
+
 \begin{itemize}
 \item
-  fit a \textbf{meta learner} (optimal weighted combination; below is a simplified description) using
+  using
 
   \begin{itemize}
   \tightlist
@@ -2223,8 +2625,8 @@ Alternatively, you can get them directly from the package: here are the first 6 
 
 The last column is coming from Ensamble SL.
 
-\hypertarget{extract-outcome-prediction-as-if-everyone-is-treated-2}{%
-\subsection{Extract outcome prediction as if everyone is treated}\label{extract-outcome-prediction-as-if-everyone-is-treated-2}}
+\hypertarget{g-comp-step-2-extract-outcome-prediction-as-if-everyone-is-treated-2}{%
+\subsection{G-comp step 2: Extract outcome prediction as if everyone is treated}\label{g-comp-step-2-extract-outcome-prediction-as-if-everyone-is-treated-2}}
 
 We are going to use \textbf{Ensamble SL} predictions in the following calculations. If you wanted to use discrete SL predictions instead, that would be fine too.
 
@@ -2257,8 +2659,8 @@ We are going to use \textbf{Ensamble SL} predictions in the following calculatio
 ##  Max.   : 58.48
 \end{verbatim}
 
-\hypertarget{extract-outcome-prediction-as-if-everyone-is-untreated-2}{%
-\subsection{Extract outcome prediction as if everyone is untreated}\label{extract-outcome-prediction-as-if-everyone-is-untreated-2}}
+\hypertarget{g-comp-step-3-extract-outcome-prediction-as-if-everyone-is-untreated-2}{%
+\subsection{G-comp step 3: Extract outcome prediction as if everyone is untreated}\label{g-comp-step-3-extract-outcome-prediction-as-if-everyone-is-untreated-2}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2289,8 +2691,8 @@ We are going to use \textbf{Ensamble SL} predictions in the following calculatio
 ##  Max.   : 55.86
 \end{verbatim}
 
-\hypertarget{treatment-effect-estimate-3}{%
-\subsection{Treatment effect estimate}\label{treatment-effect-estimate-3}}
+\hypertarget{g-comp-step-3-treatment-effect-estimate-1}{%
+\subsection{G-comp step 3: Treatment effect estimate}\label{g-comp-step-3-treatment-effect-estimate-1}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2330,30 +2732,79 @@ Mean value of predicted treatment effect
 \hypertarget{additional-details-for-sl}{%
 \subsection{Additional details for SL}\label{additional-details-for-sl}}
 
+\hypertarget{choice-of-k}{%
+\subsubsection{Choice of K}\label{choice-of-k}}
+
+\begin{itemize}
+\tightlist
+\item
+  simplest cross-validation splits the data into \(K=2\) parts, but can go higher.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    select \(K\) judiciously
+
+    \begin{itemize}
+    \tightlist
+    \item
+      large sample size means small \(K\) may be adequate
+
+      \begin{itemize}
+      \tightlist
+      \item
+        for \(n \lt 10,000\) consider \(K=3\)
+      \item
+        for \(n \lt 500\) consider \(K=20\)
+      \end{itemize}
+    \item
+      smaller sample size means larger \(K\) may be necessary
+
+      \begin{itemize}
+      \tightlist
+      \item
+        for \(n \lt 30\) consider leave 1 out
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{alternative-to-cv}{%
+\subsubsection{Alternative to CV}\label{alternative-to-cv}}
+
 \begin{itemize}
 \tightlist
 \item
   other similar algorithms such as \textbf{cross-fitting} had been shown to have better performances
+\end{itemize}
+
+\hypertarget{rare-outcome}{%
+\subsubsection{Rare outcome}\label{rare-outcome}}
+
+\begin{itemize}
+\tightlist
 \item
   for rare outcomes, consider using \textbf{stratification} to attempt to maintain training and test sample ratios the same
+\end{itemize}
+
+\hypertarget{dependant-sample}{%
+\subsubsection{Dependant sample}\label{dependant-sample}}
+
+\begin{itemize}
+\tightlist
 \item
   if data is clustered and not independent and identically distributed, use ID for the \textbf{cluster}
 \end{itemize}
 
-Also, it is easy to show that, depending on the choice of meta-learners, the coefficients of the meta learners can be slightly different.
+\hypertarget{choice-of-meta-learner-method}{%
+\subsubsection{Choice of meta learner method}\label{choice-of-meta-learner-method}}
+
+It is easy to show that, depending on the choice of meta-learners, the coefficients of the meta learners can be slightly different.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{fit.sl2 }\OtherTok{\textless{}{-}} \FunctionTok{recombineSL}\NormalTok{(fit.sl, }\AttributeTok{Y =}\NormalTok{ Y, }\AttributeTok{method =} \StringTok{"method.NNLS2"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Loading required package: quadprog
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
+\NormalTok{fit.sl2 }\OtherTok{\textless{}{-}} \FunctionTok{recombineSL}\NormalTok{(fit.sl, }\AttributeTok{Y =}\NormalTok{ Y, }
+                       \AttributeTok{method =} \StringTok{"method.NNLS2"}\NormalTok{)}
 \NormalTok{fit.sl2}\SpecialCharTok{$}\NormalTok{coef}
 \end{Highlighting}
 \end{Shaded}
@@ -2365,7 +2816,8 @@ Also, it is easy to show that, depending on the choice of meta-learners, the coe
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{fit.sl2 }\OtherTok{\textless{}{-}} \FunctionTok{recombineSL}\NormalTok{(fit.sl, }\AttributeTok{Y =}\NormalTok{ Y, }\AttributeTok{method =} \StringTok{"method.CC\_LS"}\NormalTok{)}
+\NormalTok{fit.sl2 }\OtherTok{\textless{}{-}} \FunctionTok{recombineSL}\NormalTok{(fit.sl, }\AttributeTok{Y =}\NormalTok{ Y, }
+                       \AttributeTok{method =} \StringTok{"method.CC\_LS"}\NormalTok{)}
 \NormalTok{fit.sl2}\SpecialCharTok{$}\NormalTok{coef}
 \end{Highlighting}
 \end{Shaded}
@@ -2377,16 +2829,8 @@ Also, it is easy to show that, depending on the choice of meta-learners, the coe
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{fit.sl4 }\OtherTok{\textless{}{-}} \FunctionTok{recombineSL}\NormalTok{(fit.sl, }\AttributeTok{Y =}\NormalTok{ Y, }\AttributeTok{method =} \StringTok{"method.CC\_nloglik"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Loading required package: nloptr
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
+\NormalTok{fit.sl4 }\OtherTok{\textless{}{-}} \FunctionTok{recombineSL}\NormalTok{(fit.sl, }\AttributeTok{Y =}\NormalTok{ Y, }
+                       \AttributeTok{method =} \StringTok{"method.CC\_nloglik"}\NormalTok{)}
 \NormalTok{fit.sl4}\SpecialCharTok{$}\NormalTok{coef}
 \end{Highlighting}
 \end{Shaded}
@@ -2415,7 +2859,11 @@ Also, it is easy to show that, depending on the choice of meta-learners, the coe
 \hypertarget{iptw}{%
 \chapter{IPTW}\label{iptw}}
 
-In this chapter, we are not only interested in outcome modelling, but also \textbf{exposure modelling}.
+\begin{rmdcomment}
+In this chapter, we are primarily interested about \textbf{exposure
+modelling} (e.g., fixing imbalance first, before doing outcome
+analysis).
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2435,31 +2883,19 @@ According to \citet{austin2011tutorial}, we need to follow 4 steps:
 \begin{longtable}[]{@{}ll@{}}
 \toprule
 \endhead
-\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-Step 1\strut
-\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-exposure modelling: \(PS = Prob(A=1|L)\)\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-Step 2\strut
-\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-Convert \(PS\) to \(IPW\) = \(\frac{A}{PS} + \frac{1-A}{1-PS}\)\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-Step 3\strut
-\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-Assess balance in weighted sample and overlap (\(PS\) and \(L\))\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-Step 4\strut
-\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
-outcome modelling: \(Prob(Y=1|A=1)\) to obtain treatment effect estimate\strut
-\end{minipage}\tabularnewline
+Step 1 & exposure modelling: \(PS = Prob(A=1|L)\)\tabularnewline
+Step 2 & Convert \(PS\) to \(IPW\) = \(\frac{A}{PS} + \frac{1-A}{1-PS}\)\tabularnewline
+Step 3 & Assess balance in weighted sample (\(PS\) and \(L\))\tabularnewline
+Step 4 & outcome modelling: \(E(Y|A=1)\) to obtain treatment effect estimate\tabularnewline
 \bottomrule
 \end{longtable}
 
 \hypertarget{step-1-exposure-modelling}{%
 \section{Step 1: exposure modelling}\label{step-1-exposure-modelling}}
+
+\begin{rmdcomment}
+Exposure modelling: \(PS = Prob(A=1|L)\)
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2684,6 +3120,10 @@ Check summaries:
 \hypertarget{step-2-convert-ps-to-ipw}{%
 \section{Step 2: Convert PS to IPW}\label{step-2-convert-ps-to-ipw}}
 
+\begin{rmdcomment}
+Convert \(PS\) to \(IPW\) = \(\frac{A}{PS} + \frac{1-A}{1-PS}\)
+\end{rmdcomment}
+
 \begin{itemize}
 \tightlist
 \item
@@ -2724,6 +3164,10 @@ Also possible to use pre-packged software packages to do the same:
 
 \hypertarget{step-3-balance-checking}{%
 \section{Step 3: Balance checking}\label{step-3-balance-checking}}
+
+\begin{rmdcomment}
+Assess balance in weighted sample (\(PS\) and \(L\))
+\end{rmdcomment}
 
 We can check balance numerically.
 
@@ -2854,8 +3298,16 @@ We can check balance numerically.
 
 \includegraphics{TMLEw_files/figure-latex/balp2-1.pdf}
 
+\begin{rmdcomment}
+All covariates are balanced! Reverse engineered an RCT!?!
+\end{rmdcomment}
+
 \hypertarget{step-4-outcome-modelling}{%
 \section{Step 4: outcome modelling}\label{step-4-outcome-modelling}}
+
+\begin{rmdcomment}
+Outcome modelling: \(E(Y|A=1)\) to obtain treatment effect estimate
+\end{rmdcomment}
 
 Estimate the effect of treatment on outcomes
 
@@ -2903,12 +3355,32 @@ Similar to G-computation, we will try to use machine learning methods, particula
 \textbf{Modelling Steps}:
 
 We will still follow the same steps
-\textbar{} \textbar{} \textbar{}
-\textbar-\textbar-\textbar{}
-\textbar Step 1\textbar{} exposure modelling: \(PS = Prob(A=1|L)\)\textbar{}
-\textbar Step 2\textbar{} Convert \(PS\) to \(IPW\) = \(\frac{A}{PS} + \frac{1-A}{1-PS}\)\textbar{}
-\textbar Step 3\textbar{} Assess balance in weighted sample and overlap (\(PS\) and \(L\))\textbar{}
-\textbar Step 4\textbar{} outcome modelling: \(Prob(Y=1|A=1)\) to obtain treatment effect estimate \textbar{}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+\endhead
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Step 1\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+exposure modelling: \(PS = Prob(A=1|L)\)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Step 2\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Convert \(PS\) to \(IPW\) = \(\frac{A}{PS} + \frac{1-A}{1-PS}\)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Step 3\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Assess balance in weighted sample and overlap (\(PS\) and \(L\))\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+Step 4\strut
+\end{minipage} & \begin{minipage}[t]{(\columnwidth - 1\tabcolsep) * \real{0.50}}\raggedright
+outcome modelling: \(Prob(Y=1|A=1)\) to obtain treatment effect estimate\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
 
 \hypertarget{step-1-exposure-modelling-1}{%
 \section{Step 1: exposure modelling}\label{step-1-exposure-modelling-1}}
@@ -3284,10 +3756,19 @@ Alternatively, you can use the previously estimated PS
 
 \includegraphics{TMLEw_files/figure-latex/ipw2balp2-1.pdf}
 
+\begin{rmdcomment}
+Some covariates have SMD \textgreater{} 0.1 (sign of imbalance). This
+phenomenon is common when we use strong ML methods to obtain PS
+{[}@alam2019should{]}.
+\end{rmdcomment}
+
 \hypertarget{step-4-outcome-modelling-1}{%
 \section{Step 4: outcome modelling}\label{step-4-outcome-modelling-1}}
 
 Estimate the effect of treatment on outcomes
+
+\hypertarget{crude}{%
+\subsection{Crude}\label{crude}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3305,27 +3786,145 @@ Estimate the effect of treatment on outcomes
 ##            A              4.28   [2.91;5.64] < 1e-04
 \end{verbatim}
 
+\hypertarget{adjusted}{%
+\subsection{Adjusted}\label{adjusted}}
+
+\begin{rmdcomment}
+Adjusting for all covariates to deal with potential residual confounding
+(as was indicated by imbalance). Alternatively, could adjust for
+selected covariates believed to be the reasons for potential imbalance
+{[}@nguyen2017double{]}.
+\end{rmdcomment}
+
+Estimate the effect of treatment on outcomes (after adjustment)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{out.formula2 }\OtherTok{\textless{}{-}} \FunctionTok{as.formula}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Y\textasciitilde{} A +"}\NormalTok{, }
+                               \FunctionTok{paste}\NormalTok{(baselinevars, }
+                                     \AttributeTok{collapse =} \StringTok{"+"}\NormalTok{)))}
+\NormalTok{out.fit2 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(out.formula2,}
+               \AttributeTok{data =}\NormalTok{ ObsData,}
+               \AttributeTok{weights =}\NormalTok{ IPW.SL)}
+\NormalTok{res2 }\OtherTok{\textless{}{-}} \FunctionTok{publish}\NormalTok{(out.fit2, }\AttributeTok{digits=}\DecValTok{1}\NormalTok{)}\SpecialCharTok{$}\NormalTok{regressionTable[}\DecValTok{2}\NormalTok{,]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res2}
+\end{Highlighting}
+\end{Shaded}
+
+ 
+  \providecommand{\huxb}[2]{\arrayrulecolor[RGB]{#1}\global\arrayrulewidth=#2pt}
+  \providecommand{\huxvb}[2]{\color[RGB]{#1}\vrule width #2pt}
+  \providecommand{\huxtpad}[1]{\rule{0pt}{#1}}
+  \providecommand{\huxbpad}[1]{\rule[-#1]{0pt}{#1}}
+
+\begin{table}[ht]
+\begin{centerbox}
+\begin{threeparttable}
+\captionsetup{justification=centering,singlelinecheck=off}
+\caption{\label{tab:ipw2psx4adj2} }
+ \setlength{\tabcolsep}{0pt}
+\begin{tabular}{l l l l l}
+
+
+\hhline{>{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}-}
+\arrayrulecolor{black}
+
+\multicolumn{1}{!{\huxvb{0, 0, 0}{0.4}}l!{\huxvb{0, 0, 0}{0}}}{\huxtpad{6pt + 1em}\raggedright \hspace{6pt} \textbf{Variable} \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\huxtpad{6pt + 1em}\raggedright \hspace{6pt} \textbf{Units} \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\huxtpad{6pt + 1em}\raggedright \hspace{6pt} \textbf{Coefficient} \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\huxtpad{6pt + 1em}\raggedright \hspace{6pt} \textbf{CI.95} \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0.4}}}{\huxtpad{6pt + 1em}\raggedright \hspace{6pt} \textbf{p-value} \hspace{6pt}\huxbpad{6pt}} \tabularnewline[-0.5pt]
+
+
+\hhline{>{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}-}
+\arrayrulecolor{black}
+
+\multicolumn{1}{!{\huxvb{0, 0, 0}{0.4}}l!{\huxvb{0, 0, 0}{0}}}{\cellcolor[RGB]{242, 242, 242}\huxtpad{6pt + 1em}\raggedright \hspace{6pt} A \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\cellcolor[RGB]{242, 242, 242}\huxtpad{6pt + 1em}\raggedright \hspace{6pt}  \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\cellcolor[RGB]{242, 242, 242}\huxtpad{6pt + 1em}\raggedright \hspace{6pt} 2.9 \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\cellcolor[RGB]{242, 242, 242}\huxtpad{6pt + 1em}\raggedright \hspace{6pt} [1.5;4.3] \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0.4}}}{\cellcolor[RGB]{242, 242, 242}\huxtpad{6pt + 1em}\raggedright \hspace{6pt} $<$0.1 \hspace{6pt}\huxbpad{6pt}} \tabularnewline[-0.5pt]
+
+
+\hhline{>{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}-}
+\arrayrulecolor{black}
+\end{tabular}
+\end{threeparttable}\par\end{centerbox}
+
+\end{table}
+ 
+
+\hypertarget{adjusted-from-package}{%
+\subsection{Adjusted (from package)}\label{adjusted-from-package}}
+
 Also check the output when we used the weights from the package
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{out.formula }\OtherTok{\textless{}{-}} \FunctionTok{as.formula}\NormalTok{(Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ A)}
-\NormalTok{out.fit }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(out.formula,}
+\NormalTok{out.fit3 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(out.formula2,}
                \AttributeTok{data =}\NormalTok{ ObsData,}
                \AttributeTok{weights =}\NormalTok{ W.out}\SpecialCharTok{$}\NormalTok{weights)}
-\FunctionTok{publish}\NormalTok{(out.fit)}
+\NormalTok{res3 }\OtherTok{\textless{}{-}} \FunctionTok{publish}\NormalTok{(out.fit3, }\AttributeTok{digits=}\DecValTok{1}\NormalTok{)}\SpecialCharTok{$}\NormalTok{regressionTable[}\DecValTok{2}\NormalTok{,]}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-##     Variable Units Coefficient         CI.95 p-value 
-##  (Intercept)             20.18 [19.27;21.08] < 1e-04 
-##            A              4.31   [2.94;5.68] < 1e-04
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res3}
+\end{Highlighting}
+\end{Shaded}
+
+ 
+  \providecommand{\huxb}[2]{\arrayrulecolor[RGB]{#1}\global\arrayrulewidth=#2pt}
+  \providecommand{\huxvb}[2]{\color[RGB]{#1}\vrule width #2pt}
+  \providecommand{\huxtpad}[1]{\rule{0pt}{#1}}
+  \providecommand{\huxbpad}[1]{\rule[-#1]{0pt}{#1}}
+
+\begin{table}[ht]
+\begin{centerbox}
+\begin{threeparttable}
+\captionsetup{justification=centering,singlelinecheck=off}
+\caption{\label{tab:ipw2psx4adj3} }
+ \setlength{\tabcolsep}{0pt}
+\begin{tabular}{l l l l l}
+
+
+\hhline{>{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}-}
+\arrayrulecolor{black}
+
+\multicolumn{1}{!{\huxvb{0, 0, 0}{0.4}}l!{\huxvb{0, 0, 0}{0}}}{\huxtpad{6pt + 1em}\raggedright \hspace{6pt} \textbf{Variable} \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\huxtpad{6pt + 1em}\raggedright \hspace{6pt} \textbf{Units} \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\huxtpad{6pt + 1em}\raggedright \hspace{6pt} \textbf{Coefficient} \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\huxtpad{6pt + 1em}\raggedright \hspace{6pt} \textbf{CI.95} \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0.4}}}{\huxtpad{6pt + 1em}\raggedright \hspace{6pt} \textbf{p-value} \hspace{6pt}\huxbpad{6pt}} \tabularnewline[-0.5pt]
+
+
+\hhline{>{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}-}
+\arrayrulecolor{black}
+
+\multicolumn{1}{!{\huxvb{0, 0, 0}{0.4}}l!{\huxvb{0, 0, 0}{0}}}{\cellcolor[RGB]{242, 242, 242}\huxtpad{6pt + 1em}\raggedright \hspace{6pt} A \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\cellcolor[RGB]{242, 242, 242}\huxtpad{6pt + 1em}\raggedright \hspace{6pt}  \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\cellcolor[RGB]{242, 242, 242}\huxtpad{6pt + 1em}\raggedright \hspace{6pt} 2.9 \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0}}}{\cellcolor[RGB]{242, 242, 242}\huxtpad{6pt + 1em}\raggedright \hspace{6pt} [1.5;4.3] \hspace{6pt}\huxbpad{6pt}} &
+\multicolumn{1}{l!{\huxvb{0, 0, 0}{0.4}}}{\cellcolor[RGB]{242, 242, 242}\huxtpad{6pt + 1em}\raggedright \hspace{6pt} $<$0.1 \hspace{6pt}\huxbpad{6pt}} \tabularnewline[-0.5pt]
+
+
+\hhline{>{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}->{\huxb{0, 0, 0}{0.4}}-}
+\arrayrulecolor{black}
+\end{tabular}
+\end{threeparttable}\par\end{centerbox}
+
+\end{table}
+ 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{saveRDS}\NormalTok{(out.fit, }\AttributeTok{file =} \StringTok{"data/ipwsl.RDS"}\NormalTok{)}
+\FunctionTok{saveRDS}\NormalTok{(out.fit3, }\AttributeTok{file =} \StringTok{"data/ipwsl.RDS"}\NormalTok{) }
 \end{Highlighting}
 \end{Shaded}
 
@@ -3503,7 +4102,10 @@ In our example, the outcome is continuous.
 
 \includegraphics{TMLEw_files/figure-latex/transf1-1.pdf}
 
-General recommendation is to \textbf{transform} continuous outcome to be within the range {[}0,1{]} \citep{gruber2010targeted}.
+\begin{rmdcomment}
+General recommendation is to \textbf{transform} continuous outcome to be
+within the range {[}0,1{]} {[}@gruber2010targeted{]}.
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3529,7 +4131,11 @@ Check the range of our transformed outcome variable
 \hypertarget{step-2-initial-g-comp-estimate}{%
 \section{Step 2: Initial G-comp estimate}\label{step-2-initial-g-comp-estimate}}
 
-We construct our outcome model, and make our initial predictions. For this step, we will use \textbf{SuperLearner}. This requires no apriori assumptions about the structure of our outcome model.
+\begin{rmdcomment}
+We construct our outcome model, and make our initial predictions.
+\end{rmdcomment}
+
+For this step, we will use \textbf{SuperLearner}. This requires no apriori assumptions about the structure of our outcome model.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3577,9 +4183,12 @@ We construct our outcome model, and make our initial predictions. For this step,
 \tightlist
 \item
   We will use these initial prediction values later.
-\item
-  \(Q^0(A,L)\) is often used to represent the predictions from initial G-comp model.
 \end{itemize}
+
+\begin{rmdcomment}
+\(Q^0(A,L)\) is often used to represent the predictions from initial
+G-comp model.
+\end{rmdcomment}
 
 \hypertarget{get-predictions-under-both-treatments-a-0-and-1}{%
 \subsection{\texorpdfstring{Get predictions under both treatments \(A = 0\) and \(1\)}{Get predictions under both treatments A = 0 and 1}}\label{get-predictions-under-both-treatments-a-0-and-1}}
@@ -3694,10 +4303,13 @@ At this point, we have our initial estimate and now want to perform our targeted
 \end{Highlighting}
 \end{Shaded}
 
+\begin{rmdcomment}
+These propensity score predictions (\texttt{PS.SL}) are represented as
+\(g(A_i=1|L_i)\).
+\end{rmdcomment}
+
 \begin{itemize}
 \tightlist
-\item
-  These propensity score predictions (\texttt{PS.SL}) are represented as \(g(A_i=1|L_i)\).
 \item
   We can estimate \(g(A_i=0|L_i)\) as \(1 - g(A_i=1|L_i)\) or \texttt{1\ -\ PS.SL}.
 \end{itemize}
@@ -3750,7 +4362,11 @@ At this point, we have our initial estimate and now want to perform our targeted
 \hypertarget{step-4-estimate-h}{%
 \section{\texorpdfstring{Step 4: Estimate \(H\)}{Step 4: Estimate H}}\label{step-4-estimate-h}}
 
-Clever covariate \(H(A_i, L_i) = \frac{I(A_i=1)}{g(A_i=1|L_i)} - \frac{I(A_i=0)}{g(A_i=0|L_i)}\) \citep{luque2018targeted}
+\begin{rmdcomment}
+Clever covariate
+\(H(A_i, L_i) = \frac{I(A_i=1)}{g(A_i=1|L_i)} - \frac{I(A_i=0)}{g(A_i=0|L_i)}\)
+{[}@luque2018targeted{]}
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3805,9 +4421,12 @@ Aggregated or individual clever covariate components show slight difference in t
 \hypertarget{step-5-estimate-epsilon}{%
 \section{\texorpdfstring{Step 5: Estimate \(\epsilon\)}{Step 5: Estimate \textbackslash epsilon}}\label{step-5-estimate-epsilon}}
 
+\begin{rmdcomment}
+Fluctuation parameter \(\epsilon\), representing \textbf{how large of an
+adjustment we will make} to the initial estimate.
+\end{rmdcomment}
+
 \begin{itemize}
-\item
-  Fluctuation parameter \(\epsilon\), representing \textbf{how large of an adjustment we will make} to the initial estimate.
 \item
   The fluctuation parameter \(\hat\epsilon\) could be
 
@@ -4083,8 +4702,15 @@ Alternatively, using \texttt{H.AL}:
 \tightlist
 \item
   Since the machine learning algorithms were used only in intermediary steps, rather than estimating our parameter of interest directly, 95\% confidence intervals can be calculated directly \citep{luque2018targeted}.
-\item
-  Based on semi-parametric theory, closed form variance formula is already derived \citep{van2012targeted}.
+\end{itemize}
+
+\begin{rmdcomment}
+Based on semi-parametric theory, closed form variance formula is already
+derived {[}@van2012targeted{]}.
+\end{rmdcomment}
+
+\begin{itemize}
+\tightlist
 \item
   Time-consuming bootstrap procedure is not necessary.
 \end{itemize}
@@ -4209,14 +4835,24 @@ Alternatively, using \texttt{H.AL}:
   \begin{itemize}
   \tightlist
   \item
-    generalized linear models (GLMs),
+    \texttt{SL.glm}: generalized linear models (GLMs)
   \item
-    GLM with lasso regularization, and
+    \texttt{SL.glmnet}: LASSO
   \item
-    gradient boosting.
+    \texttt{tmle.SL.dbarts2}: modeling and prediction using BART
   \end{itemize}
 \item
-  The default library for estimating the propensity scores also include the same
+  The default library for estimating the propensity scores includes
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{SL.glm}: generalized linear models (GLMs)
+  \item
+    \texttt{tmle.SL.dbarts.k.5}: SL wrappers for modeling and prediction using BART
+  \item
+    \texttt{SL.gam}: generalized additive models: (GAMs)\\
+  \end{itemize}
 \item
   It is certainly possible to use different set of learners
 
@@ -4248,27 +4884,7 @@ Alternatively, using \texttt{H.AL}:
 \FunctionTok{set.seed}\NormalTok{(}\DecValTok{1444}\NormalTok{) }
 \CommentTok{\# transform the outcome to fall within the range [0,1]}
 \NormalTok{min.Y }\OtherTok{\textless{}{-}} \FunctionTok{min}\NormalTok{(ObsData}\SpecialCharTok{$}\NormalTok{Y)}
-\NormalTok{min.Y}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] 2
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \NormalTok{max.Y }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{(ObsData}\SpecialCharTok{$}\NormalTok{Y)}
-\NormalTok{max.Y}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] 394
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \NormalTok{ObsData}\SpecialCharTok{$}\NormalTok{Y\_transf }\OtherTok{\textless{}{-}}\NormalTok{ (ObsData}\SpecialCharTok{$}\NormalTok{Y}\SpecialCharTok{{-}}\NormalTok{min.Y)}\SpecialCharTok{/}\NormalTok{(max.Y}\SpecialCharTok{{-}}\NormalTok{min.Y)}
 
 \CommentTok{\# run tmle from the tmle package }
@@ -4728,13 +5344,67 @@ Most helpful resources:
 
 Gathering previously saved results:
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit.reg }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/adjreg.RDS"}\NormalTok{)}
+\NormalTok{TEr }\OtherTok{\textless{}{-}}\NormalTok{ fit.reg}\SpecialCharTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{]}
+\NormalTok{CIr }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{confint}\NormalTok{(fit.reg, }\StringTok{\textquotesingle{}A\textquotesingle{}}\NormalTok{))}
+\NormalTok{fit.matched }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/match.RDS"}\NormalTok{)}
+\NormalTok{TEm }\OtherTok{\textless{}{-}}\NormalTok{ fit.matched}\SpecialCharTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{]}
+\NormalTok{CIm }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{confint}\NormalTok{(fit.matched, }\StringTok{\textquotesingle{}A\textquotesingle{}}\NormalTok{))}
+\NormalTok{TEg }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/gcomp.RDS"}\NormalTok{)}
+\NormalTok{CIg }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/gcompci.RDS"}\NormalTok{)}
+\NormalTok{CIgc }\OtherTok{\textless{}{-}}\NormalTok{ CIg}\SpecialCharTok{$}\NormalTok{percent[}\DecValTok{4}\SpecialCharTok{:}\DecValTok{5}\NormalTok{]}
+\NormalTok{TE1g }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/gcompxg.RDS"}\NormalTok{)}
+\NormalTok{TE2g }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/gcompls.RDS"}\NormalTok{)}
+\NormalTok{TE3g }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/gcompsl.RDS"}\NormalTok{)}
+\NormalTok{ipw }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/ipw.RDS"}\NormalTok{)}
+\NormalTok{TEi }\OtherTok{\textless{}{-}}\NormalTok{ ipw}\SpecialCharTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{]}
+\NormalTok{CIi }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{confint}\NormalTok{(ipw, }\StringTok{\textquotesingle{}A\textquotesingle{}}\NormalTok{))}
+\NormalTok{ipwsl }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/ipwsl.RDS"}\NormalTok{)}
+\NormalTok{TEsli }\OtherTok{\textless{}{-}}\NormalTok{ ipwsl}\SpecialCharTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{]}
+\NormalTok{CIsli }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{confint}\NormalTok{(ipwsl, }\StringTok{\textquotesingle{}A\textquotesingle{}}\NormalTok{))}
+\NormalTok{tmleh }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/tmlepointh.RDS"}\NormalTok{)}
+\NormalTok{tmlecih }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/tmlecih.RDS"}\NormalTok{)}
+\NormalTok{tmlesl }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/tmle.RDS"}\NormalTok{)}
+\NormalTok{tmlecisl }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/tmleci.RDS"}\NormalTok{)}
+\NormalTok{slp }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\AttributeTok{file =} \StringTok{"data/sl3.RDS"}\NormalTok{)}
+\NormalTok{ci.b }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\ConstantTok{NA}\NormalTok{,}\DecValTok{2}\NormalTok{)}
+\NormalTok{ks }\OtherTok{\textless{}{-}} \FloatTok{2.01}
+\NormalTok{ci.ks }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.6}\NormalTok{,}\FloatTok{3.41}\NormalTok{)}
+\NormalTok{point }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{c}\NormalTok{(TEr, TEm, TEg, TE1g, TE2g,  }
+\NormalTok{                      TE3g, TEi, TEsli, tmleh, }
+\NormalTok{                      tmlesl, slp, ks))}
+\NormalTok{CIs }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(CIr, CIm, CIgc, ci.b, ci.b, ci.b, }
+\NormalTok{             CIi, CIsli, tmlecih, tmlecisl, }
+\NormalTok{             ci.b, ci.ks)    }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{method.list }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Adj. Reg"}\NormalTok{,}\StringTok{"PS match"}\NormalTok{, }
+                 \StringTok{"G{-}comp (logistic)"}\NormalTok{,}\StringTok{"G{-}comp (xgboost)"}\NormalTok{, }
+                 \StringTok{"G{-}comp (lasso)"}\NormalTok{, }\StringTok{"G{-}comp (SL)"}\NormalTok{, }
+                 \StringTok{"IPW (logistic)"}\NormalTok{, }\StringTok{"IPW (SL)"}\NormalTok{, }
+                 \StringTok{"TMLE (9 steps)"}\NormalTok{, }\StringTok{"TMLE (package)"}\NormalTok{, }
+                 \StringTok{"sl3 (package)"}\NormalTok{, }\StringTok{"Keele and Small (2021) paper"}\NormalTok{) }
+\NormalTok{results }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(method.list) }
+\NormalTok{results}\SpecialCharTok{$}\NormalTok{Estimate }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(point,}\DecValTok{2}\NormalTok{)}
+\NormalTok{results}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{2.5 \%}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}}\NormalTok{ CIs[}\DecValTok{1}\NormalTok{,] }
+\NormalTok{results}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{97.5 \%}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}}\NormalTok{ CIs[}\DecValTok{2}\NormalTok{,] }
+\FunctionTok{kable}\NormalTok{(results,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{)}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{row\_spec}\NormalTok{(}\DecValTok{10}\NormalTok{, }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{color =} \StringTok{"white"}\NormalTok{, }\AttributeTok{background =} \StringTok{"\#D7261E"}\NormalTok{)  }
+\end{Highlighting}
+\end{Shaded}
+
 \begin{tabular}{l|r|r|r}
 \hline
 method.list & Estimate & 2.5 \% & 97.5 \%\\
 \hline
 Adj. Reg & 2.90 & 1.37 & 4.43\\
 \hline
-PS match & 2.86 & 1.03 & 4.68\\
+PS match & 3.25 & 1.45 & 5.05\\
 \hline
 G-comp (logistic) & 2.90 & 1.52 & 4.59\\
 \hline
@@ -4746,15 +5416,22 @@ G-comp (SL) & 1.91 &  & \\
 \hline
 IPW (logistic) & 3.24 & 1.88 & 4.60\\
 \hline
-IPW (SL) & 4.31 & 2.94 & 5.68\\
+IPW (SL) & 2.89 & 1.51 & 4.28\\
 \hline
 TMLE (9 steps) & 2.73 & 1.59 & 3.87\\
 \hline
-TMLE (package) & 2.87 & 1.77 & 3.97\\
+\cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{TMLE (package)}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{2.87}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{1.77}}} & \cellcolor[HTML]{D7261E}{\textcolor{white}{\textbf{3.97}}}\\
 \hline
 sl3 (package) & 5.33 &  & \\
 \hline
+Keele and Small (2021) paper & 2.01 & 0.60 & 3.41\\
+\hline
 \end{tabular}
+
+\begin{rmdcomment}
+@keele2021comparing used superlearner based on an ensemble of 3
+different learners: (1) GLM, (2) random forests, and (3) LASSO.
+\end{rmdcomment}
 
 \hypertarget{other-packages}{%
 \section{Other packages}\label{other-packages}}
@@ -4845,7 +5522,10 @@ You can find many other related packages on \href{https://cran.r-project.org/sea
   \end{itemize}
 \end{itemize}
 
-Relying on just a blackbox ML method may be dangerous to identify the roles.
+\begin{rmdcomment}
+Relying on just a blackbox ML method may be dangerous to identify the
+roles of variables in the relationship of interest.
+\end{rmdcomment}
 
 \hypertarget{why-sl-and-tmle}{%
 \section{Why SL and TMLE}\label{why-sl-and-tmle}}
@@ -4858,13 +5538,13 @@ Relying on just a blackbox ML method may be dangerous to identify the roles.
 \begin{itemize}
 \tightlist
 \item
-  Assuming all covariates are measured, parametric models such as linear and logistic regressions are very efficient, but relies on strong assumptions. In real-world scenarios, it is often hard (if not impossible) to guess the correct specification of the right hand side of the regression equation.
+  Assuming all covariates are measured, \textbf{parametric models} such as linear and logistic regressions are very efficient, but relies on strong assumptions. In real-world scenarios, it is often hard (if not impossible) to guess the correct specification of the right hand side of the regression equation.
 \item
-  Machine learning (ML) methods are very helpful for prediction goals. They are also helpful in identifying complex functions (non-linearities and non-additive terms) of the covariates (again, assuming they are measured).
+  Machine learning (ML) methods are very helpful for prediction goals. They are also helpful in \textbf{identifying complex functions} (non-linearities and non-additive terms) of the covariates (again, assuming they are measured).
 \item
-  There are many ML methods, but the procedures are very different, and they come with their own advantages and disadvantages. In a given real data, it is hard to apriori predict which is the best ML algorithm.
+  There are many ML methods, but the procedures are very different, and they come with their own advantages and disadvantages. In a given real data, it is \textbf{hard to apriori predict which is the best ML algorithm} for a given problem.
 \item
-  That's where super learner is helpful in combining strength from various algorithms, and producing 1 prediction column that has optimal statistical properties.
+  That's where super learner is helpful in \textbf{combining strength from various algorithms}, and producing 1 prediction column that has \textbf{optimal statistical properties}.
 \end{itemize}
 
 \hypertarget{causal-inference}{%
@@ -4875,17 +5555,23 @@ Relying on just a blackbox ML method may be dangerous to identify the roles.
 \begin{itemize}
 \tightlist
 \item
-  For causal inference goals (when we have a primary exposure of interest), machine learning methods are often misleading. This is primarily due to the fact that they usually do not have an inherent mechanism of focusing on primary exposure (RHC in this example); and treats the primary exposure as any other predictors.
+  For causal inference goals (when we have a primary exposure of interest), machine learning methods are often misleading. This is primarily due to the fact that they usually do not have an inherent mechanism of focusing on \textbf{primary exposure} (RHC in this example); and treats the primary exposure as any other predictors.
 \item
-  When using g-computation with ML methods, estimation of variance becomes a difficult problem. Generalized procedures such as robust SE or bootstrap methods are not supported by theory.
+  When using g-computation with ML methods, estimation of variance becomes a difficult problem. Generalized procedures such as \textbf{robust SE or bootstrap methods} are not supported by theory.
 \item
-  That's where TMLE methods shine, with the help of it's important statistical properties (double robustness, finite sample properties).
+  That's where TMLE methods shine, with the help of it's important \textbf{statistical properties (double robustness, finite sample properties)}.
 \end{itemize}
 
 \hypertarget{identifiability-assumptions}{%
 \subsection{Identifiability assumptions}\label{identifiability-assumptions}}
 
-However, causal inference requires satisfying identifiability assumptions for us to interpret causality based on association measures from statistical models (see below). Many of these assumptions are not empirically testable. That is why, it is extremely important to work with \textbf{subject area experts} to assess the plausibility of those assumptions in the given context. No ML method, no matter how fancy it is, can automatically produce estimates that can be directly interpreted as causal, unless the identifiability assumptions are properly taken into account.
+However, causal inference requires satisfying identifiability assumptions for us to interpret causality based on association measures from statistical models (see below). Many of these assumptions are not empirically testable. That is why, it is extremely important to work with \textbf{subject area experts} to assess the plausibility of those assumptions in the given context.
+
+\begin{rmdcomment}
+No ML method, no matter how fancy it is, can automatically produce
+estimates that can be directly interpreted as causal, unless the
+identifiability assumptions are properly taken into account.
+\end{rmdcomment}
 
 \begin{longtable}[]{@{}lll@{}}
 \toprule

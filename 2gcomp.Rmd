@@ -1,6 +1,7 @@
 # G-computation
 
 ```{r setup01g, include=FALSE}
+require(huxtable)
 require(boot)
 require(knitr)
 require(glmnet)
@@ -29,12 +30,43 @@ In this dataset, we have
 - `r dim(ObsData)[2]-2` covariates.
 
 ### View data from 6 participants
+
+```{block, type='rmdcomment'}
 Let's focus on only first 6 columns, with only 3 variables.
+```
 
 ```{r reg2rb, cache=cachex, echo = TRUE}
 small.data <- ObsData[1:6,c("sex","A","Y")]
 kable(small.data)
 ```
+
+### New notations
+
+|Notations| Example in RHC study|
+|---|---|
+|$A$: Exposure status  | RHC |  
+|$Y$: Observed outcome  | length of stay  |  
+|$Y(A=1)$ = potential outcome when exposed  | length of stay when RHC used  |  
+|$Y(A=0)$ = potential outcome when not exposed  | length of stay when RHC not used  |  
+|$L$: covariates  | $49$ covariates  |  
+
+```{block, type='rmdcomment'}
+For explaining the concepts in this chapter, we will convert our data representation 
+```
+
+- from
+
+| Covariate | Exposure | Observed outcome |
+|---|---|---|
+| $L$ | $A$ | $Y$ |  
+| sex | `RHC` | length of stay |
+
+- to the following representation:
+
+| Covariate | Exposure | Outcome under exposed | Outcome under unexposed |
+|---|---|---|---|
+| $L$ | $A$ | $Y(A=1)$ |$Y(A=0)$ |  
+| sex | `RHC` | length of stay under `RHC`  | length of stay under `no RHC` | 
 
 ### Restructure the data to estimate treatment effect
 
@@ -72,6 +104,10 @@ and the difference between these two means is the **treatment effect**.
 
 ### Treat the problem as a missing value problem
 
+```{block, type='rmdcomment'}
+Restructure the problem as a missing data problem.
+```
+
 Instead of just estimating treatment effect on an average level, an alternate could be to
 
 - impute **mean outcomes for the treated subjects**
@@ -85,12 +121,35 @@ small.data$Y1[is.na(small.data$Y1)] <- round(m.Y1)
 small.data$Y0[is.na(small.data$Y0)] <- round(m.Y0)
 small.data$TE <- small.data$Y1 - small.data$Y0
 m.Y1 <- mean(small.data$Y1)
+m.Y1
 m.Y0 <- mean(small.data$Y0)
+m.Y0
 m.TE <- mean(small.data$TE)
 mean.values <- round(c(NA,NA, NA, m.Y1, m.Y0, m.TE),0)
 small.data2 <- rbind(small.data, mean.values)
-kable(small.data2, booktabs = TRUE, digits=1,
-             col.names = c("Subject ID","Sex",
+small.data2$Y1[1:6] <- cell_spec(small.data2$Y1[1:6], 
+                            color = ifelse(small.data2$Y1[1:6] 
+                                           == round(m.Y1), 
+                                           "red", "black"),
+                            background = ifelse(small.data2$Y1[1:6] 
+                                           == round(m.Y1), 
+                                           "yellow", "white"),
+                            bold = ifelse(small.data2$Y1[1:6] 
+                                           == round(m.Y1), 
+                                           TRUE, FALSE))
+small.data2$Y0[1:6] <- cell_spec(small.data2$Y0[1:6], 
+                            color = ifelse(small.data2$Y0[1:6] 
+                                           == round(m.Y0), 
+                                           "red", "black"),
+                            background = ifelse(small.data2$Y0[1:6] 
+                                           == round(m.Y0), 
+                                           "yellow", "white"),
+                            bold = ifelse(small.data2$Y0[1:6] 
+                                           == round(m.Y0), 
+                                           TRUE, FALSE))
+kable(small.data2, booktabs = TRUE, 
+      digits=1, escape = FALSE,
+      col.names = c("Subject ID","Sex",
                            "RHC status (A)", 
                            "Y when A=1 (RHC)", 
                            "Y when A=0 (no RHC)", 
@@ -101,7 +160,9 @@ kable(small.data2, booktabs = TRUE, digits=1,
 
 ### Impute better value?
 
-However, assume that the effect of the treatment for **male** and **female** are not the same. Then, it might make more sense to 
+```{block, type='rmdcomment'}
+Assume that `sex` variable is acting as a **confounder**. Then, it might make more sense to restrict imputing outcome values specific to **male** and **female** participants.
+```
 
 - impute **means specific to males for male subjects**, and separately 
 - impute **means specific to females for female subjects**.
@@ -109,9 +170,13 @@ However, assume that the effect of the treatment for **male** and **female** are
 ```{r reg2re, cache=cachex, echo = TRUE}
 small.data <- small.data0
 m.Y1m <- mean(small.data$Y1[small.data$sex == "Male"], na.rm = TRUE)
+m.Y1m
 m.Y1f <- mean(small.data$Y1[small.data$sex == "Female"], na.rm = TRUE)
+m.Y1f
 m.Y0m <- mean(small.data$Y0[small.data$sex == "Male"], na.rm = TRUE)
+m.Y0m
 m.Y0f <- mean(small.data$Y0[small.data$sex == "Female"], na.rm = TRUE)
+m.Y0f
 m.TE.m <- m.Y1m-m.Y0m
 m.TE.f <- m.Y1f-m.Y0f
 mean.values.m <- c(NA,"Mean for males", NA, round(c(m.Y1m, m.Y0m, m.TE.m),1))
@@ -130,16 +195,28 @@ small.data$Y0[small.data$sex ==
                                                 "Female"])] <- round(m.Y0f,1)
 small.data$TE <- small.data$Y1 - small.data$Y0
 small.data2 <- rbind(small.data, mean.values.m,mean.values.f)
-kable(small.data2, booktabs = TRUE, digits=1,
-             col.names = c("Subject ID","Sex","RHC status (A)", 
+small.data2$Y1[1] <- cell_spec(round(m.Y1m,1), bold = TRUE,
+                            color = "red", background = "yellow")
+small.data2$Y0[5] <- cell_spec(round(m.Y0m,1), bold = TRUE,
+                            color = "red", background = "yellow")
+small.data2$Y1[c(4,6)] <- cell_spec(round(m.Y1f,1), bold = TRUE,
+                            color = "blue", background = "yellow")
+small.data2$Y0[c(2,3)] <- cell_spec(round(m.Y0f,1), bold = TRUE,
+                            color = "blue", background = "yellow")
+kable(small.data2, booktabs = TRUE, 
+      digits=1, escape = FALSE, 
+      col.names = c("Subject ID","Sex","RHC status (A)", 
                            "Y when A=1 (RHC)", "Y when A=0 (no RHC)", 
                            "Treatment Effect"))%>%
-  row_spec(7, bold = TRUE, color = "white", background = "#D7261E")%>%
-  row_spec(8, bold = TRUE, color = "white", background = "#D7261E")
+  row_spec(7, bold = TRUE, color = "white", background = "red")%>%
+  row_spec(8, bold = TRUE, color = "white", background = "blue")
 ```
 
 - Extending the problem to **other covariates**, you can see that we could condition on rest of the covariates (such as age, income, race, disease category) to get better imputation values. 
-- **Regression** is a generalized method to take mean conditional on many covariates.
+
+```{block, type='rmdcomment'}
+**Regression** is a generalized method to take mean conditional on many covariates.
+```
 
 ## Use Regression for predicting outcome
 
@@ -228,7 +305,7 @@ small.data01$Pred.TE <- small.data01$Pred.Y1 - small.data01$Pred.Y0
 m.Y1 <- mean(small.data01$Pred.Y1)
 m.Y0 <- mean(small.data01$Pred.Y0)
 mean.values <- round(c(NA,NA, m.Y1, m.Y0, m.Y1 -m.Y0),1)
-small.data2 <- rbind(small.data01, mean.values)
+small.data2 <- rbind(small.data01, mean.values) 
 kable(small.data2, booktabs = TRUE, digits=1,
              col.names = c("id","RHC status (A)",
                            "Y.hat when A=1 (RHC)",
@@ -237,7 +314,11 @@ kable(small.data2, booktabs = TRUE, digits=1,
   row_spec(7, bold = TRUE, color = "white", background = "#D7261E")
 ```
 
-From this table, it is easy to calculate treatment effect estimate. The process we just went through, is a version of **parametric G-computation**!
+From this table, it is easy to calculate treatment effect estimate. 
+
+```{block, type='rmdcomment'}
+The process we just went through, is a version of **parametric G-computation**!
+```
 
 ## Parametric G-computation
 
@@ -247,28 +328,45 @@ knitr::include_graphics("images/gcomp.png")
 
 ### Steps
 
-1. Fit the outcome regression on the exposure and covariates
-2. Extract outcome prediction by setting all $A=1$
-3. Extract outcome prediction by setting all $A=0$
-4. Substract these two outcome predictions to get treatment effect estimate
+|  |  |
+|-|-|
+|Step 1| Fit the outcome regression on the exposure and covariates: $Y \sim A + L$|
+|Step 2| Extract outcome prediction for treated $\hat{Y}_{A=1}$ by setting all $A=1$|
+|Step 3| Extract outcome prediction for untreated $\hat{Y}_{A=0}$ by setting all $A=0$|
+|Step 4| Subtract the mean of these two outcome predictions to get treatment effect estimate: $TE = E(\hat{Y}_{A=1}) - E(\hat{Y}_{A=0})$  |
 
-```{r reg2acnx, cache=cachex, echo = TRUE}
+
+#### Step 1
+
+Fit the outcome regression on the exposure and covariates: $Y \sim A + L$
+```{r reg2acnx001, cache=cachex, echo = TRUE}
 out.formula <- as.formula(paste("Y~ A +",
                                paste(baselinevars,
                                      collapse = "+")))
-# Step 1
 fit1 <- lm(out.formula, data = ObsData)
-# Step 2
+```
+#### Step 2
+
+Extract outcome prediction for treated $\hat{Y}_{A=1}$ by setting all $A=1$|
+```{r reg2acnx002, cache=cachex, echo = TRUE}
 ObsData$Pred.Y1 <- predict(fit1, 
                            newdata = data.frame(A = 1, 
                                                 dplyr::select(ObsData, !A)), 
                            type = "response")
-# Step 3
+```
+#### Step 3
+
+Extract outcome prediction for untreated $\hat{Y}_{A=0}$ by setting all $A=0$
+```{r reg2acnx003, cache=cachex, echo = TRUE}
 ObsData$Pred.Y0 <- predict(fit1, 
                            newdata = data.frame(A = 0, 
                                                 dplyr::select(ObsData, !A)), 
                            type = "response")
-# Step 4
+```
+#### Step 4
+
+Subtract the mean of these two outcome predictions to get treatment effect estimate: $TE = E(\hat{Y}_{A=1}) - E(\hat{Y}_{A=0})$ 
+```{r reg2acnx004, cache=cachex, echo = TRUE}
 ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
 ```
 
@@ -305,7 +403,11 @@ We already have an idea about the point estimate of the treatment effect:
 mean(ObsData$Pred.TE)
 ```
 
-However, for confidence interval estimates, bootstrap would be necessary. In the following example, we use $R = 250$.
+```{block, type='rmdcomment'}
+For confidence interval estimates for G-computation, bootstrap would be necessary. 
+```
+
+In the following example, we use $R = 250$.
 
 ```{r bootx, cache=cachex, echo = TRUE}
 require(boot)
