@@ -410,17 +410,25 @@ Relying on just a blackbox ML method may be dangerous to identify the roles of v
 <li>Assuming all covariates are measured, <strong>parametric models</strong> such as linear and logistic regressions are very efficient, but relies on strong assumptions. In real-world scenarios, it is often hard (if not impossible) to guess the correct specification of the right hand side of the regression equation.</li>
 <li>Machine learning (ML) methods are very helpful for prediction goals. They are also helpful in <strong>identifying complex functions</strong> (non-linearities and non-additive terms) of the covariates (again, assuming they are measured).</li>
 <li>There are many ML methods, but the procedures are very different, and they come with their own advantages and disadvantages. In a given real data, it is <strong>hard to apriori predict which is the best ML algorithm</strong> for a given problem.</li>
-<li>That’s where super learner is helpful in <strong>combining strength from various algorithms</strong>, and producing 1 prediction column that has <strong>optimal statistical properties</strong>.</li>
 </ul>
+<div class="rmdcomment">
+<p>
+Super learner is helpful in <strong>combining strength from various algorithms</strong>, and producing 1 prediction column that has <strong>optimal statistical properties</strong>.
+</p>
+</div>
 </div>
 <div id="causal-inference" class="section level3" number="8.2.2">
 <h3><span class="header-section-number">8.2.2</span> Causal inference</h3>
 <p><img src="images/dagci.png" width="242" /></p>
 <ul>
 <li>For causal inference goals (when we have a primary exposure of interest), machine learning methods are often misleading. This is primarily due to the fact that they usually do not have an inherent mechanism of focusing on <strong>primary exposure</strong> (RHC in this example); and treats the primary exposure as any other predictors.</li>
-<li>When using g-computation with ML methods, estimation of variance becomes a difficult problem. Generalized procedures such as <strong>robust SE or bootstrap methods</strong> are not supported by theory.</li>
-<li>That’s where TMLE methods shine, with the help of it’s important <strong>statistical properties (double robustness, finite sample properties)</strong>.</li>
+<li>When using g-computation with ML methods, estimation of variance becomes a difficult problem (with correct coverage). Generalized procedures such as <strong>robust SE or bootstrap methods</strong> are not supported by theory.</li>
 </ul>
+<div class="rmdcomment">
+<p>
+TMLE method shine, with the help of it’s important <strong>statistical properties (double robustness, finite sample properties)</strong>.
+</p>
+</div>
 </div>
 <div id="identifiability-assumptions" class="section level3" number="8.2.3">
 <h3><span class="header-section-number">8.2.3</span> Identifiability assumptions</h3>

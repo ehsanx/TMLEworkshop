@@ -544,7 +544,7 @@ One of the advantages of <code>caret</code> framework is that, it also allows ch
 <span id="cb96-8"><a href="g-computation-using-ml.html#cb96-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), </span>
 <span id="cb96-9"><a href="g-computation-using-ml.html#cb96-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>,<span class="st">&quot;blue&quot;</span>))</span>
 <span id="cb96-10"><a href="g-computation-using-ml.html#cb96-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(predY), <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code></pre></div>
-<p><img src="TMLEw_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p><img src="TMLEw_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
 <div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="g-computation-using-ml.html#cb97-1" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">RMSE</span>(predY,Y)</span></code></pre></div>
 <pre><code>## [1] 24.35099</code></pre>
 </div>
@@ -654,7 +654,7 @@ LASSO is a regularized method. One of the uses of these methods is “variable s
 <h2><span class="header-section-number">3.3</span> G-comp using SuperLearner</h2>
 <div class="rmdcomment">
 <p>
-SuperLearner is an ensemble MLtechnique, that uses <strong>cross-validation</strong> to find a weighted combination of estimates provided by different <strong>candidate learners</strong> (that help predict).
+SuperLearner is an ensemble ML technique, that uses <strong>cross-validation</strong> to find a weighted combination of estimates provided by different <strong>candidate learners</strong> (that help predict).
 </p>
 </div>
 <ul>
@@ -817,6 +817,8 @@ fit a <strong>meta learner</strong> (optimal weighted combination; below is a si
 <div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="g-computation-using-ml.html#cb132-1" aria-hidden="true" tabindex="-1"></a>fit.sl<span class="sc">$</span>coef</span></code></pre></div>
 <pre><code>##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
 ##     0.00000000     0.93740912     0.06259088</code></pre>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="g-computation-using-ml.html#cb134-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(fit.sl<span class="sc">$</span>coef)</span></code></pre></div>
+<pre><code>## [1] 1</code></pre>
 <p>Hence, in creating superlearner prediction column,</p>
 <ol style="list-style-type: lower-alpha">
 <li>Linear regression has no contribution</li>
@@ -827,8 +829,8 @@ fit a <strong>meta learner</strong> (optimal weighted combination; below is a si
 <li>A new prediction column is produced based on the fitted values from this meta regression.</li>
 </ul>
 <p>You can simply multiply these coefs to the predictions from candidate learners, and them sum them to get ensable SL. Here are the first 6 values:</p>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="g-computation-using-ml.html#cb134-1" aria-hidden="true" tabindex="-1"></a>SL.ens <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">t</span>(Yhat)<span class="sc">*</span>fit.sl<span class="sc">$</span>coef)</span>
-<span id="cb134-2"><a href="g-computation-using-ml.html#cb134-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(SL.ens)</span></code></pre></div>
+<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="g-computation-using-ml.html#cb136-1" aria-hidden="true" tabindex="-1"></a>SL.ens <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">t</span>(Yhat)<span class="sc">*</span>fit.sl<span class="sc">$</span>coef)</span>
+<span id="cb136-2"><a href="g-computation-using-ml.html#cb136-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(SL.ens)</span></code></pre></div>
 <pre><code>##   SL.glm_All SL.glmnet_All SL.xgboost_All
 ## 1          0      13.65919      0.9320378
 ## 2          0      27.15577      2.6773480
@@ -836,7 +838,7 @@ fit a <strong>meta learner</strong> (optimal weighted combination; below is a si
 ## 4          0      18.00642      1.5697163
 ## 5          0      11.42518      0.5520509
 ## 6          0      20.25714      0.7443745</code></pre>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="g-computation-using-ml.html#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.matrix</span>(<span class="fu">head</span>(<span class="fu">rowSums</span>(SL.ens)), <span class="at">ncol =</span> <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="g-computation-using-ml.html#cb138-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.matrix</span>(<span class="fu">head</span>(<span class="fu">rowSums</span>(SL.ens)), <span class="at">ncol =</span> <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>##       [,1]
 ## 1 14.59123
 ## 2 29.83312
@@ -845,7 +847,7 @@ fit a <strong>meta learner</strong> (optimal weighted combination; below is a si
 ## 5 11.97723
 ## 6 21.00152</code></pre>
 <p>Alternatively, you can get them directly from the package: here are the first 6 values</p>
-<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="g-computation-using-ml.html#cb138-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all.pred<span class="sc">$</span>pred)</span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="g-computation-using-ml.html#cb140-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all.pred<span class="sc">$</span>pred)</span></code></pre></div>
 <pre><code>##       [,1]
 ## 1 14.59123
 ## 2 29.83312
@@ -860,12 +862,12 @@ fit a <strong>meta learner</strong> (optimal weighted combination; below is a si
 <div id="g-comp-step-2-extract-outcome-prediction-as-if-everyone-is-treated-2" class="section level3" number="3.3.2">
 <h3><span class="header-section-number">3.3.2</span> G-comp step 2: Extract outcome prediction as if everyone is treated</h3>
 <p>We are going to use <strong>Ensamble SL</strong> predictions in the following calculations. If you wanted to use discrete SL predictions instead, that would be fine too.</p>
-<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="g-computation-using-ml.html#cb140-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb140-2"><a href="g-computation-using-ml.html#cb140-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
-<span id="cb140-3"><a href="g-computation-using-ml.html#cb140-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="g-computation-using-ml.html#cb142-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb142-2"><a href="g-computation-using-ml.html#cb142-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
+<span id="cb142-3"><a href="g-computation-using-ml.html#cb142-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span></code></pre></div>
 <pre><code>## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
 ## prediction from a rank-deficient fit may be misleading</code></pre>
-<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="g-computation-using-ml.html#cb142-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="g-computation-using-ml.html#cb144-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y1)</span></code></pre></div>
 <pre><code>##        V1        
 ##  Min.   :-31.15  
 ##  1st Qu.: 18.70  
@@ -876,12 +878,12 @@ fit a <strong>meta learner</strong> (optimal weighted combination; below is a si
 </div>
 <div id="g-comp-step-3-extract-outcome-prediction-as-if-everyone-is-untreated-2" class="section level3" number="3.3.3">
 <h3><span class="header-section-number">3.3.3</span> G-comp step 3: Extract outcome prediction as if everyone is untreated</h3>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="g-computation-using-ml.html#cb144-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb144-2"><a href="g-computation-using-ml.html#cb144-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
-<span id="cb144-3"><a href="g-computation-using-ml.html#cb144-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span></code></pre></div>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="g-computation-using-ml.html#cb146-1" aria-hidden="true" tabindex="-1"></a>ObsData.noY<span class="sc">$</span>A <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb146-2"><a href="g-computation-using-ml.html#cb146-2" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.Y0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit.sl, <span class="at">newdata =</span> ObsData.noY,</span>
+<span id="cb146-3"><a href="g-computation-using-ml.html#cb146-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)<span class="sc">$</span>pred</span></code></pre></div>
 <pre><code>## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
 ## prediction from a rank-deficient fit may be misleading</code></pre>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="g-computation-using-ml.html#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="g-computation-using-ml.html#cb148-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.Y0)</span></code></pre></div>
 <pre><code>##        V1        
 ##  Min.   :-33.10  
 ##  1st Qu.: 16.76  
@@ -892,12 +894,12 @@ fit a <strong>meta learner</strong> (optimal weighted combination; below is a si
 </div>
 <div id="g-comp-step-3-treatment-effect-estimate-1" class="section level3" number="3.3.4">
 <h3><span class="header-section-number">3.3.4</span> G-comp step 3: Treatment effect estimate</h3>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="g-computation-using-ml.html#cb148-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="g-computation-using-ml.html#cb150-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
 <p>Mean value of predicted treatment effect</p>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="g-computation-using-ml.html#cb149-1" aria-hidden="true" tabindex="-1"></a>TE3 <span class="ot">&lt;-</span> <span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE)</span>
-<span id="cb149-2"><a href="g-computation-using-ml.html#cb149-2" aria-hidden="true" tabindex="-1"></a>TE3</span></code></pre></div>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="g-computation-using-ml.html#cb151-1" aria-hidden="true" tabindex="-1"></a>TE3 <span class="ot">&lt;-</span> <span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE)</span>
+<span id="cb151-2"><a href="g-computation-using-ml.html#cb151-2" aria-hidden="true" tabindex="-1"></a>TE3</span></code></pre></div>
 <pre><code>## [1] 1.914702</code></pre>
-<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="g-computation-using-ml.html#cb151-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="g-computation-using-ml.html#cb153-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ObsData<span class="sc">$</span>Pred.TE)</span></code></pre></div>
 <pre><code>##        V1       
 ##  Min.   :1.099  
 ##  1st Qu.:1.849  
@@ -949,28 +951,28 @@ fit a <strong>meta learner</strong> (optimal weighted combination; below is a si
 <div id="choice-of-meta-learner-method" class="section level4" number="3.3.5.5">
 <h4><span class="header-section-number">3.3.5.5</span> Choice of meta learner method</h4>
 <p>It is easy to show that, depending on the choice of meta-learners, the coefficients of the meta learners can be slightly different.</p>
-<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="g-computation-using-ml.html#cb153-1" aria-hidden="true" tabindex="-1"></a>fit.sl2 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, </span>
-<span id="cb153-2"><a href="g-computation-using-ml.html#cb153-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method =</span> <span class="st">&quot;method.NNLS2&quot;</span>)</span>
-<span id="cb153-3"><a href="g-computation-using-ml.html#cb153-3" aria-hidden="true" tabindex="-1"></a>fit.sl2<span class="sc">$</span>coef</span></code></pre></div>
-<pre><code>##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
-##     0.00000000     0.93740912     0.06259088</code></pre>
 <div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="g-computation-using-ml.html#cb155-1" aria-hidden="true" tabindex="-1"></a>fit.sl2 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, </span>
-<span id="cb155-2"><a href="g-computation-using-ml.html#cb155-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method =</span> <span class="st">&quot;method.CC_LS&quot;</span>)</span>
+<span id="cb155-2"><a href="g-computation-using-ml.html#cb155-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method =</span> <span class="st">&quot;method.NNLS2&quot;</span>)</span>
 <span id="cb155-3"><a href="g-computation-using-ml.html#cb155-3" aria-hidden="true" tabindex="-1"></a>fit.sl2<span class="sc">$</span>coef</span></code></pre></div>
 <pre><code>##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
+##     0.00000000     0.93740912     0.06259088</code></pre>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="g-computation-using-ml.html#cb157-1" aria-hidden="true" tabindex="-1"></a>fit.sl2 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, </span>
+<span id="cb157-2"><a href="g-computation-using-ml.html#cb157-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method =</span> <span class="st">&quot;method.CC_LS&quot;</span>)</span>
+<span id="cb157-3"><a href="g-computation-using-ml.html#cb157-3" aria-hidden="true" tabindex="-1"></a>fit.sl2<span class="sc">$</span>coef</span></code></pre></div>
+<pre><code>##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
 ##     0.00000000     0.93662601     0.06337399</code></pre>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="g-computation-using-ml.html#cb157-1" aria-hidden="true" tabindex="-1"></a>fit.sl4 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, </span>
-<span id="cb157-2"><a href="g-computation-using-ml.html#cb157-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method =</span> <span class="st">&quot;method.CC_nloglik&quot;</span>)</span>
-<span id="cb157-3"><a href="g-computation-using-ml.html#cb157-3" aria-hidden="true" tabindex="-1"></a>fit.sl4<span class="sc">$</span>coef</span></code></pre></div>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="g-computation-using-ml.html#cb159-1" aria-hidden="true" tabindex="-1"></a>fit.sl4 <span class="ot">&lt;-</span> <span class="fu">recombineSL</span>(fit.sl, <span class="at">Y =</span> Y, </span>
+<span id="cb159-2"><a href="g-computation-using-ml.html#cb159-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method =</span> <span class="st">&quot;method.CC_nloglik&quot;</span>)</span>
+<span id="cb159-3"><a href="g-computation-using-ml.html#cb159-3" aria-hidden="true" tabindex="-1"></a>fit.sl4<span class="sc">$</span>coef</span></code></pre></div>
 <pre><code>##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
 ##              0              1              0</code></pre>
 <ul>
 <li><code>method.CC_LS</code> is <a href="https://si.biostat.washington.edu/sites/default/files/modules/lab1_0.pdf">suggested</a> as a good method for continuous outcome</li>
 <li><code>method.CC_nloglik</code> is <a href="https://si.biostat.washington.edu/sites/default/files/modules/lab1_0.pdf">suggested</a> as a good method for binary outcome</li>
 </ul>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="g-computation-using-ml.html#cb159-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(TE1, <span class="at">file =</span> <span class="st">&quot;data/gcompxg.RDS&quot;</span>)</span>
-<span id="cb159-2"><a href="g-computation-using-ml.html#cb159-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(TE2, <span class="at">file =</span> <span class="st">&quot;data/gcompls.RDS&quot;</span>)</span>
-<span id="cb159-3"><a href="g-computation-using-ml.html#cb159-3" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(TE3, <span class="at">file =</span> <span class="st">&quot;data/gcompsl.RDS&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="g-computation-using-ml.html#cb161-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(TE1, <span class="at">file =</span> <span class="st">&quot;data/gcompxg.RDS&quot;</span>)</span>
+<span id="cb161-2"><a href="g-computation-using-ml.html#cb161-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(TE2, <span class="at">file =</span> <span class="st">&quot;data/gcompls.RDS&quot;</span>)</span>
+<span id="cb161-3"><a href="g-computation-using-ml.html#cb161-3" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(TE3, <span class="at">file =</span> <span class="st">&quot;data/gcompsl.RDS&quot;</span>)</span></code></pre></div>
 
 </div>
 </div>
