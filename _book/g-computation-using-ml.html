@@ -253,14 +253,14 @@ div.csl-indent {
 <li class="chapter" data-level="3.2.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#a-regularized-model"><i class="fa fa-check"></i><b>3.2.1</b> A regularized model</a></li>
 <li class="chapter" data-level="3.2.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-step-2-extract-outcome-prediction-as-if-everyone-is-treated-1"><i class="fa fa-check"></i><b>3.2.2</b> G-comp step 2: Extract outcome prediction as if everyone is treated</a></li>
 <li class="chapter" data-level="3.2.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-step-3-extract-outcome-prediction-as-if-everyone-is-untreated-1"><i class="fa fa-check"></i><b>3.2.3</b> G-comp step 3: Extract outcome prediction as if everyone is untreated</a></li>
-<li class="chapter" data-level="3.2.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-step-3-treatment-effect-estimate"><i class="fa fa-check"></i><b>3.2.4</b> G-comp step 3: Treatment effect estimate</a></li>
+<li class="chapter" data-level="3.2.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-step-4-treatment-effect-estimate-1"><i class="fa fa-check"></i><b>3.2.4</b> G-comp step 4: Treatment effect estimate</a></li>
 </ul></li>
 <li class="chapter" data-level="3.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-using-superlearner"><i class="fa fa-check"></i><b>3.3</b> G-comp using SuperLearner</a>
 <ul>
 <li class="chapter" data-level="3.3.1" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#steps-1"><i class="fa fa-check"></i><b>3.3.1</b> Steps</a></li>
 <li class="chapter" data-level="3.3.2" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-step-2-extract-outcome-prediction-as-if-everyone-is-treated-2"><i class="fa fa-check"></i><b>3.3.2</b> G-comp step 2: Extract outcome prediction as if everyone is treated</a></li>
 <li class="chapter" data-level="3.3.3" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-step-3-extract-outcome-prediction-as-if-everyone-is-untreated-2"><i class="fa fa-check"></i><b>3.3.3</b> G-comp step 3: Extract outcome prediction as if everyone is untreated</a></li>
-<li class="chapter" data-level="3.3.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-step-3-treatment-effect-estimate-1"><i class="fa fa-check"></i><b>3.3.4</b> G-comp step 3: Treatment effect estimate</a></li>
+<li class="chapter" data-level="3.3.4" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#g-comp-step-4-treatment-effect-estimate-2"><i class="fa fa-check"></i><b>3.3.4</b> G-comp step 4: Treatment effect estimate</a></li>
 <li class="chapter" data-level="3.3.5" data-path="g-computation-using-ml.html"><a href="g-computation-using-ml.html#additional-details-for-sl"><i class="fa fa-check"></i><b>3.3.5</b> Additional details for SL</a></li>
 </ul></li>
 </ul></li>
@@ -422,7 +422,7 @@ G-computation is highly sensitive to on <strong>model misspecification</strong>;
 </ul>
 <div class="rmdcomment">
 <p>
-When we use same model for training and obtaining prediction, often the predictions are highly optimistic (RMSE is unrealistically low for future predictions), and we call this a <strong>over-fitting</strong> problem.
+When we use same <strong>data</strong> for training and obtaining prediction, often the predictions are highly optimistic (RMSE is unrealistically low for future predictions), and we call this a <strong>over-fitting</strong> problem.
 </p>
 </div>
 <ul>
@@ -632,8 +632,8 @@ LASSO is a regularized method. One of the uses of these methods is “variable s
 ##  3rd Qu.: 24.54  
 ##  Max.   : 35.42</code></pre>
 </div>
-<div id="g-comp-step-3-treatment-effect-estimate" class="section level3" number="3.2.4">
-<h3><span class="header-section-number">3.2.4</span> G-comp step 3: Treatment effect estimate</h3>
+<div id="g-comp-step-4-treatment-effect-estimate-1" class="section level3" number="3.2.4">
+<h3><span class="header-section-number">3.2.4</span> G-comp step 4: Treatment effect estimate</h3>
 <div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="g-computation-using-ml.html#cb113-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
 <p>Mean value of predicted treatment effect</p>
 <div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="g-computation-using-ml.html#cb114-1" aria-hidden="true" tabindex="-1"></a>TE2 <span class="ot">&lt;-</span> <span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE)</span>
@@ -892,8 +892,8 @@ fit a <strong>meta learner</strong> (optimal weighted combination; below is a si
 ##  3rd Qu.: 25.18  
 ##  Max.   : 55.86</code></pre>
 </div>
-<div id="g-comp-step-3-treatment-effect-estimate-1" class="section level3" number="3.3.4">
-<h3><span class="header-section-number">3.3.4</span> G-comp step 3: Treatment effect estimate</h3>
+<div id="g-comp-step-4-treatment-effect-estimate-2" class="section level3" number="3.3.4">
+<h3><span class="header-section-number">3.3.4</span> G-comp step 4: Treatment effect estimate</h3>
 <div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="g-computation-using-ml.html#cb150-1" aria-hidden="true" tabindex="-1"></a>ObsData<span class="sc">$</span>Pred.TE <span class="ot">&lt;-</span> ObsData<span class="sc">$</span>Pred.Y1 <span class="sc">-</span> ObsData<span class="sc">$</span>Pred.Y0  </span></code></pre></div>
 <p>Mean value of predicted treatment effect</p>
 <div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="g-computation-using-ml.html#cb151-1" aria-hidden="true" tabindex="-1"></a>TE3 <span class="ot">&lt;-</span> <span class="fu">mean</span>(ObsData<span class="sc">$</span>Pred.TE)</span>

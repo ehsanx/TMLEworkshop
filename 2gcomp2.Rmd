@@ -71,7 +71,7 @@ caret::RMSE(predY,Y)
 - What we have done here is we have used the `ObsData.matrix` data to train our model, and we have used `newdata = ObsData.matrix` to obtain prediction. 
 
 ```{block, type='rmdcomment'}
-When we use same model for training and obtaining prediction, often the predictions are highly optimistic (RMSE is unrealistically low for future predictions), and we call this a **over-fitting** problem.
+When we use same **data** for training and obtaining prediction, often the predictions are highly optimistic (RMSE is unrealistically low for future predictions), and we call this a **over-fitting** problem.
 ```
 
 - One way to deal with this problem is called Cross-validation.
@@ -267,7 +267,7 @@ ObsData$Pred.Y0 <- predict(fit4, newx = ObsData.matrix.A0,
 summary(ObsData$Pred.Y0)
 ```
 
-### G-comp step 3: Treatment effect estimate
+### G-comp step 4: Treatment effect estimate
 
 
 ```{r ML13br, cache=cachex, echo = TRUE}
@@ -501,7 +501,7 @@ ObsData$Pred.Y0 <- predict(fit.sl, newdata = ObsData.noY,
 summary(ObsData$Pred.Y0)
 ```
 
-### G-comp step 3: Treatment effect estimate
+### G-comp step 4: Treatment effect estimate
 
 
 ```{r ML13bs, cache=cachex, echo = TRUE}

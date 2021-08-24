@@ -73,7 +73,7 @@ using one real epidemiological data,
 The workshop was first developed for [R/Medicine
 Virtual Conference](https://r-medicine.org/schedule/) 2021, August 24th; title: `An Introductory R Guide for Targeted Maximum Likelihood Estimation in Medical Research'.
 
-Feel free to reach out for any comments, corrections, suggestions.
+Feel free to [reach out](https://ehsank.com/) for any comments, corrections, suggestions.
 
 ## Contributor list {-}
 
