@@ -610,7 +610,7 @@ Diagnostics do not necessarily look so good.
 <p>We also conduct propensity score pair matching analysis, as follows.</p>
 <div class="rmdcomment">
 <p>
-<strong>Note</strong>: In this workshop, we will not cover Propensity Score Matching (PSM) in this workshop. If you want to learn more about this, feel free to check out this other workshop: <a href="https://ehsanx.github.io/psw/">Understanding Propensity Score Matching</a>.
+<strong>Note</strong>: In this workshop, we will not cover Propensity Score Matching (PSM). If you want to learn more about this, feel free to check out this other workshop: <a href="https://ehsanx.github.io/psw/">Understanding Propensity Score Matching</a> and the <a href="https://www.youtube.com/watch?v=u4Nl7gnDEAY">video recording</a> on youtube.
 </p>
 </div>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="rhc-data-description.html#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">111</span>)</span>
@@ -736,6 +736,8 @@ Diagnostics do not necessarily look so good.
 </div>
 <div id="psm-results" class="section level4" number="1.7.1.2">
 <h4><span class="header-section-number">1.7.1.2</span> PSM results</h4>
+<div id="p-value" class="section level5" number="1.7.1.2.1">
+<h5><span class="header-section-number">1.7.1.2.1</span> p-value</h5>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="rhc-data-description.html#cb27-1" aria-hidden="true" tabindex="-1"></a>matched.data <span class="ot">&lt;-</span> <span class="fu">match.data</span>(match.obj)   </span>
 <span id="cb27-2"><a href="rhc-data-description.html#cb27-2" aria-hidden="true" tabindex="-1"></a>tab1y <span class="ot">&lt;-</span> <span class="fu">CreateTableOne</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>),</span>
 <span id="cb27-3"><a href="rhc-data-description.html#cb27-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> matched.data, <span class="at">strata =</span> <span class="st">&quot;A&quot;</span>, </span>
@@ -748,9 +750,12 @@ Diagnostics do not necessarily look so good.
 ##   Y (mean (SD)) 21.22 (25.36) 24.47 (28.79) &lt;0.001</code></pre>
 <div class="rmdcomment">
 <p>
-Hence, our conclusion based on propensity score pair matched data (<span class="math inline"><span class="math inline">\(p \lt 0.001\)</span></span>) is different than Table 5 in <span class="citation"><span class="citation"><a href="#ref-connors1996effectiveness" role="doc-biblioref">Connors et al.</a> (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span></span> (<span class="math inline"><span class="math inline">\(p = 0.14\)</span></span>). Variability in results for 1-to-1 matching is possible, and modelling choices may be different (we used caliper option here).
+Our conclusion based on propensity score pair matched data (<span class="math inline"><span class="math inline">\(p \lt 0.001\)</span></span>) is different than Table 5 in <span class="citation"><span class="citation"><a href="#ref-connors1996effectiveness" role="doc-biblioref">Connors et al.</a> (<a href="#ref-connors1996effectiveness" role="doc-biblioref">1996</a>)</span></span> (<span class="math inline"><span class="math inline">\(p = 0.14\)</span></span>). Variability in results for 1-to-1 matching is possible, and modelling choices may be different (we used caliper option here).
 </p>
 </div>
+</div>
+<div id="treatment-effect" class="section level5" number="1.7.1.2.2">
+<h5><span class="header-section-number">1.7.1.2.2</span> Treatment effect</h5>
 <ul>
 <li>We can also estimate the effect of <code>RHC</code> on <code>length of stay</code> using propensity score-matched sample:</li>
 </ul>
@@ -762,6 +767,7 @@ Hence, our conclusion based on propensity score pair matched data (<span class="
 ##  (Intercept)             21.22 [19.94;22.49]     &lt; 1e-04 
 ##            A              3.25   [1.45;5.05]   0.0004145</code></pre>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="rhc-data-description.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(fit.matched, <span class="at">file =</span> <span class="st">&quot;data/match.RDS&quot;</span>)   </span></code></pre></div>
+</div>
 </div>
 </div>
 <div id="tmle-in-rhc-data" class="section level3" number="1.7.2">

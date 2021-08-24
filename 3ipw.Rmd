@@ -1,7 +1,9 @@
 # IPTW
 
+In this chapter, we will cover PS and IPTW (or IPW).
+
 ```{block, type='rmdcomment'}
-In this chapter, we are primarily interested about **exposure modelling** (e.g., fixing imbalance first, before doing outcome analysis).
+We are now primarily interested about **exposure modelling** (e.g., fixing imbalance first, before doing outcome analysis).
 ```
 
 ```{r setup01i, include=FALSE}
@@ -66,7 +68,10 @@ require(Publish)
 publish(PS.fit,  format = "[u;l]")
 ```
 
-- Coef of PS model fit is not of concern 
+```{block, type='rmdcomment'}
+Coef of PS model fit is not of concern.  
+```
+
 - Model can be rich: to the extent that prediction is better
 - But look for multi-collinearity issues
   - SE too high?
@@ -75,6 +80,10 @@ Obtain the propesnity score (PS) values from the fit
 
 ```{r psx2, cache=TRUE, echo = TRUE}
 ObsData$PS <- predict(PS.fit, type="response")
+```
+
+```{block, type='rmdcomment'}
+These propensity score predictions (`PS`) are often represented as $g(A_i=1|L_i)$.
 ```
 
 Check summaries: 
@@ -101,14 +110,18 @@ Convert $PS$ to $IPW$  = $\frac{A}{PS} + \frac{1-A}{1-PS}$
 ```
 
 - Convert PS to IPW using the formula. We are using the formula for average treatment effect (ATE). 
-- It is possible to use alternative formulas, but we are using ATE formula for our illustration.
+
+```{block, type='rmdcomment'}
+It is possible to use alternative formulas, but we are using ATE formula for our illustration.
+```
+
 
 ```{r psx2c, cache=TRUE, echo = TRUE}
 ObsData$IPW <- ObsData$A/ObsData$PS + (1-ObsData$A)/(1-ObsData$PS)
 summary(ObsData$IPW)
 ```
 
-Also possible to use pre-packged software packages to do the same:
+Also possible to use pre-packaged software packages to do the same:
 
 ```{r psx2c2, cache=TRUE, echo = TRUE}
 require(WeightIt)

@@ -399,7 +399,7 @@ kable(results,digits = 2)%>%
 ```
 
 ```{block, type='rmdcomment'}
-@keele2021comparing used superlearner based on an ensemble of 3 different learners: (1) GLM, (2) random forests, and (3) LASSO.
+@keele2021comparing used TMLE-SL based on an ensemble of 3 different learners: (1) GLM, (2) random forests, and (3) LASSO.
 ```
 
 ## Other packages

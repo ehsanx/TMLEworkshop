@@ -47,7 +47,12 @@ This is the exposure model that we decided on:
 ps.formula
 ```
 
-Fit SuperLearner to estimate propensity scores. We again use the same candidate learners:
+```{block, type='rmdcomment'}
+Fit SuperLearner (SL) to estimate propensity scores. 
+```
+
+
+We again use the same candidate learners:
 
 - linear model
 - LASSO

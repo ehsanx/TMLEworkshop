@@ -345,6 +345,11 @@ out.formula <- as.formula(paste("Y~ A +",
                                      collapse = "+")))
 fit1 <- lm(out.formula, data = ObsData)
 ```
+
+```{block, type='rmdcomment'}
+$Q(A,L)$ is often used to represent the predictions from the G-comp model.
+```
+
 #### Step 2
 
 Extract outcome prediction for treated $\hat{Y}_{A=1}$ by setting all $A=1$|

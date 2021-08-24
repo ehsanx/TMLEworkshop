@@ -188,7 +188,7 @@ Table 5 in @connors1996effectiveness showed that, after propensity score pair (1
 We also conduct propensity score pair matching analysis, as follows. 
 
 ```{block, type='rmdcomment'}
-**Note**: In this workshop, we will not cover Propensity Score Matching (PSM) in this workshop. If you want to learn more about this, feel free to check out this other workshop: [Understanding Propensity Score Matching](https://ehsanx.github.io/psw/).
+**Note**: In this workshop, we will not cover Propensity Score Matching (PSM). If you want to learn more about this, feel free to check out this other workshop: [Understanding Propensity Score Matching](https://ehsanx.github.io/psw/) and the [video recording](https://www.youtube.com/watch?v=u4Nl7gnDEAY) on youtube.
 ```
 
 ```{r ps16854, cache=TRUE, echo = TRUE}
@@ -236,6 +236,8 @@ The love plot suggests satisfactory propensity score matching (all SMD < 0.1).
 
 #### PSM results
 
+##### p-value
+
 ```{r ps3, cache=TRUE, echo = TRUE}
 matched.data <- match.data(match.obj)   
 tab1y <- CreateTableOne(vars = c("Y"),
@@ -246,8 +248,10 @@ print(tab1y, showAllLevels = FALSE,
 ```
 
 ```{block, type='rmdcomment'}
-Hence, our conclusion based on propensity score pair matched data ($p  \lt 0.001$) is different than Table 5 in @connors1996effectiveness ($p = 0.14$). Variability in results for 1-to-1 matching is possible, and modelling choices may be different (we used caliper option here).
+Our conclusion based on propensity score pair matched data ($p  \lt 0.001$) is different than Table 5 in @connors1996effectiveness ($p = 0.14$). Variability in results for 1-to-1 matching is possible, and modelling choices may be different (we used caliper option here).
 ```
+
+##### Treatment effect
 
 - We can also estimate the effect of `RHC` on `length of stay` using propensity score-matched sample:
 

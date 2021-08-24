@@ -289,7 +289,7 @@ Notice that the mean is very similar to the parametric G-computation method.
 ## G-comp using SuperLearner
 
 ```{block, type='rmdcomment'}
-SuperLearner is an ensemble MLtechnique, that uses **cross-validation** to find a weighted combination of estimates provided by different **candidate learners** (that help predict).
+SuperLearner is an ensemble ML technique, that uses **cross-validation** to find a weighted combination of estimates provided by different **candidate learners** (that help predict).
 ```
 
 - There exists many candidate learners. Here we are using a combination of
@@ -446,11 +446,14 @@ scaled.coefs <- abs(coefs)/sum(abs(coefs))
 scaled.coefs
 ``` 
 
-
 Scaled coefs
 
 ```{r ML12stestcoef, cache=cachex, echo = TRUE}
 fit.sl$coef
+```
+
+```{r ML12stestcoef2b, cache=cachex, echo = TRUE}
+sum(fit.sl$coef)
 ```
 
 Hence, in creating superlearner prediction column,
