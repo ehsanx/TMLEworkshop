@@ -1,0 +1,2964 @@
+--- 
+title: "R Guide for TMLE in Medical Research"
+author: "Ehsan Karim & Hanna Frank"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output:
+  bookdown::html_document2:
+    includes:
+      in_header: header.html
+      css: [style.css]
+  bookdown::gitbook:
+    includes:
+      in_header: header.html
+  bookdown::pdf_book:
+    includes:
+      in_header: header.html
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: ehsanx/intro2R
+description: "Intro to R."
+header-includes: 
+  - \usepackage{tcolorbox}
+  - \newtcolorbox{blackbox}{colback=black,colframe=orange,coltext=white,boxsep=5pt,arc=4pt}
+  - \usepackage{color}
+  - \usepackage{framed}
+  - \setlength{\fboxsep}{.8em}
+---
+
+\newenvironment{blackbox}{
+  \definecolor{shadecolor}{rgb}{0, 0, 0}  % black
+  \color{white}
+  \begin{shaded}}
+ {\end{shaded}}
+
+# Preface {-}
+
+## Background  {-}
+
+In comparative effectiveness studies, researchers typically use propensity score methods. However, propensity score methods have known limitations in real-world scenarios, when the true data generating mechanism is unknown. **Targeted maximum likelihood estimation** (TMLE) is an alternative estimation method with a number of desirable statistical properties. It is a doubly robust method, making use of both the outcome model and propensity score model to generate an unbiased estimate as long as at least one of the models is correctly specified. TMLE also enables the integration of machine learning approaches. Despite the fact that this method has been shown to perform better than propensity score methods in a variety of scenarios, it is **not widely used in medical research** as the implementation details of this approach are generally not well understood. 
+
+## Goal  {-}
+
+In this workshop we will present an introductory tutorial explaining an overview of 
+
+- TMLE and 
+- some of the relevant methods 
+  - G-computation and 
+  - IPW 
+
+using one real epidemiological data, 
+
+- the steps to use the methods in R, and 
+- a demonstration of relevant R packages. 
+
+## Philosophy  {-}
+
+**Code-first** philosophy is adopted for this workshop; demonstrating the **analyses through one real data analysis** problem used in the literature. 
+
+- This workshop is not theory-focused, nor utilizes simulated data to explain the ideas. Given the focus on implementation, theory is beyond the scope of this workshop. 
+- At the end of the workshop, we will provide key references where the theories are well explained.
+
+## Pre-requisites {-}
+
+- Basic understanding of *R* language is required. 
+- A general understanding of *multiple regression* is expected. 
+- Familiarity with *machine learning* and *epidemiological* core concepts would be helpful, but not required. 
+- Deep understanding of *causal inference* or *advanced statistical inference* knowledge is not expected. 
+
+## Version history {-}
+
+The workshop was first developed for [R/Medicine
+Virtual Conference](https://r-medicine.org/schedule/) 2021, August 24th; title: `An Introductory R Guide for Targeted Maximum Likelihood Estimation in Medical Research'.
+
+Feel free to reach out for any comments, corrections, suggestions.
+
+## Contributor list {-}
+
+|||
+|---|---|
+| [Hanna Frank](https://www.linkedin.com/in/hanna-f-940813b9/) (SPPH, UBC) | [Ehsan Karim](https://ehsank.com/) (SPPH, UBC) |  
+## License {-}
+
+```{r, echo=FALSE, out.width="25%"}
+knitr::include_graphics("images/by-nc-sa.png")
+```
+
+The online version of this book is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) International License. You may share, adapt the content and may distribute your contributions under the same license (CC BY-NC-SA 4.0), but you have to give appropriate credit, and cannot use material for the commercial purposes.
+
+```{block, type='rmdcomment'}
+**How to cite**
+
+Karim, ME and Frank, H (2021) "R Guide for TMLE in Medical Research", URL: [ehsanx.github.io/TMLEworkshop/](https://ehsanx.github.io/TMLEworkshop/), (v1.1). Zenodo. https://doi.org/10.5281/zenodo.5246085
+```
+
+<!--chapter:end:index.Rmd-->
+
+# RHC data description
+
+```{r setup01, include=FALSE}
+require(tableone)
+require(Publish)
+require(MatchIt)
+require(cobalt)
+```
+
+There is a widespread belief among cardiologists that the right heart catheterization (RHC hereafter; a monitoring device for measurement of cardiac function) is helpful in managing critically ill patients in the intensive care unit. @connors1996effectiveness examined the association of 
+
+- *RHC use* during the first 24 hours of care in the intensive care unit and 
+- a number of health-outcomes such as *length of stay* (hospital).
+
+## Data download
+
+```{block, type='rmdcomment'}
+Data is freely available from [Vanderbilt Biostatistics](https://hbiostat.org/data/).
+```
+
+
+```{r, cache=TRUE}
+# load the dataset
+ObsData <- read.csv("https://hbiostat.org/data/repo/rhc.csv", header = TRUE)
+saveRDS(ObsData, file = "data/rhc.RDS")
+```
+
+## Analytic data
+
+Below we show the process of creating the analytic data (optional).
+
+```{r, warning=FALSE}
+# add column for outcome Y: length of stay 
+# Y = date of discharge - study admission date
+# Y = date of death - study admission date if date of discharge not available
+ObsData$Y <- ObsData$dschdte - ObsData$sadmdte
+ObsData$Y[is.na(ObsData$Y)] <- ObsData$dthdte[is.na(ObsData$Y)] - 
+  ObsData$sadmdte[is.na(ObsData$Y)]
+# remove outcomes we are not examining in this example
+ObsData <- dplyr::select(ObsData, 
+                         !c(dthdte, lstctdte, dschdte, death, t3d30, dth30, surv2md1))
+# remove unnecessary and problematic variables 
+ObsData <- dplyr::select(ObsData, 
+                         !c(sadmdte, ptid, X, adld3p, urin1, cat2))
+
+# convert all categorical variables to factors 
+factors <- c("cat1", "ca", "cardiohx", "chfhx", "dementhx", "psychhx", 
+             "chrpulhx", "renalhx", "liverhx", "gibledhx", "malighx", 
+             "immunhx", "transhx", "amihx", "sex", "dnr1", "ninsclas", 
+             "resp", "card", "neuro", "gastr", "renal", "meta", "hema", 
+             "seps", "trauma", "ortho", "race", "income")
+ObsData[factors] <- lapply(ObsData[factors], as.factor)
+# convert our treatment A (RHC vs. No RHC) to a binary variable
+ObsData$A <- ifelse(ObsData$swang1 == "RHC", 1, 0)
+ObsData <- dplyr::select(ObsData, !swang1)
+# Categorize the variables to match with the original paper
+ObsData$age <- cut(ObsData$age,breaks=c(-Inf, 50, 60, 70, 80, Inf),right=FALSE)
+ObsData$race <- factor(ObsData$race, levels=c("white","black","other"))
+ObsData$sex <- as.factor(ObsData$sex)
+ObsData$sex <- relevel(ObsData$sex, ref = "Male")
+ObsData$cat1 <- as.factor(ObsData$cat1)
+levels(ObsData$cat1) <- c("ARF","CHF","Other","Other","Other",
+                          "Other","Other","MOSF","MOSF")
+ObsData$ca <- as.factor(ObsData$ca)
+levels(ObsData$ca) <- c("Metastatic","None","Localized (Yes)")
+ObsData$ca <- factor(ObsData$ca, levels=c("None",
+                                          "Localized (Yes)","Metastatic"))
+# Rename variables
+names(ObsData) <- c("Disease.category", "Cancer", "Cardiovascular", 
+                    "Congestive.HF", "Dementia", "Psychiatric", "Pulmonary", 
+                    "Renal", "Hepatic", "GI.Bleed", "Tumor", 
+                    "Immunosupperssion", "Transfer.hx", "MI", "age", "sex", 
+                    "edu", "DASIndex", "APACHE.score", "Glasgow.Coma.Score", 
+                    "blood.pressure", "WBC", "Heart.rate", "Respiratory.rate", 
+                    "Temperature", "PaO2vs.FIO2", "Albumin", "Hematocrit", 
+                    "Bilirubin", "Creatinine", "Sodium", "Potassium", "PaCo2", 
+                    "PH", "Weight", "DNR.status", "Medical.insurance", 
+                    "Respiratory.Diag", "Cardiovascular.Diag", 
+                    "Neurological.Diag", "Gastrointestinal.Diag", "Renal.Diag",
+                    "Metabolic.Diag", "Hematologic.Diag", "Sepsis.Diag", 
+                    "Trauma.Diag", "Orthopedic.Diag", "race", "income", 
+                    "Y", "A")
+saveRDS(ObsData, file = "data/rhcAnalytic.RDS")
+```
+
+## Notations
+
+|Notations| Example in RHC study|
+|---|---|
+|$A$: Exposure status  | RHC |  
+|$Y$: Observed outcome  | length of stay  |  
+|$L$: Covariates  | See below |  
+
+## Variables
+
+```{r vars, cache=TRUE, echo = TRUE}
+baselinevars <- names(dplyr::select(ObsData, 
+                         !c(A,Y)))
+baselinevars
+```
+
+## Table 1 stratified by RHC exposure
+
+```{block, type='rmdcomment'}
+Only for some demographic and co-morbidity variables; match with Table 1 in @connors1996effectiveness.
+```
+
+
+```{r tab0, cache=TRUE, echo = TRUE}
+require(tableone)
+tab0 <- CreateTableOne(vars = c("age", "sex", "race", "Disease.category", "Cancer"),
+                       data = ObsData, 
+                       strata = "A", 
+                       test = FALSE)
+print(tab0, showAllLevels = FALSE, )
+```
+
+```{block, type='rmdcomment'}
+Only outcome variable (Length of stay); slightly different than Table 2 in @connors1996effectiveness (means 20.5 vs. 25.7; and medians 13 vs. 17).
+```
+
+```{r tab1, cache=TRUE, echo = TRUE}
+tab1 <- CreateTableOne(vars = c("Y"),
+                       data = ObsData, 
+                       strata = "A", 
+                       test = FALSE)
+print(tab1, showAllLevels = FALSE, )
+median(ObsData$Y[ObsData$A==0]); median(ObsData$Y[ObsData$A==1])
+```
+
+## Basic regression analysis
+
+### Crude analysis
+
+```{r reg1, cache=TRUE, echo = TRUE, results='hide'}
+# adjust the exposure variable (primary interest)
+fit0 <- lm(Y~A, data = ObsData)
+require(Publish)
+crude.fit <- publish(fit0, digits=1)$regressionTable[2,]
+```
+
+```{r reg1c, cache=TRUE, echo = TRUE}
+crude.fit
+```
+
+
+### Adjusted analysis
+
+```{r reg2, cache=TRUE, echo = TRUE, results='hide'}
+# adjust the exposure variable (primary interest) + covariates
+out.formula <- as.formula(paste("Y~ A +", 
+                               paste(baselinevars, 
+                                     collapse = "+")))
+fit1 <- lm(out.formula, data = ObsData)
+adj.fit <- publish(fit1, digits=1)$regressionTable[2,]
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(fit1, file = "data/adjreg.RDS")
+```
+
+```{r reg2a, cache=TRUE, echo = TRUE}
+out.formula
+adj.fit
+```
+
+### Regression diagnostics
+
+```{r reg2a578, cache=TRUE, echo = TRUE}
+plot(fit1)
+```
+
+```{block, type='rmdcomment'}
+Diagnostics do not necessarily look so good. 
+```
+
+
+## Comparison with literature
+
+```{block, type='rmdcomment'}
+@connors1996effectiveness conducted a propensity score matching analysis. 
+```
+
+Table 5 in @connors1996effectiveness showed that, after propensity score pair (1-to-1) matching, means of length of stay ($Y$), when stratified by RHC ($A$) were not significantly different ($p = 0.14$). 
+
+### PSM in RHC data
+
+We also conduct propensity score pair matching analysis, as follows. 
+
+```{block, type='rmdcomment'}
+**Note**: In this workshop, we will not cover Propensity Score Matching (PSM). If you want to learn more about this, feel free to check out this other workshop: [Understanding Propensity Score Matching](https://ehsanx.github.io/psw/) and the [video recording](https://www.youtube.com/watch?v=u4Nl7gnDEAY) on youtube.
+```
+
+```{r ps16854, cache=TRUE, echo = TRUE}
+set.seed(111)
+require(MatchIt)
+ps.formula <- as.formula(paste("A~", 
+                paste(baselinevars, collapse = "+")))
+PS.fit <- glm(ps.formula,family="binomial", 
+              data=ObsData)
+ObsData$PS <- predict(PS.fit, 
+                      newdata = ObsData, type="response") 
+```
+
+
+
+```{r ps2, cache=TRUE, echo = TRUE}
+logitPS <-  -log(1/ObsData$PS - 1)  
+match.obj <- matchit(ps.formula, data =ObsData,
+                     distance = ObsData$PS,
+                     method = "nearest", replace=FALSE,
+                     ratio = 1,
+                     caliper = .2*sd(logitPS))
+```
+
+#### PSM diagnostics
+
+```{r ps2x, cache=TRUE, echo = TRUE}
+require(cobalt)
+bal.plot(match.obj,  
+         var.name = "distance", 
+         which = "both", 
+         type = "histogram",  
+         mirror = TRUE)
+bal.tab(match.obj, un = TRUE, 
+        thresholds = c(m = .1))
+```
+
+
+```{r ps2b, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+love.plot(match.obj, binary = "std", 
+          thresholds = c(m = .1))  
+```
+
+The love plot suggests satisfactory propensity score matching (all SMD < 0.1).
+
+#### PSM results
+
+##### p-value
+
+```{r ps3, cache=TRUE, echo = TRUE}
+matched.data <- match.data(match.obj)   
+tab1y <- CreateTableOne(vars = c("Y"),
+               data = matched.data, strata = "A", 
+               test = TRUE)
+print(tab1y, showAllLevels = FALSE, 
+      test = TRUE)
+```
+
+```{block, type='rmdcomment'}
+Our conclusion based on propensity score pair matched data ($p  \lt 0.001$) is different than Table 5 in @connors1996effectiveness ($p = 0.14$). Variability in results for 1-to-1 matching is possible, and modelling choices may be different (we used caliper option here).
+```
+
+##### Treatment effect
+
+- We can also estimate the effect of `RHC` on `length of stay` using propensity score-matched sample:
+
+```{r ps12ryy, cache=TRUE, echo = TRUE}
+fit.matched <- glm(Y~A,
+            family=gaussian,  
+            data = matched.data)  
+publish(fit.matched)
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(fit.matched, file = "data/match.RDS")   
+```
+
+### TMLE in RHC data
+
+There are other papers that have used RHC data [@keele2021comparing;@keele2018pre]. 
+
+```{block, type='rmdcomment'}
+@keele2021comparing used TMLE (with super learner) method in estimating the impact of RHC on length of stay, and found point estimate $2.01 (95\% CI: 0.6-3.41)$.  
+```
+
+In today's workshop, we will learn about TMLE-SL methods.
+
+
+
+<!--chapter:end:1RHC.Rmd-->
+
+# G-computation
+
+```{r setup01g, include=FALSE}
+require(huxtable)
+require(boot)
+require(knitr)
+require(glmnet)
+require(kableExtra)
+require(dplyr)
+require(xgboost)
+require(SuperLearner)
+options(knitr.kable.NA = '')
+cachex=TRUE
+```
+
+
+## Closer look at the data
+
+```{r reg2r, cache=cachex, echo = TRUE}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+dim(ObsData)
+```
+
+In this dataset, we have 
+
+- `r prettyNum(dim(ObsData)[1],big.mark=",",scientific=FALSE)` subjects, 
+- 1 outcome variable ($Y$ = length of stay), 
+- 1 exposure variable ($A$ = RHC status), and 
+- `r dim(ObsData)[2]-2` covariates.
+
+### View data from 6 participants
+
+```{block, type='rmdcomment'}
+Let's focus on only first 6 columns, with only 3 variables.
+```
+
+```{r reg2rb, cache=cachex, echo = TRUE}
+small.data <- ObsData[1:6,c("sex","A","Y")]
+kable(small.data)
+```
+
+### New notations
+
+|Notations| Example in RHC study|
+|---|---|
+|$A$: Exposure status  | RHC |  
+|$Y$: Observed outcome  | length of stay  |  
+|$Y(A=1)$ = potential outcome when exposed  | length of stay when RHC used  |  
+|$Y(A=0)$ = potential outcome when not exposed  | length of stay when RHC not used  |  
+|$L$: covariates  | $49$ covariates  |  
+
+```{block, type='rmdcomment'}
+For explaining the concepts in this chapter, we will convert our data representation 
+```
+
+- from
+
+| Covariate | Exposure | Observed outcome |
+|---|---|---|
+| $L$ | $A$ | $Y$ |  
+| sex | `RHC` | length of stay |
+
+- to the following representation:
+
+| Covariate | Exposure | Outcome under exposed | Outcome under unexposed |
+|---|---|---|---|
+| $L$ | $A$ | $Y(A=1)$ |$Y(A=0)$ |  
+| sex | `RHC` | length of stay under `RHC`  | length of stay under `no RHC` | 
+
+### Restructure the data to estimate treatment effect
+
+In causal inference literature, often the data is structured in such a way that the outcomes $Y$ under different treatments $A$ are in different columns. What we are doing here is we are distinguishing $Y(A=1)$ from $Y(A=0)$.
+
+```{r reg2rc, cache=cachex, echo = TRUE}
+small.data$id <- c("John","Emma","Isabella","Sophia","Luke", "Mia")
+small.data$Y1 <- ifelse(small.data$A==1, small.data$Y, NA)
+small.data$Y0 <- ifelse(small.data$A==0, small.data$Y, NA)
+small.data$TE <- small.data$Y1 - small.data$Y0
+small.data <- small.data[c("id", "sex","A","Y1","Y0", "TE")]
+small.data$Y <- NULL
+small.data$sex <- as.character(small.data$sex)
+m.Y1 <- mean(small.data$Y1, na.rm = TRUE)
+m.Y0 <- mean(small.data$Y0, na.rm = TRUE)
+mean.values <- round(c(NA,NA, NA, m.Y1, m.Y0,
+                 m.Y1 - m.Y0),0)
+small.data2 <- rbind(small.data, mean.values)
+kable(small.data2, booktabs = TRUE, digits=1,
+             col.names = c("Subject ID","Sex",
+                           "RHC status (A)", 
+                           "Y when A=1 (RHC)", 
+                           "Y when A=0 (no RHC)", 
+                           "Treatment Effect"))%>%
+  row_spec(7, bold = TRUE, color = "white", 
+           background = "#D7261E")
+```
+
+Then it is easy to see 
+
+- the mean outcome under treated group (`RHC`)
+- the mean outcome under untreated group (`no RHC`)
+
+and the difference between these two means is the **treatment effect**.
+
+### Treat the problem as a missing value problem
+
+```{block, type='rmdcomment'}
+Restructure the problem as a missing data problem.
+```
+
+Instead of just estimating treatment effect on an average level, an alternate could be to
+
+- impute **mean outcomes for the treated subjects**
+- impute **mean outcomes for the untreated subjects**
+- Calculate individual treatment effect estimate
+- then calculate the **average treatment effect**
+
+```{r reg2rd, cache=cachex, echo = TRUE}
+small.data0 <- small.data
+small.data$Y1[is.na(small.data$Y1)] <- round(m.Y1)
+small.data$Y0[is.na(small.data$Y0)] <- round(m.Y0)
+small.data$TE <- small.data$Y1 - small.data$Y0
+m.Y1 <- mean(small.data$Y1)
+m.Y1
+m.Y0 <- mean(small.data$Y0)
+m.Y0
+m.TE <- mean(small.data$TE)
+mean.values <- round(c(NA,NA, NA, m.Y1, m.Y0, m.TE),0)
+small.data2 <- rbind(small.data, mean.values)
+small.data2$Y1[1:6] <- cell_spec(small.data2$Y1[1:6], 
+                            color = ifelse(small.data2$Y1[1:6] 
+                                           == round(m.Y1), 
+                                           "red", "black"),
+                            background = ifelse(small.data2$Y1[1:6] 
+                                           == round(m.Y1), 
+                                           "yellow", "white"),
+                            bold = ifelse(small.data2$Y1[1:6] 
+                                           == round(m.Y1), 
+                                           TRUE, FALSE))
+small.data2$Y0[1:6] <- cell_spec(small.data2$Y0[1:6], 
+                            color = ifelse(small.data2$Y0[1:6] 
+                                           == round(m.Y0), 
+                                           "red", "black"),
+                            background = ifelse(small.data2$Y0[1:6] 
+                                           == round(m.Y0), 
+                                           "yellow", "white"),
+                            bold = ifelse(small.data2$Y0[1:6] 
+                                           == round(m.Y0), 
+                                           TRUE, FALSE))
+kable(small.data2, booktabs = TRUE, 
+      digits=1, escape = FALSE,
+      col.names = c("Subject ID","Sex",
+                           "RHC status (A)", 
+                           "Y when A=1 (RHC)", 
+                           "Y when A=0 (no RHC)", 
+                           "Treatment Effect"))%>%
+  row_spec(7, bold = TRUE, color = "white", 
+           background = "#D7261E")
+```
+
+### Impute better value?
+
+```{block, type='rmdcomment'}
+Assume that `sex` variable is acting as a **confounder**. Then, it might make more sense to restrict imputing outcome values specific to **male** and **female** participants.
+```
+
+- impute **means specific to males for male subjects**, and separately 
+- impute **means specific to females for female subjects**.
+
+```{r reg2re, cache=cachex, echo = TRUE}
+small.data <- small.data0
+m.Y1m <- mean(small.data$Y1[small.data$sex == "Male"], na.rm = TRUE)
+m.Y1m
+m.Y1f <- mean(small.data$Y1[small.data$sex == "Female"], na.rm = TRUE)
+m.Y1f
+m.Y0m <- mean(small.data$Y0[small.data$sex == "Male"], na.rm = TRUE)
+m.Y0m
+m.Y0f <- mean(small.data$Y0[small.data$sex == "Female"], na.rm = TRUE)
+m.Y0f
+m.TE.m <- m.Y1m-m.Y0m
+m.TE.f <- m.Y1f-m.Y0f
+mean.values.m <- c(NA,"Mean for males", NA, round(c(m.Y1m, m.Y0m, m.TE.m),1))
+mean.values.f <- c(NA,"Mean for females", NA, round(c(m.Y1f, m.Y0f, m.TE.f),1))
+small.data$Y1[small.data$sex == 
+                "Male"][is.na(small.data$Y1[small.data$sex == 
+                                              "Male"])] <- round(m.Y1m,1)
+small.data$Y0[small.data$sex == 
+                "Male"][is.na(small.data$Y0[small.data$sex == 
+                                              "Male"])] <- round(m.Y0m,1)
+small.data$Y1[small.data$sex == 
+                "Female"][is.na(small.data$Y1[small.data$sex == 
+                                                "Female"])] <- round(m.Y1f,1)
+small.data$Y0[small.data$sex == 
+                "Female"][is.na(small.data$Y0[small.data$sex == 
+                                                "Female"])] <- round(m.Y0f,1)
+small.data$TE <- small.data$Y1 - small.data$Y0
+small.data2 <- rbind(small.data, mean.values.m,mean.values.f)
+small.data2$Y1[1] <- cell_spec(round(m.Y1m,1), bold = TRUE,
+                            color = "red", background = "yellow")
+small.data2$Y0[5] <- cell_spec(round(m.Y0m,1), bold = TRUE,
+                            color = "red", background = "yellow")
+small.data2$Y1[c(4,6)] <- cell_spec(round(m.Y1f,1), bold = TRUE,
+                            color = "blue", background = "yellow")
+small.data2$Y0[c(2,3)] <- cell_spec(round(m.Y0f,1), bold = TRUE,
+                            color = "blue", background = "yellow")
+kable(small.data2, booktabs = TRUE, 
+      digits=1, escape = FALSE, 
+      col.names = c("Subject ID","Sex","RHC status (A)", 
+                           "Y when A=1 (RHC)", "Y when A=0 (no RHC)", 
+                           "Treatment Effect"))%>%
+  row_spec(7, bold = TRUE, color = "white", background = "red")%>%
+  row_spec(8, bold = TRUE, color = "white", background = "blue")
+```
+
+- Extending the problem to **other covariates**, you can see that we could condition on rest of the covariates (such as age, income, race, disease category) to get better imputation values. 
+
+```{block, type='rmdcomment'}
+**Regression** is a generalized method to take mean conditional on many covariates.
+```
+
+## Use Regression for predicting outcome
+
+Let us fit the outcome with all covariates, including the exposure status.
+
+```{r reg2r2b, cache=cachex, echo = TRUE}
+# isolate the names of baseline covariates
+baselinevars <- names(dplyr::select(ObsData, !c(A,Y)))
+# adjust the exposure variable (primary interest) + covariates
+out.formula <- as.formula(paste("Y~ A +", 
+                               paste(baselinevars, 
+                                     collapse = "+")))
+fit1 <- lm(out.formula, data = ObsData)
+coef(fit1)
+```
+
+### Predict outcome for treated
+
+- Using the regression fit, we can obtain predicted outcome values for the treated. 
+- We are not only predicting for the unobserved, but also for the observed values when a person was treated.
+
+```{r reg2ab, cache=cachex, echo = TRUE}
+ObsData$Pred.Y1 <- predict(fit1, 
+                           newdata = data.frame(A = 1, 
+                                                dplyr::select(ObsData, !A)), 
+                           type = "response")
+```
+
+Mean predicted outcome for treated
+
+```{r reg2abv, cache=cachex, echo = TRUE}
+mean(ObsData$Pred.Y1)
+hist(ObsData$Pred.Y1, 
+     main = "Histogram for predicted outcome for treated", 
+     xlab = "Y(A=1)")
+abline(v=mean(ObsData$Pred.Y1),col="blue", lwd = 4)
+```
+
+### Look at the predicted outcome data for treated
+
+```{r reg2abx, cache=cachex, echo = TRUE}
+small.data1 <- ObsData[1:6,c("A","Pred.Y1")]
+small.data1$id <- c("John","Emma","Isabella","Sophia","Luke", "Mia")
+small.data1 <- small.data1[c("id", "A","Pred.Y1")]
+kable(small.data1, booktabs = TRUE, digits=1,
+             col.names = c("id","RHC status (A)", 
+                           "Y.hat when A=1 (RHC)"))
+```
+
+### Predict outcome for untreated
+
+```{r reg2ac, cache=cachex, echo = TRUE}
+ObsData$Pred.Y0 <- predict(fit1, 
+                           newdata = data.frame(A = 0, 
+                                                dplyr::select(ObsData, !A)), 
+                           type = "response")
+```
+
+Mean predicted outcome for untreated
+
+```{r reg2ac2, cache=cachex, echo = TRUE}
+mean(ObsData$Pred.Y0)
+hist(ObsData$Pred.Y0, 
+     main = "Histogram for predicted outcome for untreated", 
+     xlab = "Y(A=0)")
+abline(v=mean(ObsData$Pred.Y0),col="blue", lwd = 4)
+```
+
+### Look at the predicted outcome data for untreated
+
+```{r reg2acx, cache=cachex, echo = TRUE}
+small.data0 <- ObsData[1:6,c("A","Pred.Y0")]
+small.data0$id <- c("John","Emma","Isabella","Sophia","Luke", "Mia")
+small.data0 <- small.data0[c("id", "A","Pred.Y0")]
+kable(small.data0, booktabs = TRUE, digits=1,
+             col.names = c("id","RHC status (A)", 
+                           "Y.hat when A=0 (no RHC)"))
+```
+
+### Look at the predicted outcome data for all!
+
+```{r reg2ad, cache=cachex, echo = TRUE}
+small.data01 <- small.data1
+small.data01$Pred.Y0 <- small.data0$Pred.Y0
+small.data01$Pred.TE <- small.data01$Pred.Y1 - small.data01$Pred.Y0
+m.Y1 <- mean(small.data01$Pred.Y1)
+m.Y0 <- mean(small.data01$Pred.Y0)
+mean.values <- round(c(NA,NA, m.Y1, m.Y0, m.Y1 -m.Y0),1)
+small.data2 <- rbind(small.data01, mean.values) 
+kable(small.data2, booktabs = TRUE, digits=1,
+             col.names = c("id","RHC status (A)",
+                           "Y.hat when A=1 (RHC)",
+                           "Y.hat when A=0 (no RHC)",
+                           "Treatment Effect"))%>%
+  row_spec(7, bold = TRUE, color = "white", background = "#D7261E")
+```
+
+From this table, it is easy to calculate treatment effect estimate. 
+
+```{block, type='rmdcomment'}
+The process we just went through, is a version of **parametric G-computation**!
+```
+
+## Parametric G-computation
+
+```{r gcomppic, echo=FALSE, fig.cap="Defining treatment effect in terms of potential outcomes and observations", out.width = '70%'}
+knitr::include_graphics("images/gcomp.png")
+```
+
+### Steps
+
+|  |  |
+|-|-|
+|Step 1| Fit the outcome regression on the exposure and covariates: $Y \sim A + L$|
+|Step 2| Extract outcome prediction for treated $\hat{Y}_{A=1}$ by setting all $A=1$|
+|Step 3| Extract outcome prediction for untreated $\hat{Y}_{A=0}$ by setting all $A=0$|
+|Step 4| Subtract the mean of these two outcome predictions to get treatment effect estimate: $TE = E(\hat{Y}_{A=1}) - E(\hat{Y}_{A=0})$  |
+
+
+#### Step 1
+
+Fit the outcome regression on the exposure and covariates: $Y \sim A + L$
+```{r reg2acnx001, cache=cachex, echo = TRUE}
+out.formula <- as.formula(paste("Y~ A +",
+                               paste(baselinevars,
+                                     collapse = "+")))
+fit1 <- lm(out.formula, data = ObsData)
+```
+
+```{block, type='rmdcomment'}
+$Q(A,L)$ is often used to represent the predictions from the G-comp model.
+```
+
+#### Step 2
+
+Extract outcome prediction for treated $\hat{Y}_{A=1}$ by setting all $A=1$|
+```{r reg2acnx002, cache=cachex, echo = TRUE}
+ObsData$Pred.Y1 <- predict(fit1, 
+                           newdata = data.frame(A = 1, 
+                                                dplyr::select(ObsData, !A)), 
+                           type = "response")
+```
+#### Step 3
+
+Extract outcome prediction for untreated $\hat{Y}_{A=0}$ by setting all $A=0$
+```{r reg2acnx003, cache=cachex, echo = TRUE}
+ObsData$Pred.Y0 <- predict(fit1, 
+                           newdata = data.frame(A = 0, 
+                                                dplyr::select(ObsData, !A)), 
+                           type = "response")
+```
+#### Step 4
+
+Subtract the mean of these two outcome predictions to get treatment effect estimate: $TE = E(\hat{Y}_{A=1}) - E(\hat{Y}_{A=0})$ 
+```{r reg2acnx004, cache=cachex, echo = TRUE}
+ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
+```
+
+### Treatment effect estimate
+
+Mean value of predicted treatment effect 
+
+```{r reg2acnx1, cache=cachex, echo = TRUE}
+TE <- mean(ObsData$Pred.TE)
+TE
+```
+
+SD of treatment effect
+
+```{r reg2acnx2, cache=cachex, echo = TRUE}
+sd(ObsData$Pred.TE)
+```
+
+
+```{r reg2acnx3, cache=cachex, echo = TRUE}
+hist(ObsData$Pred.TE, 
+     main = "Histogram for predicted treatment effect", 
+     xlab = "Y(A=1) - Y(A=0)")
+abline(v=mean(ObsData$Pred.TE),col="blue", lwd = 4)
+```
+
+This shows that the SD estimate is useless from g-computation method directly.
+
+## Estimating the confidence intervals
+
+We already have an idea about the point estimate of the treatment effect:
+
+```{r reg2acnx1rev, cache=cachex, echo = TRUE}
+mean(ObsData$Pred.TE)
+```
+
+```{block, type='rmdcomment'}
+For confidence interval estimates for G-computation, bootstrap would be necessary. 
+```
+
+In the following example, we use $R = 250$.
+
+```{r bootx, cache=cachex, echo = TRUE}
+require(boot)
+gcomp.boot <- function(formula = out.formula, data = ObsData, indices) {
+  boot_sample <- data[indices, ]
+  fit.boot <- lm(formula, data = boot_sample)
+  Pred.Y1 <- predict(fit.boot, 
+                     newdata = data.frame(A = 1, 
+                                          dplyr::select(boot_sample, !A)), 
+                           type = "response")
+  Pred.Y0 <- predict(fit.boot, 
+                     newdata = data.frame(A = 0, 
+                                          dplyr::select(boot_sample, !A)), 
+                           type = "response")
+  Pred.TE <- mean(Pred.Y1) - mean(Pred.Y0)
+  return(Pred.TE)
+}
+set.seed(123)
+gcomp.res <- boot(data=ObsData, 
+                  statistic=gcomp.boot,
+                  R=250, 
+                  formula=out.formula)
+```
+
+Below we show the resulting estimates from $R$ bootstrap samples.
+
+```{r bootx2, cache=cachex, echo = TRUE}
+plot(gcomp.res) 
+```
+
+Below are two versions of confidence interval. 
+
+- One is based on normality assumption: point estimate - and + with 1.96 multiplied by SD estimate
+- Another is based on percentiles
+
+```{r bootx3, cache=cachex, echo = TRUE}
+CI1 <- boot.ci(gcomp.res, type="norm") 
+CI1
+CI2 <- boot.ci(gcomp.res, type="perc")
+CI2
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(TE, file = "data/gcomp.RDS")
+saveRDS(CI2, file = "data/gcompci.RDS")
+```
+
+
+<!--chapter:end:2gcomp.Rmd-->
+
+# G-computation using ML
+
+```{r setup01gm, include=FALSE}
+require(knitr)
+require(glmnet)
+require(kableExtra)
+require(dplyr)
+require(xgboost)
+require(caret)
+require(SuperLearner)
+options(knitr.kable.NA = '')
+cachex=TRUE
+```
+
+```{block, type='rmdcomment'}
+G-computation is highly sensitive to on **model misspecification**; and when model is **not correctly specified**, result is subject to bias. 
+```
+
+- Therefore, it can be a good idea to use **machine learning** methods, that are more flexible, than parametric methods to estimate the treatment effect.
+- Although ML methods are powerful in point estimation, the **coverage probabilities** are usually poor when more flexible methods are used, if inference is one of the goals. Hence we are focusing on **point estimation** here.
+
+## G-comp using Regression tree
+
+```{r reg2sl, cache=cachex, echo = TRUE}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+baselinevars <- names(dplyr::select(ObsData, !A))
+out.formula <- as.formula(paste("Y~ A +",
+                               paste(baselinevars,
+                                     collapse = "+")))
+```
+
+### A tree based algorithm
+
+XGBoost is a fast version of gradient boosting algorithm. Let us use this one to fit the data first. We follow the exact same procedure that we followed in the parametric G-computation setting.
+
+```{r ML1, cache=cachex, echo = TRUE, warning= FALSE}
+require(xgboost)
+Y <-ObsData$Y 
+ObsData.matrix <- model.matrix(out.formula, data = ObsData)
+```
+
+
+```{r ML1fit, cache=cachex, echo = TRUE}
+fit3 <- xgboost(data = ObsData.matrix, 
+                label = Y,
+                max.depth = 10, 
+                eta = 1, 
+                nthread = 15, 
+                nrounds = 100, 
+                alpha = 0.5,
+                objective = "reg:squarederror", 
+                verbose = 0)
+```
+
+
+```{r ML1fit2, cache=cachex, echo = TRUE}
+predY <- predict(fit3, newdata = ObsData.matrix)
+plot(density(Y), 
+     col = "red", 
+     main = "Predicted and observed Y",
+     xlim = c(1,100))  
+legend("topright", 
+       c("Y","Predicted Y"), 
+       lty = c(1,2), 
+       col = c("red","blue"))
+lines(density(predY), col = "blue", lty = 2)
+caret::RMSE(predY,Y)
+```
+
+- What we have done here is we have used the `ObsData.matrix` data to train our model, and we have used `newdata = ObsData.matrix` to obtain prediction. 
+
+```{block, type='rmdcomment'}
+When we use same model for training and obtaining prediction, often the predictions are highly optimistic (RMSE is unrealistically low for future predictions), and we call this a **over-fitting** problem.
+```
+
+- One way to deal with this problem is called Cross-validation.
+
+### Cross-validation
+
+Cross-validation means
+
+- splitting the data into
+  - training data
+  - testing data
+
+
+```{block, type='rmdcomment'}
+In each iteration: (1) Fitting models in training data (2) obtaining prediction $\hat{Y}$ in test data (3) obtain all RMSEs from each iteration, and (4) average all RMSEs.
+```
+
+```{r cvpic, echo = FALSE, out.width = "650px", fig.cap="Cross validation from [wiki](https://en.wikipedia.org/wiki/Cross-validation_(statistics)); training data = used for building model; test data = used for prediction from the model that was built using training data; each iteration = fold"}
+knitr::include_graphics("images/CV.png")
+```
+
+#### Cross-validation using caret
+
+We use `caret` package to do cross-validation. 
+
+```{block, type='rmdcomment'}
+`caret` is a general framework package for machine learning that can also incorporate other ML approaches such as `xgboost`.
+```
+
+```{r ML1car, cache=cachex, echo = TRUE}
+require(caret)
+set.seed(123)
+X_ObsData.matrix <- xgb.DMatrix(ObsData.matrix)
+Y_ObsData <- ObsData$Y
+```
+
+Below we define $K = 3$ for cross-validation. Ideally for a sample size close to $n=5,000$, we would select $K=10$, but for learning / demonstration / computational time-saving purposes, we just use $K = 3$. 
+
+```{r ML1carx, cache=cachex, echo = TRUE}
+xgb_trcontrol = trainControl(
+  method = "cv",
+  number = 3,  
+  allowParallel = TRUE,
+  verboseIter = FALSE,
+  returnData = FALSE
+)
+```
+
+#### Fine tuning
+
+```{block, type='rmdcomment'}
+One of the advantages of `caret` framework is that, it also allows checking the impact of various parameters (can do **fine tuning**).  
+```
+
+For example, 
+
+- for interaction depth, we previously use `max.depth = 10`. That means $covariate^{10}$ polynomial.
+- We could also check if other interaction depth choices (such as $covariate^{2}$ or $covariate^{4}$) would be better in terms of honest predictions.
+
+```{r ML1carxy, cache=cachex, echo = TRUE}
+xgbGrid <- expand.grid(
+  nrounds = 100, 
+  max_depth = seq(2,10,2),
+  eta = 1,
+  gamma = 0,
+  colsample_bytree = 0.1,
+  min_child_weight = 2,
+  subsample = 0.5 
+)
+```
+
+
+#### Fit model with CV
+
+once we set
+
+- resampling or cross-validation settings
+- parameter grid
+
+we can fit the model:
+
+```{r ML1car2, cache=cachex, echo = TRUE}
+fit.xgb <- train(
+  X_ObsData.matrix, Y_ObsData,  
+  trControl = xgb_trcontrol,
+  method = "xgbTree",
+  tuneGrid = xgbGrid,
+  verbose = FALSE
+)
+fit.xgb
+```
+
+Based on the loss function (say, RMSE) it automatically chose the best tuning parameter set:
+
+```{r ML1car3, cache=cachex, echo = TRUE}
+fit.xgb$bestTune$max_depth
+``` 
+
+```{r}
+predY <- predict(fit.xgb, newdata = ObsData.matrix)
+plot(density(Y), 
+     col = "red", 
+     main = "Predicted and observed Y",
+     xlim = c(1,100))  
+legend("topright", 
+       c("Y","Predicted Y"), 
+       lty = c(1,2), 
+       col = c("red","blue"))
+lines(density(predY), col = "blue", lty = 2)
+caret::RMSE(predY,Y)
+```
+
+
+### G-comp step 2: Extract outcome prediction as if everyone is treated
+
+```{r ML12, cache=cachex, echo = TRUE}
+ObsData.matrix.A1 <- ObsData.matrix 
+ObsData.matrix.A1[,"A"] <- 1
+ObsData$Pred.Y1 <- predict(fit.xgb, newdata = ObsData.matrix.A1)
+summary(ObsData$Pred.Y1)
+```
+
+### G-comp step 3: Extract outcome prediction as if everyone is untreated
+
+
+```{r ML13, cache=cachex, echo = TRUE}
+ObsData.matrix.A0 <- ObsData.matrix
+ObsData.matrix.A0[,"A"] <- 0
+ObsData$Pred.Y0 <- predict(fit.xgb, newdata = ObsData.matrix.A0)
+summary(ObsData$Pred.Y0)
+```
+
+### G-comp step 4: Treatment effect estimate
+
+
+```{r ML13b, cache=cachex, echo = TRUE}
+ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
+```
+
+
+Mean value of predicted treatment effect 
+
+```{r reg2acnx1b, cache=cachex, echo = TRUE}
+TE1 <- mean(ObsData$Pred.TE)
+TE1
+summary(ObsData$Pred.TE)
+```
+
+Notice that the mean is slightly different than the parametric G-computation method.
+
+## G-comp using regularized methods
+
+### A regularized model
+
+```{block, type='rmdcomment'}
+LASSO is a regularized method. One of the uses of these methods is "variable selection" or addressing concerns of multicollinearity. 
+```
+
+Let us use this method to fit our data. 
+
+- We are again using cross-validation here, and we chose $K=3$.
+
+```{r ML1r, cache=cachex, echo = TRUE, warning=FALSE}
+require(glmnet)
+Y <-ObsData$Y
+ObsData.matrix <- model.matrix(out.formula, data = ObsData)
+fit4 <-  cv.glmnet(x = ObsData.matrix, 
+                y = Y,
+                alpha = 1,
+                nfolds = 3,
+                relax=TRUE)
+```
+
+
+### G-comp step 2: Extract outcome prediction as if everyone is treated
+
+```{r ML12r, cache=cachex, echo = TRUE}
+ObsData.matrix.A1 <- ObsData.matrix 
+ObsData.matrix.A1[,"A"] <- 1
+ObsData$Pred.Y1 <- predict(fit4, newx = ObsData.matrix.A1,
+                           s = "lambda.min")
+summary(ObsData$Pred.Y1)
+```
+
+### G-comp step 3: Extract outcome prediction as if everyone is untreated
+
+
+```{r ML13r, cache=cachex, echo = TRUE}
+ObsData.matrix.A0 <- ObsData.matrix
+ObsData.matrix.A0[,"A"] <- 0
+ObsData$Pred.Y0 <- predict(fit4, newx = ObsData.matrix.A0,
+                           s = "lambda.min")
+summary(ObsData$Pred.Y0)
+```
+
+### G-comp step 3: Treatment effect estimate
+
+
+```{r ML13br, cache=cachex, echo = TRUE}
+ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
+
+```
+
+
+Mean value of predicted treatment effect 
+
+```{r reg2acnx1br, cache=cachex, echo = TRUE}
+TE2 <- mean(ObsData$Pred.TE)
+TE2
+summary(ObsData$Pred.TE)
+```
+
+Notice that the mean is very similar to the parametric G-computation method.
+
+## G-comp using SuperLearner
+
+```{block, type='rmdcomment'}
+SuperLearner is an ensemble ML technique, that uses **cross-validation** to find a weighted combination of estimates provided by different **candidate learners** (that help predict).
+```
+
+- There exists many candidate learners. Here we are using a combination of
+  - linear regression
+  - Regularized regression (lasso)
+  - gradient boosting (tree based)
+  
+### Steps  
+
+|  |  |
+|-|-|
+|Step 1| Identify candidate learners|
+|Step 2| Choose Cross-validation K|
+|Step 3| Select loss function for meta learner|
+|Step 4| Find SL prediction: (1) Discrete SL (2) Ensamble SL |
+
+
+#### Identify candidate learners
+
+- Choose variety of candidate learners 
+   - parametric (linear or logistic regression)
+    - regularized (LASSO, ridge, elasticnet)
+    - stepwise
+   - non-parametric 
+    - transformation (SVM, NN)
+    - tree based (bagging, boosting)
+   - smoothing or spline (gam)
+- tune the candidate learners for better performance
+  - tree depth
+  - tune regularization parameters
+  - variable selection
+
+```{r ML1s00, cache=cachex, echo = TRUE}
+SL.library.chosen=c("SL.glm", "SL.glmnet", "SL.xgboost")
+```
+
+  
+**SuperLearner** is an ensemble learning method. Let us use this one to fit the data first.
+
+#### Choose Cross-validation K
+
+To combat against optimism, we use cross-validation. SuperLearner first **splits** the data according to chosen $K$ fold for the cross-validation. 
+
+```{r ML1s000, cache=cachex, echo = TRUE}
+cvControl.chosen = list(V = 3)
+```
+
+#### Select loss function for meta learner and estimate risk
+
+```{block, type='rmdcomment'}
+The goal is to minimize the estimated risk (i.e., minimize the difference of $Y$ and $\hat{Y}$) that comes out of a model. 
+```
+
+<!---
+For each fold, estimate a **measure of performance** (could be RMSE) in test sets based on models that was built using training sets
+
+$RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^n (Y - \hat{Y})^2}$ for continuous $Y$
+
+- we obtain risk estimate in each fold (from test data)
+- we average all the estimates risks
+---->
+
+We can chose a (non-negative) least squares loss function for the meta learner (explained below):
+
+```{r ML1s0, cache=cachex, echo = TRUE}
+loss.chosen = "method.NNLS"
+```
+
+#### Find SL prediction
+
+We first fit the super learner:
+
+```{r ML1s, cache=cachex, echo = TRUE, results='hide', warning = FALSE}
+require(SuperLearner)
+ObsData.noY <- dplyr::select(ObsData, !Y)
+fit.sl <- SuperLearner(Y=ObsData$Y, 
+                       X=ObsData.noY, 
+                       cvControl = cvControl.chosen,
+                       SL.library=SL.library.chosen,
+                       method=loss.chosen,
+                       family="gaussian")
+```
+
+We can also obtain the predictions from each candidate learners.
+
+```{r ML12stest0, cache=cachex, echo = TRUE}
+all.pred <- predict(fit.sl, type = "response")
+Yhat <- all.pred$library.predict
+head(Yhat)
+```  
+
+We can obtain the $K$-fold cross-validated risk estimates for each candidate learners.
+
+```{r ML12stestrisk, cache=cachex, echo = TRUE}
+fit.sl$cvRisk
+```
+
+Once we have the performance measures and predictions from candidate learners, we could go one of **two routes** here
+
+##### Discrete SL
+
+```{block, type='rmdcomment'}
+Get measure of performance from all folds are averaged, and choose the **best** one. The prediction from the chosen learners are then used.
+```
+
+`glmnet` has the lowest cross-validated risk
+
+```{r ML12stest, cache=cachex, echo = TRUE}
+lowest.risk.learner <- names(which(
+  fit.sl$cvRisk == min(fit.sl$cvRisk)))
+lowest.risk.learner
+as.matrix(head(Yhat[,lowest.risk.learner]), 
+          ncol=1)
+```  
+
+##### Ensamble SL 
+
+Here are the first 6 rows from the candidate learner predictions:
+
+```{r ML12stestx, cache=cachex, echo = TRUE}
+head(Yhat)
+``` 
+
+```{block, type='rmdcomment'}
+fit a **meta learner** (optimal weighted combination; below is a simplified description)
+```
+
+- using
+  - linear regression (without intercept, but could produce -ve coefs) or 
+  - preferably non-negative least squares for 
+  
+  $Y_{obs}$ $\sim$ $\hat{Y}_{SL.glm}$ + $\hat{Y}_{SL.glmnet}$ + $\hat{Y}_{SL.xgboost}$. 
+
+- Obtain the regression coefs $\mathbf{\beta}$ = ($\beta_{SL.glm}$, $\beta_{SL.glmnet}$, $\beta_{SL.xgboost}$) for each $\hat{Y}$, 
+- scale them to 1 
+  - $\mathbf{\beta_{scaled}}$ = $\mathbf{\beta}$ / $\sum_{i=1}^3{\mathbf{\beta}}$; 
+  - so that the  sum of scaled coefs =  1 
+- Scaled coefficients $\mathbf{\beta_{scaled}}$ represents the **value / importance of the corresponding candidate learner**. 
+
+```{r ML12stestxreg, cache=cachex, echo = TRUE, include= FALSE}
+# fit.meta <- lm(Y ~ 0 + Yhat)
+# lm produces -ve
+# non-negative least squares (NNLS)
+fit.meta <- nnls::nnls(A=Yhat,b=Y)
+# alternate would be to use glmnet
+# fit.meta <- glmnet(X, Yhat, 
+#                    lambda = 0, 
+#                    lower.limits = 0, 
+#                    intercept = FALSE)
+fit.meta
+coefs <- coef(fit.meta)
+coefs
+scaled.coefs <- abs(coefs)/sum(abs(coefs))
+scaled.coefs
+``` 
+
+Scaled coefs
+
+```{r ML12stestcoef, cache=cachex, echo = TRUE}
+fit.sl$coef
+```
+
+```{r ML12stestcoef2b, cache=cachex, echo = TRUE}
+sum(fit.sl$coef)
+```
+
+Hence, in creating superlearner prediction column,
+
+a. Linear regression has no contribution
+b. lasso has majority contribution
+c. gradient boosting of tree has some minimal contribution
+
+- A new prediction column is produced based on the fitted values from this meta regression.
+
+You can simply multiply these coefs to the predictions from candidate learners, and them sum them to get ensable SL. Here are the first 6 values:
+
+```{r ML12stestb0, cache=cachex, echo = TRUE}
+SL.ens <- t(t(Yhat)*fit.sl$coef)
+head(SL.ens)
+as.matrix(head(rowSums(SL.ens)), ncol = 1)
+```  
+
+Alternatively, you can get them directly from the package: here are the first 6 values
+
+```{r ML12stestb, cache=cachex, echo = TRUE}
+head(all.pred$pred)
+```  
+
+The last column is coming from Ensamble SL.
+
+### G-comp step 2: Extract outcome prediction as if everyone is treated
+
+We are going to use **Ensamble SL** predictions in the following calculations. If you wanted to use discrete SL predictions instead, that would be fine too.
+
+```{r ML12s, cache=cachex, echo = TRUE}
+ObsData.noY$A <- 1
+ObsData$Pred.Y1 <- predict(fit.sl, newdata = ObsData.noY,
+                           type = "response")$pred
+summary(ObsData$Pred.Y1)
+```
+
+### G-comp step 3: Extract outcome prediction as if everyone is untreated
+
+
+```{r ML13s, cache=cachex, echo = TRUE}
+ObsData.noY$A <- 0
+ObsData$Pred.Y0 <- predict(fit.sl, newdata = ObsData.noY,
+                           type = "response")$pred
+summary(ObsData$Pred.Y0)
+```
+
+### G-comp step 3: Treatment effect estimate
+
+
+```{r ML13bs, cache=cachex, echo = TRUE}
+ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0  
+
+```
+
+
+Mean value of predicted treatment effect 
+
+```{r reg2acnx1bs, cache=cachex, echo = TRUE}
+TE3 <- mean(ObsData$Pred.TE)
+TE3
+summary(ObsData$Pred.TE)
+```
+
+### Additional details for SL
+
+#### Choice of K
+
+- simplest cross-validation splits the data into $K=2$ parts, but can go higher.
+  - select $K$ judiciously
+    - large sample size means small $K$ may be adequate
+      - for $n \lt 10,000$ consider $K=3$
+      - for $n \lt 500$ consider $K=20$
+    - smaller sample size means larger $K$ may be necessary
+      - for $n \lt 30$ consider leave 1 out 
+
+#### Alternative to CV
+
+- other similar algorithms such as **cross-fitting** had been shown to have better performances
+
+#### Rare outcome
+
+- for rare outcomes, consider using **stratification** to attempt to maintain training and test sample ratios the same
+
+#### Dependant sample
+
+- if data is clustered and not independent and identically distributed, use ID for the **cluster**
+
+#### Choice of meta learner method
+
+It is easy to show that, depending on the choice of meta-learners, the coefficients of the meta learners can be slightly different.
+
+```{r ML12lossf, cache=cachex, echo = TRUE}
+fit.sl2 <- recombineSL(fit.sl, Y = Y, 
+                       method = "method.NNLS2")
+fit.sl2$coef
+fit.sl2 <- recombineSL(fit.sl, Y = Y, 
+                       method = "method.CC_LS")
+fit.sl2$coef
+fit.sl4 <- recombineSL(fit.sl, Y = Y, 
+                       method = "method.CC_nloglik")
+fit.sl4$coef
+```
+
+- `method.CC_LS` is [suggested](https://si.biostat.washington.edu/sites/default/files/modules/lab1_0.pdf) as a good method for continuous outcome
+- `method.CC_nloglik` is [suggested](https://si.biostat.washington.edu/sites/default/files/modules/lab1_0.pdf) as a good method for binary outcome
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(TE1, file = "data/gcompxg.RDS")
+saveRDS(TE2, file = "data/gcompls.RDS")
+saveRDS(TE3, file = "data/gcompsl.RDS")
+```
+
+<!--chapter:end:2gcomp2.Rmd-->
+
+# IPTW
+
+In this chapter, we will cover PS and IPTW (or IPW).
+
+```{block, type='rmdcomment'}
+We are now primarily interested about **exposure modelling** (e.g., fixing imbalance first, before doing outcome analysis).
+```
+
+```{r setup01i, include=FALSE}
+require(knitr)
+require(glmnet)
+require(kableExtra)
+require(dplyr)
+require(xgboost)
+require(SuperLearner)
+require(Publish)
+require(tableone)
+require(survey)
+require(cobalt)
+require(WeightIt)
+options(knitr.kable.NA = '')
+cachex=TRUE
+```
+
+```{r reg2ps, cache=cachex, echo = TRUE}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+baselinevars <- names(dplyr::select(ObsData, !c(A,Y)))
+```
+
+## IPTW steps 
+
+**Modelling Steps**:
+
+According to @austin2011tutorial, we need to follow 4 steps:
+
+|  |  |
+|-|-|
+|Step 1| exposure modelling: $PS = Prob(A=1|L)$|
+|Step 2| Convert $PS$ to $IPW$  = $\frac{A}{PS} + \frac{1-A}{1-PS}$|
+|Step 3| Assess balance in weighted sample ($PS$ and $L$)|
+|Step 4| outcome modelling: $E(Y|A=1)$ to obtain treatment effect estimate  |
+
+## Step 1: exposure modelling
+
+```{block, type='rmdcomment'}
+Exposure modelling: $PS = Prob(A=1|L)$
+```
+
+```{r ps1, cache=cachex, echo = TRUE}
+ps.formula <- as.formula(paste("A ~",
+                               paste(baselinevars,
+                                     collapse = "+")))
+ps.formula
+```
+
+- Other than main effect terms, what other model specifications are possible?
+  - Common terms to add (indeed based on biological plausibility; requiring subject area knowledge)
+  - Interactions
+  - polynomials or splines
+  - transformations
+
+Fit logistic regression to estimate propensity scores
+
+```{r ps321xxx, cache=TRUE, echo = TRUE}
+PS.fit <- glm(ps.formula,family="binomial", data=ObsData)
+require(Publish)
+publish(PS.fit,  format = "[u;l]")
+```
+
+```{block, type='rmdcomment'}
+Coef of PS model fit is not of concern.  
+```
+
+- Model can be rich: to the extent that prediction is better
+- But look for multi-collinearity issues
+  - SE too high?
+
+Obtain the propesnity score (PS) values from the fit
+
+```{r psx2, cache=TRUE, echo = TRUE}
+ObsData$PS <- predict(PS.fit, type="response")
+```
+
+```{block, type='rmdcomment'}
+These propensity score predictions (`PS`) are often represented as $g(A_i=1|L_i)$.
+```
+
+Check summaries: 
+
+- enough overlap?
+- PS values very close to 0 or 1?
+
+```{r psx2b, cache=TRUE, echo = TRUE}
+summary(ObsData$PS)
+tapply(ObsData$PS, ObsData$A, summary)
+plot(density(ObsData$PS[ObsData$A==0]), 
+     col = "red", main = "")
+lines(density(ObsData$PS[ObsData$A==1]), 
+      col = "blue", lty = 2)
+legend("topright", c("No RHC","RHC"), 
+       col = c("red", "blue"), lty=1:2)
+```
+
+
+## Step 2: Convert PS to IPW 
+
+```{block, type='rmdcomment'}
+Convert $PS$ to $IPW$  = $\frac{A}{PS} + \frac{1-A}{1-PS}$
+```
+
+- Convert PS to IPW using the formula. We are using the formula for average treatment effect (ATE). 
+
+```{block, type='rmdcomment'}
+It is possible to use alternative formulas, but we are using ATE formula for our illustration.
+```
+
+
+```{r psx2c, cache=TRUE, echo = TRUE}
+ObsData$IPW <- ObsData$A/ObsData$PS + (1-ObsData$A)/(1-ObsData$PS)
+summary(ObsData$IPW)
+```
+
+Also possible to use pre-packaged software packages to do the same:
+
+```{r psx2c2, cache=TRUE, echo = TRUE}
+require(WeightIt)
+W.out <- weightit(ps.formula, 
+                    data = ObsData, 
+                    estimand = "ATE",
+                    method = "ps")
+summary(W.out$weights)
+```
+
+
+## Step 3: Balance checking
+
+```{block, type='rmdcomment'}
+Assess balance in weighted sample ($PS$ and $L$)
+```
+
+We can check balance numerically. 
+
+- We set SMD = 0.1 as threshold for balance.
+- $SMD \gt 0.1$ means we do not have balance
+
+```{r balp, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+require(cobalt)
+bal.tab(W.out, un = TRUE, 
+        thresholds = c(m = .1))
+```
+
+- We can also check this in a plot
+
+```{r balp2, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+require(cobalt)
+love.plot(W.out, binary = "std",
+          thresholds = c(m = .1),
+          abs = TRUE, 
+          var.order = "unadjusted", 
+          line = TRUE)
+```
+
+```{block, type='rmdcomment'}
+All covariates are balanced! Reverse engineered an RCT!?!
+```
+
+## Step 4: outcome modelling 
+
+```{block, type='rmdcomment'}
+Outcome modelling: $E(Y|A=1)$ to obtain treatment effect estimate
+```
+
+Estimate the effect of treatment on outcomes 
+
+```{r psx4, cache=TRUE, echo = TRUE}
+out.formula <- as.formula(Y ~ A)
+out.fit <- glm(out.formula,
+               data = ObsData,
+               weights = IPW)
+publish(out.fit)
+```
+
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(out.fit, file = "data/ipw.RDS")
+```
+
+<!--chapter:end:3ipw.Rmd-->
+
+# IPTW using ML
+
+Similar to G-computation, we will try to use machine learning methods, particularly Superlearner in estimating IPW estimates
+
+```{r ipw2setup01ic, include=FALSE}
+require(knitr)
+require(glmnet)
+require(kableExtra)
+require(dplyr)
+require(xgboost)
+require(Publish)
+require(tableone)
+require(survey)
+require(WeightIt)
+require(SuperLearner)
+options(knitr.kable.NA = '')
+cachex=TRUE
+```
+
+```{r ipw2reg2ps, cache=cachex, echo = TRUE}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+baselinevars <- names(dplyr::select(ObsData, !c(A,Y)))
+ps.formula <- as.formula(paste("A ~",
+                               paste(baselinevars,
+                                     collapse = "+")))
+```
+
+## IPTW Steps from SL
+
+**Modelling Steps**:
+
+We will still follow the same steps
+
+|  |  |
+|-|-|
+|Step 1| exposure modelling: $PS = Prob(A=1|L)$|
+|Step 2| Convert $PS$ to $IPW$  = $\frac{A}{PS} + \frac{1-A}{1-PS}$|
+|Step 3| Assess balance in weighted sample and overlap ($PS$ and $L$)|
+|Step 4| outcome modelling: $Prob(Y=1|A=1)$ to obtain treatment effect estimate|
+
+## Step 1: exposure modelling
+
+This is the exposure model that we decided on:
+
+```{r ipw2ps1, cache=cachex, echo = TRUE}
+ps.formula
+```
+
+```{block, type='rmdcomment'}
+Fit SuperLearner (SL) to estimate propensity scores. 
+```
+
+
+We again use the same candidate learners:
+
+- linear model
+- LASSO
+- gradient boosting
+
+```{r ipw2ps321xxx, cache=TRUE, echo = TRUE}
+require(SuperLearner)
+ObsData.noYA <- dplyr::select(ObsData, !c(Y,A))
+PS.fit.SL <- SuperLearner(Y=ObsData$A, 
+                       X=ObsData.noYA, 
+                       cvControl = list(V = 3),
+                       SL.library=c("SL.glm", "SL.glmnet", "SL.xgboost"), 
+                       method="method.NNLS",
+                       family="binomial")
+```
+
+Here, `method.AUC` is also possible to use instead of `method.NNLS` for binary response. We could use `cvControl = list(V = 3, stratifyCV = TRUE)` to make the splits be stratified by the binary response.
+
+Obtain the propesnity score (PS) values from the fit
+
+```{r ipw2psx2, cache=TRUE, echo = TRUE}
+all.pred <- predict(PS.fit.SL, type = "response")
+ObsData$PS.SL <- all.pred$pred
+```
+
+Check summaries: 
+
+```{r ipw2psx2b, cache=TRUE, echo = TRUE}
+summary(ObsData$PS.SL)
+tapply(ObsData$PS.SL, ObsData$A, summary)
+plot(density(ObsData$PS.SL[ObsData$A==0]), 
+     col = "red", main = "")
+lines(density(ObsData$PS.SL[ObsData$A==1]), 
+      col = "blue", lty = 2)
+legend("topright", c("No RHC","RHC"), 
+       col = c("red", "blue"), lty=1:2)
+```
+
+
+## Step 2: Convert PS to IPW 
+
+- Convert PS from SL to IPW using the formula (again, ATE formula). 
+
+```{r ipw2psx2c, cache=TRUE, echo = TRUE}
+ObsData$IPW.SL <- ObsData$A/ObsData$PS.SL + (1-ObsData$A)/(1-ObsData$PS.SL)
+summary(ObsData$IPW.SL)
+```
+
+Output from pre-packged software packages to do the same (very similar estimates):
+
+```{r ipw2psx2c2, cache=TRUE, echo = TRUE}
+require(WeightIt)
+W.out <- weightit(ps.formula, 
+                    data = ObsData, 
+                    estimand = "ATE",
+                    method = "super",
+                    SL.library = c("SL.glm", 
+                                   "SL.glmnet", 
+                                   "SL.xgboost"))
+summary(W.out$weights)
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(W.out, file = "data/ipwslps.RDS")
+```
+
+Alternatively, you can use the previously estimated PS
+
+```{r ipw2psx2c2clone, cache=TRUE, echo = TRUE}
+W.out2 <- weightit(ps.formula, 
+                    data = ObsData, 
+                    estimand = "ATE",
+                    ps = ObsData$PS.SL)
+summary(W.out2$weights)
+```
+
+## Step 3: Balance checking
+
+- We first check balance numerically for SMD = 0.1 as threshold for balance.
+
+
+```{r ipw2balp, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+bal.tab(W.out, un = TRUE, 
+        thresholds = c(m = .1))
+```
+
+- And also via plot
+
+```{r ipw2balp2, cache=TRUE, echo = TRUE, fig.height=10, fig.width=5}
+require(cobalt)
+love.plot(W.out, binary = "std",
+          thresholds = c(m = .1),
+          abs = TRUE, 
+          var.order = "unadjusted", 
+          line = TRUE)
+```
+
+```{block, type='rmdcomment'}
+Some covariates have SMD > 0.1 (sign of imbalance). This phenomenon is common when we use strong ML methods to obtain PS [@alam2019should].
+```
+
+## Step 4: outcome modelling 
+
+Estimate the effect of treatment on outcomes 
+
+### Crude
+
+```{r ipw2psx4, cache=TRUE, echo = TRUE}
+out.formula <- as.formula(Y ~ A)
+out.fit <- glm(out.formula,
+               data = ObsData,
+               weights = IPW.SL)
+publish(out.fit)
+```
+
+### Adjusted
+
+```{block, type='rmdcomment'}
+Adjusting for all covariates to deal with potential residual confounding (as was indicated by imbalance). Alternatively, could adjust for selected covariates believed to be the reasons for potential imbalance [@nguyen2017double].
+```
+
+Estimate the effect of treatment on outcomes (after adjustment)
+
+```{r ipw2psx4adj, cache=TRUE, echo = TRUE, results='hide'}
+out.formula2 <- as.formula(paste("Y~ A +", 
+                               paste(baselinevars, 
+                                     collapse = "+")))
+out.fit2 <- glm(out.formula2,
+               data = ObsData,
+               weights = IPW.SL)
+res2 <- publish(out.fit2, digits=1)$regressionTable[2,]
+```
+
+```{r ipw2psx4adj2, cache=TRUE, echo = TRUE}
+res2
+```
+
+### Adjusted (from package)
+
+Also check the output when we used the weights from the package
+
+```{r ipw2psx4b, cache=TRUE, echo = TRUE, results='hide'}
+out.fit3 <- glm(out.formula2,
+               data = ObsData,
+               weights = W.out$weights)
+res3 <- publish(out.fit3, digits=1)$regressionTable[2,]
+```
+
+```{r ipw2psx4adj3, cache=TRUE, echo = TRUE}
+res3
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(out.fit3, file = "data/ipwsl.RDS") 
+```
+
+<!--chapter:end:3ipw2.Rmd-->
+
+# TMLE
+
+```{r tmlesetup01t, include=FALSE}
+require(knitr)
+require(glmnet)
+require(kableExtra)
+require(dplyr)
+require(xgboost)
+require(SuperLearner)
+require(Publish)
+require(tableone)
+options(knitr.kable.NA = '')
+cachex=TRUE
+```
+
+## Doubly robust estimators
+
+Now that we have covered 
+
+- outcome models (e.g., G-computation) and 
+- exposure models (e.g., propensity score models), 
+
+let us talk about doubly robust (DR) estimators. DR has several important properties: 
+
+* They use information from both 
+  - the exposure and 
+  - the outcome models. 
+* They provide a **consistent estimator** if either of the above mentioned models is correctly specified.
+  - consistent estimator means as the sample size increases, distribution of the estimates gets concentrated near the true parameter
+* They provide an **efficient estimator** if both the exposure and the outcome model are correctly specified. 
+  - efficient estimator means estimates approximates the true parameter in terms of a chosen loss function (e.g., could be RMSE).
+
+## TMLE
+
+Targeted Maximum Likelihood Estimation (TMLE) is a DR method, using 
+
+- an initial estimate from the outcome model (G-computation)
+- the propensity score (exposure) model to improve.
+
+In addition to being DR, TMLE has several other desirable properties:
+
+* It allows the use of **data-adaptive algorithms** like machine learning without sacrificing interpretability.
+  * ML is only used in intermediary steps to develop the estimator, so the optimization and interpretation of the estimator as a whole remains intact.
+  * The use of machine learning can help mitigate model misspecification. 
+* It has been shown to outperform other methods, particularly in **sparse data settings**. 
+
+## TMLE Steps
+
+According to @luque2018targeted, we need to the following steps (2-7) for obtaining point estimates when dealing with binary outcome. But as we are dealing with continuous outcome, we need an added transformation step at the beginning, and also at the end.
+
+|  |  |
+|-|-|
+|Step 1| Transformation of continuous outcome variable |
+|Step 2| Predict from initial outcome modelling: G-computation|
+|Step 3| Predict from propensity score model|
+|Step 4| Estimate clever covariate $H$ |
+|Step 5| Estimate fluctuation parameter $\epsilon$|
+|Step 6| Update the initial outcome model prediction based on targeted adjustment of the initial predictions using the PS model |
+|Step 7| Find treatment effect estimate  |
+|Step 8| Transform back the treatment effect estimate in the original outcome scale  |
+|Step 9| Confidence interval estimation based on closed form formula|
+
+- We will go through the steps of TMLE one-by-one, using the RHC dataset presented in previous chapters. 
+- As a reminder, the exposure we are considering is RHC (right heart catheterization) and the outcome of interest is length of stay in the hospital. 
+
+```{r dataload_02, cache=TRUE, echo = TRUE}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+```
+
+## Step 1: Transformation of Y
+
+In our example, the outcome is continuous. 
+
+```{r transf1, cache=TRUE, echo = TRUE}
+summary(ObsData$Y)
+plot(density(ObsData$Y), main = "Observed Y")
+```
+
+```{block, type='rmdcomment'}
+General recommendation is to **transform** continuous outcome to be within the range [0,1] [@gruber2010targeted].
+```
+
+<!--- However, it is recommended that even with continuous outcomes we use a log-likelihood loss function for the maximum likelihood estimation, as we would with a binary outcome.  --->
+
+
+```{r transf, cache=TRUE, echo = TRUE}
+min.Y <- min(ObsData$Y)
+max.Y <- max(ObsData$Y)
+ObsData$Y.bounded <- (ObsData$Y-min.Y)/(max.Y-min.Y)
+```
+
+Check the range of our transformed outcome variable
+
+```{r transf2, cache=TRUE, echo = TRUE}
+summary(ObsData$Y.bounded)
+```
+
+## Step 2: Initial G-comp estimate
+
+```{block, type='rmdcomment'}
+We construct our outcome model, and make our initial predictions. 
+```
+
+For this step, we will use **SuperLearner**. This requires no apriori assumptions about the structure of our outcome model. 
+
+```{r SL_out0, cache=TRUE, message=FALSE, warning=FALSE}
+library(SuperLearner)
+set.seed(123)
+ObsData.noY <- dplyr::select(ObsData, !c(Y,Y.bounded))
+Y.fit.sl <- SuperLearner(Y=ObsData$Y.bounded, 
+                       X=ObsData.noY, 
+                       cvControl = list(V = 3),
+                       SL.library=c("SL.glm", 
+                                    "SL.glmnet", 
+                                    "SL.xgboost"),
+                       method="method.CC_nloglik", 
+                       family="gaussian")
+```
+
+```{r SL_out01x, cache=TRUE}
+ObsData$init.Pred <- predict(Y.fit.sl, newdata = ObsData.noY, 
+                           type = "response")$pred
+
+summary(ObsData$init.Pred)
+# alternatively, we could write
+# ObsData$init.Pred <- Y.fit.sl$SL.predict
+```
+
+- We will use these initial prediction values later. 
+
+```{block, type='rmdcomment'}
+$Q^0(A,L)$ is often used to represent the predictions from initial G-comp model.
+```
+
+### Get predictions under both treatments $A = 0$ and $1$
+
+- We could estimate the treatment effect from this initial model.
+- We will need the $Q^0(A=1,L)$ and $Q^0(A=0,L)$ predictions later.
+- $Q^0(A=1,L)$ predictions:
+
+```{r SL_out01, cache=TRUE}
+ObsData.noY$A <- 1
+ObsData$Pred.Y1 <- predict(Y.fit.sl, newdata = ObsData.noY, 
+                           type = "response")$pred
+summary(ObsData$Pred.Y1)
+```
+
+-  $Q^0(A=0,L)$ predictions:
+
+```{r SL_out02, cache=TRUE}
+ObsData.noY$A <- 0
+ObsData$Pred.Y0 <- predict(Y.fit.sl, newdata = ObsData.noY, 
+                           type = "response")$pred
+summary(ObsData$Pred.Y0)
+```
+
+### Get initial treatment effect estimate
+
+```{r SL_out03, cache=cachex, echo = TRUE}
+ObsData$Pred.TE <- ObsData$Pred.Y1 - ObsData$Pred.Y0   
+```
+
+```{r SL_out04, cache=cachex, echo = TRUE}
+summary(ObsData$Pred.TE) 
+```
+
+```{r SL_out, cache=TRUE, message=FALSE, warning=FALSE, include = FALSE}
+# # specify the library of machine learning algorithms our SuperLearner should use
+# # we will use the same set that is the default set in the tmle package
+# Q.SL.library = c("SL.glm", "SL.xgboost", "SL.glmnet")
+# # check number of missing values, and omit rows with missing values if there are not too many
+# sapply(ObsData, function(x) sum(is.na(x))) 
+# ObsData <- na.omit(ObsData) 
+# # fit our SuperLearner
+# X <- dplyr::select(ObsData, !Y)
+# QbarSL <- SuperLearner(Y=ObsData$Y, X=X, SL.library=Q.SL.library, family="gaussian", method="method.CC_nloglik")
+# # make predictions with our fitted model
+# QbarAW <- QbarSL$SL.predict
+# 
+# # predict the counterfactual outcomes under treatment/no treatment for each observation
+# X1 <- X
+# X1$A <- 1
+# X0 <- X
+# X0$A <- 0
+# # predicted outcome under treatment
+# Qbar1W<- SuperLearner(Y=ObsData$Y, X=X, SL.library=Q.SL.library, family="gaussian", method="method.CC_nloglik", newX=X1)$SL.predict  
+# # predicted outcome under no treatment
+# Qbar0W<- SuperLearner(Y=ObsData$Y, X=X, SL.library=Q.SL.library, family="gaussian", method="method.CC_nloglik", newX=X0)$SL.predict   
+# 
+# # initial estimate of the effect of A on Y:
+# PsiHat.SS <- mean(Qbar1W - Qbar0W)
+# cat("/n Our initial estimate of the effect of RHC on length of stay is: ", PsiHat.SS)
+```
+
+## Step 3: PS model
+
+At this point, we have our initial estimate and now want to perform our targeted improvement. 
+
+```{r SL_out0ps, cache=TRUE, message=FALSE, warning=FALSE}
+library(SuperLearner)
+set.seed(124)
+ObsData.noYA <- dplyr::select(ObsData, !c(Y,Y.bounded,
+                                          A,init.Pred,
+                                          Pred.Y1,Pred.Y0,
+                                          Pred.TE))
+PS.fit.SL <- SuperLearner(Y=ObsData$A, 
+                       X=ObsData.noYA, 
+                       cvControl = list(V = 3),
+                       SL.library=c("SL.glm", 
+                                    "SL.glmnet", 
+                                    "SL.xgboost"),
+                       method="method.CC_nloglik",
+                       family="binomial")  
+```
+
+
+```{r SL_out01ps2, cache=TRUE}
+all.pred <- predict(PS.fit.SL, type = "response")
+ObsData$PS.SL <- all.pred$pred 
+```
+
+```{block, type='rmdcomment'}
+These propensity score predictions (`PS.SL`) are represented as $g(A_i=1|L_i)$.
+```
+
+- We can estimate $g(A_i=0|L_i)$ as $1 - g(A_i=1|L_i)$ or `1 - PS.SL`.
+
+```{r ipw2psx2btmle, cache=TRUE, echo = TRUE}
+summary(ObsData$PS.SL)
+tapply(ObsData$PS.SL, ObsData$A, summary)
+plot(density(ObsData$PS.SL[ObsData$A==0]), 
+     col = "red", main = "")
+lines(density(ObsData$PS.SL[ObsData$A==1]), 
+      col = "blue", lty = 2)
+legend("topright", c("No RHC","RHC"), 
+       col = c("red", "blue"), lty=1:2) 
+```
+
+
+```{r SL_ps, cache=TRUE, message=FALSE, error = FALSE, warning=FALSE, include = FALSE}
+# library(SuperLearner)
+# set.seed(123) 
+# 
+# # specify the library of machine learning algorithms our SuperLearner should use
+# # we will use the same set that is the default set in the tmle package
+# G.SL.library = c("SL.glm", "SL.gam", "tmle.SL.dbarts.k.5")
+# # construct the propensity score model using SuperLearner
+# gHatSL <- SuperLearner(Y=ObsData$A, X=subset(ObsData, select= -c(A,Y)), 
+#                        SL.library=G.SL.library, family="binomial")
+# # get the probability of receiving each treatment for each observation
+# gHat1W <- gHatSL$SL.predict # predicted probabilities of A=1 given baseline chars
+# gHat0W <- 1 - gHat1W
+# # get the probability of receiving the treatment they did receive for each observation
+# gHatAW <- rep(NA, nrow(ObsData))
+# gHatAW[ObsData$A==1] <- gHat1W[ObsData$A==1]
+# gHatAW[ObsData$A==0] <- gHat0W[ObsData$A==0]
+```
+
+## Step 4: Estimate $H$ 
+
+```{block, type='rmdcomment'}
+Clever covariate $H(A_i, L_i) = \frac{I(A_i=1)}{g(A_i=1|L_i)} - \frac{I(A_i=0)}{g(A_i=0|L_i)}$ [@luque2018targeted]
+```
+
+```{r hestimate2, cache=TRUE, warning=FALSE}
+ObsData$H.A1L <- (ObsData$A) / ObsData$PS.SL 
+ObsData$H.A0L <- (1-ObsData$A) / (1- ObsData$PS.SL)
+ObsData$H.AL <- ObsData$H.A1L - ObsData$H.A0L
+summary(ObsData$H.AL)
+tapply(ObsData$H.AL, ObsData$A, summary)
+t(apply(cbind(-ObsData$H.A0L,ObsData$H.A1L), 
+      2, summary)) 
+```
+
+Aggregated or individual clever covariate components show slight difference in their summaries.
+
+## Step 5: Estimate $\epsilon$
+
+```{block, type='rmdcomment'}
+Fluctuation parameter $\epsilon$, representing **how large of an adjustment we will make** to the initial estimate. 
+```
+
+- The fluctuation parameter $\hat\epsilon$ could be 
+  - a scalar or 
+  - a vector with 2 components $\hat\epsilon_0$ and $\hat\epsilon_1$. 
+- It  is estimated through MLE, using a model with an offset based on the initial estimate, and clever covariates as independent variables [@gruber2009targeted]:
+
+  $E(Y|A,L)(\epsilon) = \frac{1}{1+\exp(-\log\frac{\bar Q^0(A,L)}{(1-\bar Q^0(A,L))}-\epsilon \times H(A,L))}$ 
+
+### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
+
+This is closer to how `tmle` package has implement clever covariates
+
+```{r eestimate, cache=TRUE, warning=FALSE}
+eps_mod <- glm(Y.bounded ~ -1 + H.A1L + H.A0L +  
+                 offset(qlogis(init.Pred)), 
+               family = "binomial",
+               data = ObsData)
+epsilon <- coef(eps_mod)  
+epsilon["H.A1L"]
+epsilon["H.A0L"] 
+```
+
+Note that, if `init.Pred` includes negative values, `NaNs` would be produced after applying `qlogis()`.
+
+### Only 1 $\hat\epsilon$
+
+For demonstration purposes
+
+```{r eestimate2, cache=TRUE, warning=FALSE}
+eps_mod1 <- glm(Y.bounded ~ -1 + H.AL +
+                 offset(qlogis(init.Pred)),
+               family = "binomial",
+               data = ObsData)
+epsilon1 <- coef(eps_mod1) 
+epsilon1 
+```
+
+Alternative could be to use `H.AL` as weights (not shown here).
+
+## Step 6: Update
+
+### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
+
+We can use `epsilon["H.A1L"]` and `epsilon["H.A0L"]` to update
+
+```{r teestimate, cache=TRUE, warning=FALSE}
+ObsData$Pred.Y1.update <- plogis(qlogis(ObsData$Pred.Y1) +  
+                                   epsilon["H.A1L"]*ObsData$H.A1L)
+ObsData$Pred.Y0.update <- plogis(qlogis(ObsData$Pred.Y0) + 
+                                   epsilon["H.A0L"]*ObsData$H.A0L)
+summary(ObsData$Pred.Y1.update)
+summary(ObsData$Pred.Y0.update)  
+```
+
+### Only 1 $\hat\epsilon$
+
+Alternatively, we could use `epsilon` to from `H.AL` to update
+
+```{r teestimateb, cache=TRUE, warning=FALSE}
+ObsData$Pred.Y1.update1 <- plogis(qlogis(ObsData$Pred.Y1) +  
+                                   epsilon1*ObsData$H.AL)
+ObsData$Pred.Y0.update1 <- plogis(qlogis(ObsData$Pred.Y0) + 
+                                   epsilon1*ObsData$H.AL)
+summary(ObsData$Pred.Y1.update1)
+summary(ObsData$Pred.Y0.update1)   
+```
+
+Note that, if `Pred.Y1` and `Pred.Y0` include negative values, `NaNs` would be produced after applying `qlogis()`.
+
+```{r hestimate, cache=TRUE, warning=FALSE, include = FALSE}
+# # clever covariates
+# H1W <- ObsData$A / gHat1W
+# H0W <- (1-ObsData$A) / gHat0W
+# 
+# # fluctuation parameter
+# eps_mod <- glm(ObsData$Y ~ -1 + H0W + H1W + offset(qlogis(QbarAW)), family = "binomial")
+# epsilon <- coef(eps_mod)
+# cat("Epsilon:", epsilon)
+# 
+# # updated estimates
+# Q0W_1 <- plogis(qlogis(Qbar0W) + epsilon[1]*H0W)
+# Q1W_1 <- plogis(qlogis(Qbar1W) + epsilon[2]*H1W)
+```
+
+## Step 7: Effect estimate
+
+Now that the updated predictions of our outcome models are calculated, we can calculate the ATE.
+
+### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
+
+```{r teestimate2, cache=TRUE, warning=FALSE}
+ATE.TMLE.bounded.vector <- ObsData$Pred.Y1.update -  
+                           ObsData$Pred.Y0.update
+summary(ATE.TMLE.bounded.vector) 
+ATE.TMLE.bounded <- mean(ATE.TMLE.bounded.vector, 
+                         na.rm = TRUE) 
+ATE.TMLE.bounded 
+```
+
+### Only 1 $\hat\epsilon$
+
+Alternatively, using `H.AL`:
+
+```{r teestimate2b, cache=TRUE, warning=FALSE}
+ATE.TMLE.bounded.vector1 <- ObsData$Pred.Y1.update1 -  
+                           ObsData$Pred.Y0.update1
+summary(ATE.TMLE.bounded.vector1) 
+ATE.TMLE.bounded1 <- mean(ATE.TMLE.bounded.vector1, 
+                         na.rm = TRUE) 
+ATE.TMLE.bounded1 
+```
+
+## Step 8: Rescale effect estimate
+
+We make sure to transform back to our original scale. 
+
+### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
+
+```{r meantmle, cache=TRUE}
+ATE.TMLE <- (max.Y-min.Y)*ATE.TMLE.bounded   
+ATE.TMLE 
+```
+
+### Only 1 $\hat\epsilon$
+
+Alternatively, using `H.AL`:
+
+```{r meantmle2, cache=TRUE}
+ATE.TMLE1 <- (max.Y-min.Y)*ATE.TMLE.bounded1
+ATE.TMLE1 
+```
+
+## Step 9: Confidence interval estimation
+
+- Since the machine learning algorithms were used only in intermediary steps, rather than estimating our parameter of interest directly, 95% confidence intervals can be calculated directly [@luque2018targeted]. 
+
+```{block, type='rmdcomment'}
+Based on semi-parametric theory, closed form variance formula is already derived [@van2012targeted]. 
+```
+
+- Time-consuming bootstrap procedure is not necessary.
+
+```{r tmleinf2, cache=TRUE}
+ci.estimate <- function(data = ObsData, H.AL.components = 1){
+  min.Y <- min(data$Y)
+  max.Y <- max(data$Y)
+  # transform predicted outcomes back to original scale
+  if (H.AL.components == 2){
+    data$Pred.Y1.update.rescaled <- 
+      (max.Y- min.Y)*data$Pred.Y1.update + min.Y
+    data$Pred.Y0.update.rescaled <- 
+      (max.Y- min.Y)*data$Pred.Y0.update + min.Y
+  } 
+  if (H.AL.components == 1) {
+    data$Pred.Y1.update.rescaled <- 
+      (max.Y- min.Y)*data$Pred.Y1.update1 + min.Y
+    data$Pred.Y0.update.rescaled <- 
+      (max.Y- min.Y)*data$Pred.Y0.update1 + min.Y
+  }
+  EY1_TMLE1 <- mean(data$Pred.Y1.update.rescaled, 
+                    na.rm = TRUE)
+  EY0_TMLE1 <- mean(data$Pred.Y0.update.rescaled, 
+                    na.rm = TRUE)
+  # ATE efficient influence curve
+  D1 <- data$A/data$PS.SL*
+    (data$Y - data$Pred.Y1.update.rescaled) + 
+    data$Pred.Y1.update.rescaled - EY1_TMLE1
+  D0 <- (1 - data$A)/(1 - data$PS.SL)*
+    (data$Y - data$Pred.Y0.update.rescaled) + 
+    data$Pred.Y0.update.rescaled - EY0_TMLE1
+  EIC <- D1 - D0
+  # ATE variance
+  n <- nrow(data)
+  varHat.IC <- var(EIC, na.rm = TRUE)/n
+  # ATE 95% CI
+  if (H.AL.components == 2) {
+    ATE.TMLE.CI <- c(ATE.TMLE - 1.96*sqrt(varHat.IC), 
+                   ATE.TMLE + 1.96*sqrt(varHat.IC))
+  }
+  if (H.AL.components == 1) {
+    ATE.TMLE.CI <- c(ATE.TMLE1 - 1.96*sqrt(varHat.IC), 
+                   ATE.TMLE1 + 1.96*sqrt(varHat.IC))
+  }
+  return(ATE.TMLE.CI) 
+}
+```
+
+### $\hat\epsilon$ = $\hat\epsilon_0$ and $\hat\epsilon_1$ 
+
+```{r tmleinf2b, cache=TRUE}
+CI2 <- ci.estimate(data = ObsData, H.AL.components = 2) 
+CI2
+```
+
+### Only 1 $\hat\epsilon$
+
+```{r tmleinf2c, cache=TRUE}
+CI1 <- ci.estimate(data = ObsData, H.AL.components = 1) 
+CI1
+```
+
+```{r tmleinf, cache=TRUE, include = FALSE}
+# # transform predicted outcomes back to original scale
+# Q1W_1_sc <- (b-a)*Q1W_1+a
+# Q0W_1_sc <- (b-a)*Q0W_1+a
+# 
+# EY1_TMLE1 <- mean(Q1W_1_sc)
+# EY0_TMLE1 <- mean(Q0W_1_sc)
+# 
+# # ATE efficient influence curve
+# D1 <- ObsData$A/gHat1W*(ObsData$Y - Q1W_1_sc) + Q1W_1_sc - EY1_TMLE1
+# D0 <- (1 - ObsData$A)/(1 - gHat1W)*(ObsData$Y - Q0W_1_sc) + Q0W_1_sc - EY0_TMLE1
+# EIC <- D1 - D0
+# #ATE variance
+# n <- nrow(ObsData)
+# varHat.IC <- var(EIC)/n
+# #ATE 95% CI
+# ATE_TMLE1_CI <- c(ATE_TMLE1 - 1.96*sqrt(varHat.IC), ATE_TMLE1 + 1.96*sqrt(varHat.IC))
+# cat("ATE: ", ATE_TMLE1, "  (", ATE_TMLE1_CI[1], ", ", ATE_TMLE1_CI[2], ")", sep = "")
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(ATE.TMLE, file = "data/tmlepointh.RDS") 
+saveRDS(CI2, file = "data/tmlecih.RDS")
+```
+
+<!--chapter:end:4tmle.Rmd-->
+
+
+```{r setup01ss, include=FALSE}
+require(knitr)
+require(glmnet)
+require(kableExtra)
+require(dplyr)
+require(xgboost)
+require(SuperLearner)
+require(sl3)
+require(Rsolnp)
+require(ltmle)
+require(AIPW)
+require(tmle3)
+require(sl3)
+options(knitr.kable.NA = '')
+cachex=TRUE
+cachexy=FALSE
+```
+
+```{r dataload_01, cache=cachex, echo = TRUE}
+# Read the data saved at the last chapter
+ObsData <- readRDS(file = "data/rhcAnalytic.RDS")
+dim(ObsData)
+```
+
+# Pre-packaged software
+
+## tmle
+
+- The _tmle_ package can handle 
+  - both binary and 
+  - continuous outcomes, and 
+  - uses the _SuperLearner_ package to construct both models just like we did in the steps above.
+- The default SuperLearner library for estimating the outcome includes [@tmlePkgDocs] 
+  - `SL.glm`: generalized linear models (GLMs)
+  - `SL.glmnet`: LASSO
+  - `tmle.SL.dbarts2`: modeling and prediction using BART
+- The default library for estimating the propensity scores includes
+  - `SL.glm`: generalized linear models (GLMs)
+  - `tmle.SL.dbarts.k.5`: SL wrappers for modeling and prediction using BART
+  - `SL.gam`: generalized additive models: (GAMs)  
+- It is certainly possible to use different set of learners
+  - More methods can be added by 
+    - specifying lists of models in the _Q.SL.library_ (for the outcome model) and 
+    - _g.SL.library_ (for the propensity score model) arguments. 
+- Note also that the outcome $Y$ is required to be within the range of $[0,1]$ for this method as well, 
+  - so we need to pass in the transformed data, then transform back the estimate.
+
+```{r tmlepkg, cache=cachex, message=FALSE, warning=FALSE}
+set.seed(1444) 
+# transform the outcome to fall within the range [0,1]
+min.Y <- min(ObsData$Y)
+max.Y <- max(ObsData$Y)
+ObsData$Y_transf <- (ObsData$Y-min.Y)/(max.Y-min.Y)
+
+# run tmle from the tmle package 
+ObsData.noYA <- dplyr::select(ObsData, 
+                              !c(Y_transf, Y, A))
+SL.library = c("SL.glm", 
+               "SL.glmnet", 
+               "SL.xgboost")
+```
+
+
+```{r tmlepkg33, cache=cachex, message=FALSE, warning=FALSE}
+tmle.fit <- tmle::tmle(Y = ObsData$Y_transf, 
+                   A = ObsData$A, 
+                   W = ObsData.noYA, 
+                   family = "gaussian", 
+                   V = 3,
+                   Q.SL.library = SL.library, 
+                   g.SL.library = SL.library)
+tmle.fit
+```
+
+
+```{r tmlepkgtr2, cache=cachex, message=FALSE, warning=FALSE}
+summary(tmle.fit)
+```
+
+
+```{r tmlepkgtr, cache=cachex, message=FALSE, warning=FALSE}
+tmle_est_tr <- tmle.fit$estimates$ATE$psi
+tmle_est_tr
+# transform back the ATE estimate
+tmle_est <- (max.Y-min.Y)*tmle_est_tr
+tmle_est
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(tmle_est, file = "data/tmle.RDS")
+```
+
+```{r tmlepkg2, cache=cachex, results='hide', message=FALSE, warning=FALSE}
+tmle_ci <- paste("(", 
+                 round((max.Y-min.Y)*tmle.fit$estimates$ATE$CI[1], 3), ", ", 
+                 round((max.Y-min.Y)*tmle.fit$estimates$ATE$CI[2], 3), ")", sep = "")
+```
+
+```{r, cache=TRUE, echo = TRUE}
+tmle.ci <- (max.Y-min.Y)*tmle.fit$estimates$ATE$CI
+saveRDS(tmle.ci, file = "data/tmleci.RDS")
+```
+
+```{r, cache=cachex, echo=FALSE}
+cat("ATE from tmle package: ", tmle_est, tmle_ci, sep = "")
+```
+
+Notes about the _tmle_ package: 
+
+* does not scale the outcome for you
+* can give some error messages when dealing with variable types it is not expecting
+* practically all steps are nicely packed up in one function, very easy to use but need to dig a little to truly understand what it does
+
+Most helpful resources: 
+
+* [CRAN docs](https://cran.r-project.org/web/packages/tmle/tmle.pdf)
+* [tmle package paper](https://www.jstatsoft.org/article/view/v051i13)
+
+## tmle (reduced computation)
+
+We can use the previously calculated propensity score predictions from SL (calculated using `WeightIt` package) in the `tmle` to reduce some computing time.
+
+```{r tmlepkg33b, cache=cachex, message=FALSE, warning=FALSE}
+ps.obj <- readRDS(file = "data/ipwslps.RDS")
+ps.SL <- ps.obj$weights
+tmle.fit2 <- tmle::tmle(Y = ObsData$Y_transf, 
+                   A = ObsData$A, 
+                   W = ObsData.noYA, 
+                   family = "gaussian",
+                   V = 3,
+                   Q.SL.library = SL.library, 
+                   g1W = ps.SL)
+tmle.fit2
+```
+
+```{r tmlepkgtrb, cache=cachex, message=FALSE, warning=FALSE}
+# transform back ATE estimate
+(max.Y-min.Y)*tmle.fit2$estimates$ATE$psi
+```
+
+## sl3 (optional)
+
+```{r}
+# install sl3 if not done so
+# remotes::install_github("tlverse/sl3")
+```
+The _sl3_ package is a newer package, that implements two types of Super Learning: 
+
+- **discrete Super Learning**, 
+  - in which the best prediction algorithm (based on cross-validation) from a specified library is returned, and 
+- **ensemble Super Learning**, 
+  - in which the best linear combination of the specified algorithms is returned (@coyle2021sl3).
+
+The first step is to create a sl3 task which keeps track of the roles of the variables in our problem (@coyle2021tlverse). 
+
+```{r sl301, cache=cachexy}
+require(sl3)
+# create sl3 task, specifying outcome and covariates 
+rhc_task <- make_sl3_Task(
+  data = ObsData, 
+  covariates = colnames(ObsData)[-which(names(ObsData) == "Y")],
+  outcome = "Y"
+)
+```
+
+
+```{r sl30156, cache=cachexy}
+rhc_task
+```
+
+Next, we create our SuperLearner. To do this, 
+
+- we need to specify a **selection of machine learning algorithms** we want to include as candidates, as well as 
+- a **metalearner** that the SuperLearner will use to combine or choose from the machine learning algorithms provided (@coyle2021tlverse). 
+
+```{r sl302, cache=cachexy}
+# see what algorithms are available for a continuous outcome 
+# (similar can be done for a binary outcome)
+sl3_list_learners("continuous")
+```
+
+The chosen candidate algorithms can be created and collected in a Stack.
+
+```{r sl303, cache=cachexy, results='hide', message=FALSE, warning=FALSE}
+# initialize candidate learners
+lrn_glm <- make_learner(Lrnr_glm)
+lrn_lasso <- make_learner(Lrnr_glmnet) # alpha default is 1
+xgb_5 <- Lrnr_xgboost$new(nrounds = 5)
+
+# collect learners in stack
+stack <- make_learner(
+  Stack, lrn_glm, lrn_lasso, xgb_5
+)
+```
+
+The stack is then given to the SuperLearner.
+```{r sl304, cache=cachexy, results='hide', message=FALSE, warning=FALSE}
+# to make an ensemble SuperLearner
+sl_meta <- Lrnr_nnls$new()
+sl <- Lrnr_sl$new(
+  learners = stack,
+  metalearner = sl_meta)
+
+# or a discrete SuperLearner
+sl_disc_meta <- Lrnr_cv_selector$new()
+sl_disc <- Lrnr_sl$new(
+  learners = stack, 
+  metalearner = sl_disc_meta
+)
+```
+
+The SuperLearner is then trained on the sl3 task we created at the start and then it can be used to make predictions.
+
+```{r sl305, cache=cachexy, message=FALSE, warning=FALSE}
+set.seed(1444)
+
+# train SL
+sl_fit <- sl$train(rhc_task)
+# or for discrete SL
+# sl_fit <- sl_disc$train(rhc_task)
+
+# make predictions
+sl3_data <- ObsData
+sl3_data$sl_preds <- sl_fit$predict()
+
+sl3_est <- mean(sl3_data$sl_preds[sl3_data$A == 1]) - 
+  mean(sl3_data$sl_preds[sl3_data$A == 0])
+
+sl3_est
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(sl3_est, file = "data/sl3.RDS")
+```
+
+Notes about the _sl3_ package: 
+
+* fairly easy to implement & understand structure
+* large selection of candidate algorithms provided
+* unsure why result is so different
+* very different structure from _SuperLearner_ library, but very customizable
+* could use more explanations of when to use what metalearner and what exactly the structure of the metalearner construction means 
+
+Most helpful resources: 
+
+* [tlverse sl3 page](https://tlverse.org/sl3/)
+* [sl3 GitHub repository](https://github.com/tlverse/sl3/)
+* [tlverse handbook chapter 6](https://tlverse.org/tlverse-handbook/tmle3.html)
+* Vignettes in R
+
+<!---
+## ltmle
+
+Similarly to the _tmle_ package, the _ltmle_ package gives the direct TMLE result with the call of one function. 
+
+```{r ltmlepkg, cache=cachex, message=FALSE, warning=FALSE}
+# exclude Y_transf since ltmle scales automatically
+ltmle_data <- dplyr::select(ObsData, !Y_transf)
+```
+
+
+```{r ltmlepkgxd, cache=cachex, message=FALSE, warning=FALSE}
+# run ltmle
+ltmle_est <- ltmle(ltmle_data, 
+                   Anodes = "A", 
+                   Ynodes = "Y", 
+                   abar = list(1,0), 
+                   SL.cvControl=list(V=3),
+                   SL.library = SL.library,
+                   estimate.time = FALSE)
+```
+
+
+```{r ltmlepkgpr, cache=cachex}
+summary(ltmle_est)
+```
+
+```{r, cache=TRUE, echo = TRUE}
+saveRDS(ltmle_est, file = "data/ltmle.RDS")
+```
+
+
+```{r ltmlepkg2, cache=cachex, include = FALSE}
+# # print result & confidence intervals
+# ltmle_ci <- paste("(",
+#                   round(summary(ltmle_est)[["treatment"]][["CI"]][,"2.5%"], 3),
+#                   ", ", round(summary(ltmle_est)[["treatment"]][["CI"]][,"97.5%"], 3),
+#                   ")", sep = "")
+# cat("ATE from ltmle package: ",
+#     ltmle_est$estimates[["tmle"]], ltmle_ci, sep = "")
+```
+
+- The main difference between the _tmle_ and the _ltmle_ package is that the _ltmle_ package is designed to handle longitudinal data, with measurements data recorded for each subject at multiple timepoints. 
+- More information on the use of the _ltmle_ package in these settings can be found [here](https://cran.r-project.org/web/packages/ltmle/vignettes/ltmle-intro.html).
+
+## AIPW
+
+- The _aipw_ package implements augmented inverse probability weighting (another type of DR method). 
+- It has similar parameters as the _tmle_ package. 
+- It is typically used with the _SuperLearner_ library. 
+
+```{r aipwpkg, cache=cachex, results='hide', message=FALSE, warning=FALSE, include = FALSE}
+set.seed(1444) 
+# construct AIPW estimator
+aipw <- AIPW$new(Y=ObsData$Y, 
+                 A=ObsData$A, 
+                 W=ObsData[colnames(ObsData)[-which(names(ObsData) == "Y")]], 
+                 Q.SL.library = c("SL.glm", 
+                                  "SL.glmnet", 
+                                  "SL.xgboost"), 
+                 g.SL.library = c(c("SL.glm", 
+                                    "SL.glmnet", 
+                                    "SL.xgboost")), 
+                 k_split=3, 
+                 verbose=FALSE)
+```
+
+
+```{r aipwpkg2, cache=cachex, results='hide', message=FALSE, warning=FALSE, include = FALSE}
+# fit AIPW object
+aipw$fit()
+```
+
+
+```{r aipwpkg3, cache=cachex, results='hide', message=FALSE, warning=FALSE, include = FALSE}
+# calculate ATE
+aipw$summary()
+print(aipw$estimates)
+aipw_est <- aipw$estimates$RD[["Estimate"]]
+
+# 95% CI
+aipw_ci <- paste(" (", 
+                 round(aipw$estimates$RD["95% LCL"], 3), ", ", 
+                 round(aipw$estimates$RD["95% UCL"], 3), ")", sep = "")
+```
+
+```{r, cache=TRUE, echo = TRUE, include = FALSE}
+saveRDS(aipw, file = "data/aipw.RDS")
+```
+
+```{r asg, echo=FALSE, include = FALSE}
+cat("ATE from aipw package: ", aipw_est, aipw_ci, sep = "") 
+```
+--->
+
+## RHC results
+
+Gathering previously saved results:
+```{r summarytable0, cache=cachex, echo=TRUE, results='hold', warning=FALSE, message=FALSE}
+fit.reg <- readRDS(file = "data/adjreg.RDS")
+TEr <- fit.reg$coefficients[2]
+CIr <- as.numeric(confint(fit.reg, 'A'))
+fit.matched <- readRDS(file = "data/match.RDS")
+TEm <- fit.matched$coefficients[2]
+CIm <- as.numeric(confint(fit.matched, 'A'))
+TEg <- readRDS(file = "data/gcomp.RDS")
+CIg <- readRDS(file = "data/gcompci.RDS")
+CIgc <- CIg$percent[4:5]
+TE1g <- readRDS(file = "data/gcompxg.RDS")
+TE2g <- readRDS(file = "data/gcompls.RDS")
+TE3g <- readRDS(file = "data/gcompsl.RDS")
+ipw <- readRDS(file = "data/ipw.RDS")
+TEi <- ipw$coefficients[2]
+CIi <- as.numeric(confint(ipw, 'A'))
+ipwsl <- readRDS(file = "data/ipwsl.RDS")
+TEsli <- ipwsl$coefficients[2]
+CIsli <- as.numeric(confint(ipwsl, 'A'))
+tmleh <- readRDS(file = "data/tmlepointh.RDS")
+tmlecih <- readRDS(file = "data/tmlecih.RDS")
+tmlesl <- readRDS(file = "data/tmle.RDS")
+tmlecisl <- readRDS(file = "data/tmleci.RDS")
+slp <- readRDS(file = "data/sl3.RDS")
+ci.b <- rep(NA,2)
+ks <- 2.01
+ci.ks <- c(0.6,3.41)
+point <- as.numeric(c(TEr, TEm, TEg, TE1g, TE2g,  
+                      TE3g, TEi, TEsli, tmleh, 
+                      tmlesl, slp, ks))
+CIs <- cbind(CIr, CIm, CIgc, ci.b, ci.b, ci.b, 
+             CIi, CIsli, tmlecih, tmlecisl, 
+             ci.b, ci.ks)    
+```
+
+
+```{r summarytable, cache=cachex, echo=TRUE}
+method.list <- c("Adj. Reg","PS match", 
+                 "G-comp (logistic)","G-comp (xgboost)", 
+                 "G-comp (lasso)", "G-comp (SL)", 
+                 "IPW (logistic)", "IPW (SL)", 
+                 "TMLE (9 steps)", "TMLE (package)", 
+                 "sl3 (package)", "Keele and Small (2021) paper") 
+results <- data.frame(method.list) 
+results$Estimate <- round(point,2)
+results$`2.5 %` <- CIs[1,] 
+results$`97.5 %` <- CIs[2,] 
+kable(results,digits = 2)%>%
+  row_spec(10, bold = TRUE, color = "white", background = "#D7261E")  
+```
+
+```{block, type='rmdcomment'}
+@keele2021comparing used TMLE-SL based on an ensemble of 3 different learners: (1) GLM, (2) random forests, and (3) LASSO.
+```
+
+## Other packages
+
+Other packages that may be useful: 
+
+| Package | Resources | Notes |
+|---|---|---|
+| ltmle | [CRAN vignette](https://cran.r-project.org/web/packages/ltmle/vignettes/ltmle-intro.html) | Longitudinal |
+| tmle3 | [GitHub](https://github.com/tlverse/tmle3), [framework overview](https://tlverse.org/tmle3/articles/framework.html), [tlverse handbook](https://tlverse.org/tlverse-handbook/tmle3.html) | tmle3 is still under development | 
+| aipw | [GitHub](https://github.com/yqzhong7/AIPW), [CRAN vignette](https://cran.r-project.org/web/packages/AIPW/vignettes/AIPW.html) | Newer package for AIPW (another DR method) |
+| Others | [van der Laan research group](https://www.stat.berkeley.edu/users/laan/Software/) |  |
+
+You can find many other related packages on [CRAN](https://cran.r-project.org/search.html) or GitHub.
+
+<!--chapter:end:5software.Rmd-->
+
+# Final Words
+
+```{r setup2vf, include=FALSE}
+require(knitr)
+require(kableExtra)
+require(DiagrammeR)
+require(DiagrammeRsvg)
+require(rsvg)
+library(magrittr)
+library(svglite)
+library(png)
+require(nhanesA)
+library(skimr)
+library(jtools)
+require(cobalt)
+require(tableone)
+require(Publish)
+```
+
+## Select variables judiciously
+
+
+```{r role, echo = FALSE, out.width = "650px", fig.cap="Variable roles: A = exposure or treatment; Y = outcome; L = confounder; R = risk factor for Y; M = mediator; C = collider; E = effect of Y; I = instrument; u = unmeasured confounder; P = proxy of U; N = noise variable"}
+knitr::include_graphics("images/role.png")
+```
+
+- Think about the role of variables first
+  - ideally include confounders to reduce bias
+  - consider including risk factor for outcome for greater accuracy
+  - IV, collider, mediators, effect of outcome, noise variables should be avoided
+  - if something is unmeasured, consider adding proxy (with caution)
+- If you do not have subject area expertise, talk to experts
+- do pre-screening
+    - sparse binary variables
+    - highly collinear variables
+
+```{block, type='rmdcomment'}
+Relying on just a blackbox ML method may be dangerous to identify the roles of variables in the relationship of interest.  
+```
+
+
+## Why SL and TMLE
+
+### Prediction goal
+
+```{r dag1, echo=FALSE, cache=TRUE}
+g2 <- grViz("
+	digraph causal {
+	
+	  # Nodes
+    node [shape = circle]
+    y [label = 'Length of stay']
+    
+    node [shape = box]
+    a [label = 'RHC']
+    b [label = 'age']
+    c [label = 'sex']
+    d [label = 'race']
+    e [label = 'education']
+    f [label = 'Disease.category']
+    g [label = 'Cancer']
+    h [label = 'Income']
+    
+	  # Edges
+	  edge [color = black,
+	        arrowhead = vee]
+	  rankdir = LR
+	  {b c d e f g h} -> y
+	  a -> y
+	  
+	  # Graph
+	  graph [overlap = true, fontsize = 10]
+	}")
+g2 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("images/dagpred.png")
+```
+
+```{r plot1, echo=FALSE}
+knitr::include_graphics("images/dagpred.png")
+```
+
+- Assuming all covariates are measured, **parametric models** such as linear and logistic regressions are very efficient, but relies on strong assumptions. In real-world scenarios, it is often hard (if not impossible) to guess the correct specification of the right hand side of the regression equation.
+- Machine learning (ML) methods are very helpful for prediction goals. They are also helpful in **identifying complex functions** (non-linearities and non-additive terms) of the covariates (again, assuming they are measured). 
+- There are many ML methods, but the procedures are very different, and they come with their own advantages and disadvantages. In a given real data, it is **hard to apriori predict which is the best ML algorithm** for a given problem.
+
+
+```{block, type='rmdcomment'}
+Super learner is helpful in **combining strength from various algorithms**, and producing 1 prediction column that has **optimal statistical properties**.
+```
+
+### Causal inference
+
+```{r dag2, echo=FALSE, cache=TRUE}
+g2 <- grViz("
+	digraph causal {
+	
+	  # Nodes
+    node [shape = circle]
+    a [label = 'RHC']
+    y [label = 'Length of stay']
+    
+    node [shape = box]
+    b [label = 'age']
+    c [label = 'sex']
+    d [label = 'race']
+    e [label = 'education']
+    f [label = 'Disease.category']
+    g [label = 'Cancer']
+    h [label = 'Income']
+    
+	  # Edges
+	  edge [color = black,
+	        arrowhead = vee]
+	  rankdir = LR
+	  {b c d e f g h} -> y
+	  {b c d e f g h} -> a
+	  a -> y
+	  
+	  # Graph
+	  graph [overlap = true, fontsize = 10]
+	}")
+g2 %>% export_svg %>% charToRaw %>% rsvg %>% png::writePNG("images/dagci.png")
+```
+
+```{r plot2, echo=FALSE}
+knitr::include_graphics("images/dagci.png")
+```
+
+- For causal inference goals (when we have a primary exposure of interest), machine learning methods are often misleading. This is primarily due to the fact that they usually do not have an inherent mechanism of focusing on **primary exposure** (RHC in this example); and treats the primary exposure as any other predictors. 
+- When using g-computation with ML methods, estimation of variance becomes a difficult problem (with correct coverage). Generalized procedures such as **robust SE or bootstrap methods** are not supported by theory.
+
+
+```{block, type='rmdcomment'}
+TMLE method shine, with the help of it's important **statistical properties (double robustness, finite sample properties)**.
+```
+
+### Identifiability assumptions
+
+However, causal inference requires satisfying identifiability assumptions for us to interpret causality based on association measures from statistical models (see below). Many of these assumptions are not empirically testable. That is why, it is extremely important to work with **subject area experts** to assess the plausibility of those assumptions in the given context.  
+
+```{block, type='rmdcomment'}
+No ML method, no matter how fancy it is,  can automatically produce estimates that can be directly interpreted as causal, unless the identifiability assumptions are properly taken into account. 
+```
+
+|  |  |  |
+|-|-|-|
+|Conditional Exchangeability| $Y(1), Y(0) \perp A | L$ |Treatment assignment is independent of the potential outcome, given covariates|
+|Positivity| $0 < P(A=1 | L) < 1$ |Subjects are eligible to receive both treatment, given covariates|
+|Consistency| $Y = Y(a)  \forall A=a$ |No multiple version of the treatment; and well defined treatment|
+
+## Further reading
+
+### Key articles
+
+- TMLE Procedure: 
+  - @luque2018targeted
+  - @schuler2017targeted
+- Super learner: 
+  - @rose2013mortality 
+  - @naimi2018stacked
+
+### Additional readings
+
+- @rose2020intersections
+- @snowden2011implementation
+- @naimi2017introduction
+- @austin2015moving
+- @naimi2017challenges
+- @balzer2021demystifying
+  
+### Workshops
+
+Highly recommend joining SER if interested in Epi methods development. The following workshops and summer course are very useful.
+
+- [SER Workshop](https://epiresearch.org/) Introduction to Parametric and Semi-parametric Estimators for Causal Inference by Laura B. Balzer & Jennifer Ahern, 2020
+- [SER Workshop](https://epiresearch.org/) Machine Learning and Artificial Intelligence for Causal Inference and Prediction: A Primer by Naimi A, 2021
+- [SISCER](https://si.biostat.washington.edu/suminst/archives/SISCER2021/CR2106) Modern Statistical Learning for Observational Data by Marco Carone, David Benkeser, 2021
+
+### Recorded webinars
+
+The following webinars and workshops are freely accessible, and great for understanding the intuitions, theories and mechanisms behind these methods!
+
+#### Introductory materials
+
+- [An Introduction to Targeted Maximum Likelihood Estimation of Causal Effects](https://www.youtube.com/watch?v=8Q9dfW3oOi4) by Susan Gruber (Putnam Data Sciences)
+- [Practical Considerations for Specifying a Super Learner](https://www.youtube.com/watch?v=WYnjja8DKPg) by Rachael Phillips (Putnam Data Sciences)
+
+
+#### More theory talks
+
+- [Targeted Machine Learning for Causal Inference based on Real World Data](https://www.youtube.com/watch?v=PrPNP5RVcLg) by Mark van der Laan (Putnam Data Sciences)
+- [An introduction to Super Learning](https://www.youtube.com/watch?v=1zT17HtvtF8) by Eric Polly (Putnam Data Sciences)
+- [Cross-validated Targeted Maximum Likelihood Estimation (CV-TMLE)](https://www.youtube.com/watch?v=MDmddX267Ys) by Alan Hubbard (Putnam Data Sciences)
+- [Higher order Targeted Maximum Likelihood Estimation](https://www.youtube.com/watch?v=2jumfnRQpxs) by Mark van der Laan (Online Causal Inference Seminar)
+- [Targeted learning for the estimation of drug safety and effectiveness: Getting better answers by asking better questions](http://bcooltv.mcgill.ca/FDownloader.aspx?rid=e3143be2-918d-49d9-82ce-4dfea75ef1dc&DLType=VGAMP4) by Mireille Schnitzer (CNODES)
+
+#### More applied talks
+
+- [Applications of Targeted Maximum Likelihood Estimation](https://www.youtube.com/watch?v=foY7HoCeo88) by Laura Balzar (UCSF Epi & Biostats)
+- [Applying targeted maximum likelihood estimation to pharmacoepidemiology](https://www.cnodes.ca/online-lecture/targeted-learning-estimation/) by Menglan Pang (CNODES)
+
+#### Blog
+
+- [Kat’s Stats](https://www.khstats.com/) by Katherine Hoffman
+- [towardsdatascience](https://towardsdatascience.com/targeted-maximum-likelihood-tmle-for-causal-inference-1be88542a749) by Yao Yang
+- [The Research Group of Mark van der Laan](https://vanderlaan-lab.org/post/) by Mark van der Laan
+
+<!--chapter:end:6final.Rmd-->
+
+`r if (knitr:::is_html_output()) '
+# References {-}
+'`
+<div id="refs"></div>
+
+
+<!--chapter:end:7references.Rmd-->
+

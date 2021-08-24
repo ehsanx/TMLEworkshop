@@ -211,7 +211,7 @@ document.write('<input onclick="toggle_R();" type="button" value="Hide Global" i
 \section*{Background}\label{background}}
 \addcontentsline{toc}{section}{Background}
 
-In comparative effectiveness studies, researchers typically use propensity score methods. However, propensity score methods have known limitations in real-world scenarios, when the true data generating mechanism is unknown. Targeted maximum likelihood estimation (TMLE) is an alternative estimation method with a number of desirable statistical properties. It is a doubly robust method, making use of both the outcome model and propensity score model to generate an unbiased estimate as long as at least one of the models is correctly specified. TMLE also enables the integration of machine learning approaches. Despite the fact that this method has been shown to perform better than propensity score methods in a variety of scenarios, it is not widely used in medical research as the technical details of this approach are generally not well understood.
+In comparative effectiveness studies, researchers typically use propensity score methods. However, propensity score methods have known limitations in real-world scenarios, when the true data generating mechanism is unknown. \textbf{Targeted maximum likelihood estimation} (TMLE) is an alternative estimation method with a number of desirable statistical properties. It is a doubly robust method, making use of both the outcome model and propensity score model to generate an unbiased estimate as long as at least one of the models is correctly specified. TMLE also enables the integration of machine learning approaches. Despite the fact that this method has been shown to perform better than propensity score methods in a variety of scenarios, it is \textbf{not widely used in medical research} as the implementation details of this approach are generally not well understood.
 
 \hypertarget{goal}{%
 \section*{Goal}\label{goal}}
@@ -249,7 +249,7 @@ using one real epidemiological data,
 \section*{Philosophy}\label{philosophy}}
 \addcontentsline{toc}{section}{Philosophy}
 
-Code-first philosophy is adopted for this workshop; demonstrating the analyses through one real data analysis problem used in the literature.
+\textbf{Code-first} philosophy is adopted for this workshop; demonstrating the \textbf{analyses through one real data analysis} problem used in the literature.
 
 \begin{itemize}
 \tightlist
@@ -282,6 +282,8 @@ Code-first philosophy is adopted for this workshop; demonstrating the analyses t
 The workshop was first developed for \href{https://r-medicine.org/schedule/}{R/Medicine
 Virtual Conference} 2021, August 24th; title: `An Introductory R Guide for Targeted Maximum Likelihood Estimation in Medical Research'.
 
+Feel free to reach out for any comments, corrections, suggestions.
+
 \hypertarget{contributor-list}{%
 \section*{Contributor list}\label{contributor-list}}
 \addcontentsline{toc}{section}{Contributor list}
@@ -306,7 +308,8 @@ The online version of this book is licensed under the \href{https://creativecomm
 
 Karim, ME and Frank, H (2021) ``R Guide for TMLE in Medical Research'',
 URL:
-\href{https://ehsanx.github.io/TMLEworkshop/}{ehsanx.github.io/TMLEworkshop/}
+\href{https://ehsanx.github.io/TMLEworkshop/}{ehsanx.github.io/TMLEworkshop/},
+(v1.1). Zenodo. \url{https://doi.org/10.5281/zenodo.5246085}
 \end{rmdcomment}
 
 \hypertarget{rhc-data-description}{%
@@ -634,10 +637,12 @@ We also conduct propensity score pair matching analysis, as follows.
 
 \begin{rmdcomment}
 \textbf{Note}: In this workshop, we will not cover Propensity Score
-Matching (PSM) in this workshop. If you want to learn more about this,
-feel free to check out this other workshop:
+Matching (PSM). If you want to learn more about this, feel free to check
+out this other workshop:
 \href{https://ehsanx.github.io/psw/}{Understanding Propensity Score
-Matching}.
+Matching} and the
+\href{https://www.youtube.com/watch?v=u4Nl7gnDEAY}{video recording} on
+youtube.
 \end{rmdcomment}
 
 \begin{Shaded}
@@ -795,6 +800,9 @@ The love plot suggests satisfactory propensity score matching (all SMD \textless
 \hypertarget{psm-results}{%
 \subsubsection{PSM results}\label{psm-results}}
 
+\hypertarget{p-value}{%
+\paragraph{p-value}\label{p-value}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{matched.data }\OtherTok{\textless{}{-}} \FunctionTok{match.data}\NormalTok{(match.obj)   }
@@ -814,11 +822,14 @@ The love plot suggests satisfactory propensity score matching (all SMD \textless
 \end{verbatim}
 
 \begin{rmdcomment}
-Hence, our conclusion based on propensity score pair matched data
+Our conclusion based on propensity score pair matched data
 (\(p \lt 0.001\)) is different than Table 5 in @connors1996effectiveness
 (\(p = 0.14\)). Variability in results for 1-to-1 matching is possible,
 and modelling choices may be different (we used caliper option here).
 \end{rmdcomment}
+
+\hypertarget{treatment-effect}{%
+\paragraph{Treatment effect}\label{treatment-effect}}
 
 \begin{itemize}
 \tightlist
@@ -1596,6 +1607,11 @@ Fit the outcome regression on the exposure and covariates: \(Y \sim A + L\)
 \end{Highlighting}
 \end{Shaded}
 
+\begin{rmdcomment}
+\(Q(A,L)\) is often used to represent the predictions from the G-comp
+model.
+\end{rmdcomment}
+
 \hypertarget{step-2}{%
 \subsubsection{Step 2}\label{step-2}}
 
@@ -2079,7 +2095,7 @@ Based on the loss function (say, RMSE) it automatically chose the best tuning pa
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{TMLEw_files/figure-latex/unnamed-chunk-28-1.pdf}
+\includegraphics{TMLEw_files/figure-latex/unnamed-chunk-29-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2282,7 +2298,7 @@ Notice that the mean is very similar to the parametric G-computation method.
 \section{G-comp using SuperLearner}\label{g-comp-using-superlearner}}
 
 \begin{rmdcomment}
-SuperLearner is an ensemble MLtechnique, that uses
+SuperLearner is an ensemble ML technique, that uses
 \textbf{cross-validation} to find a weighted combination of estimates
 provided by different \textbf{candidate learners} (that help predict).
 \end{rmdcomment}
@@ -2549,6 +2565,16 @@ Scaled coefs
 \begin{verbatim}
 ##     SL.glm_All  SL.glmnet_All SL.xgboost_All 
 ##     0.00000000     0.93740912     0.06259088
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(fit.sl}\SpecialCharTok{$}\NormalTok{coef)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1
 \end{verbatim}
 
 Hence, in creating superlearner prediction column,
@@ -2859,10 +2885,11 @@ It is easy to show that, depending on the choice of meta-learners, the coefficie
 \hypertarget{iptw}{%
 \chapter{IPTW}\label{iptw}}
 
+In this chapter, we will cover PS and IPTW (or IPW).
+
 \begin{rmdcomment}
-In this chapter, we are primarily interested about \textbf{exposure
-modelling} (e.g., fixing imbalance first, before doing outcome
-analysis).
+We are now primarily interested about \textbf{exposure modelling} (e.g.,
+fixing imbalance first, before doing outcome analysis).
 \end{rmdcomment}
 
 \begin{Shaded}
@@ -3043,10 +3070,12 @@ Fit logistic regression to estimate propensity scores
 ##                                 Under $11k      1.06  [0.90;1.26]   0.4797051
 \end{verbatim}
 
+\begin{rmdcomment}
+Coef of PS model fit is not of concern.
+\end{rmdcomment}
+
 \begin{itemize}
 \tightlist
-\item
-  Coef of PS model fit is not of concern
 \item
   Model can be rich: to the extent that prediction is better
 \item
@@ -3066,6 +3095,11 @@ Obtain the propesnity score (PS) values from the fit
 \NormalTok{ObsData}\SpecialCharTok{$}\NormalTok{PS }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(PS.fit, }\AttributeTok{type=}\StringTok{"response"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{rmdcomment}
+These propensity score predictions (\texttt{PS}) are often represented
+as \(g(A_i=1|L_i)\).
+\end{rmdcomment}
 
 Check summaries:
 
@@ -3128,9 +3162,12 @@ Convert \(PS\) to \(IPW\) = \(\frac{A}{PS} + \frac{1-A}{1-PS}\)
 \tightlist
 \item
   Convert PS to IPW using the formula. We are using the formula for average treatment effect (ATE).
-\item
-  It is possible to use alternative formulas, but we are using ATE formula for our illustration.
 \end{itemize}
+
+\begin{rmdcomment}
+It is possible to use alternative formulas, but we are using ATE formula
+for our illustration.
+\end{rmdcomment}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3144,7 +3181,7 @@ Convert \(PS\) to \(IPW\) = \(\frac{A}{PS} + \frac{1-A}{1-PS}\)
 ##   1.002   1.183   1.472   1.986   2.064  63.509
 \end{verbatim}
 
-Also possible to use pre-packged software packages to do the same:
+Also possible to use pre-packaged software packages to do the same:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3406,7 +3443,11 @@ This is the exposure model that we decided on:
 ##     Sepsis.Diag + Trauma.Diag + Orthopedic.Diag + race + income
 \end{verbatim}
 
-Fit SuperLearner to estimate propensity scores. We again use the same candidate learners:
+\begin{rmdcomment}
+Fit SuperLearner (SL) to estimate propensity scores.
+\end{rmdcomment}
+
+We again use the same candidate learners:
 
 \begin{itemize}
 \tightlist
@@ -5429,8 +5470,8 @@ Keele and Small (2021) paper & 2.01 & 0.60 & 3.41\\
 \end{tabular}
 
 \begin{rmdcomment}
-@keele2021comparing used superlearner based on an ensemble of 3
-different learners: (1) GLM, (2) random forests, and (3) LASSO.
+@keele2021comparing used TMLE-SL based on an ensemble of 3 different
+learners: (1) GLM, (2) random forests, and (3) LASSO.
 \end{rmdcomment}
 
 \hypertarget{other-packages}{%
@@ -5543,9 +5584,13 @@ roles of variables in the relationship of interest.
   Machine learning (ML) methods are very helpful for prediction goals. They are also helpful in \textbf{identifying complex functions} (non-linearities and non-additive terms) of the covariates (again, assuming they are measured).
 \item
   There are many ML methods, but the procedures are very different, and they come with their own advantages and disadvantages. In a given real data, it is \textbf{hard to apriori predict which is the best ML algorithm} for a given problem.
-\item
-  That's where super learner is helpful in \textbf{combining strength from various algorithms}, and producing 1 prediction column that has \textbf{optimal statistical properties}.
 \end{itemize}
+
+\begin{rmdcomment}
+Super learner is helpful in \textbf{combining strength from various
+algorithms}, and producing 1 prediction column that has \textbf{optimal
+statistical properties}.
+\end{rmdcomment}
 
 \hypertarget{causal-inference}{%
 \subsection{Causal inference}\label{causal-inference}}
@@ -5557,10 +5602,13 @@ roles of variables in the relationship of interest.
 \item
   For causal inference goals (when we have a primary exposure of interest), machine learning methods are often misleading. This is primarily due to the fact that they usually do not have an inherent mechanism of focusing on \textbf{primary exposure} (RHC in this example); and treats the primary exposure as any other predictors.
 \item
-  When using g-computation with ML methods, estimation of variance becomes a difficult problem. Generalized procedures such as \textbf{robust SE or bootstrap methods} are not supported by theory.
-\item
-  That's where TMLE methods shine, with the help of it's important \textbf{statistical properties (double robustness, finite sample properties)}.
+  When using g-computation with ML methods, estimation of variance becomes a difficult problem (with correct coverage). Generalized procedures such as \textbf{robust SE or bootstrap methods} are not supported by theory.
 \end{itemize}
+
+\begin{rmdcomment}
+TMLE method shine, with the help of it's important \textbf{statistical
+properties (double robustness, finite sample properties)}.
+\end{rmdcomment}
 
 \hypertarget{identifiability-assumptions}{%
 \subsection{Identifiability assumptions}\label{identifiability-assumptions}}
