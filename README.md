@@ -48,6 +48,6 @@ Virtual Conference](https://r-medicine.org/schedule/) 2021, August 24th; title: 
 The online version of this book is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) International License. You may share, adapt the content and may distribute your contributions under the same license (CC BY-NC-SA 4.0), but you have to give appropriate credit, and cannot use material for the commercial purposes.
 
 
-## How to cite**
+## How to cite
 
 Karim, ME and Frank, H (2021) "R Guide for TMLE in Medical Research", URL: [ehsanx.github.io/TMLEworkshop/](https://ehsanx.github.io/TMLEworkshop/)
