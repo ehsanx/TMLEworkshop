@@ -13,7 +13,7 @@ cachex=TRUE
 ```
 
 ```{block, type='rmdcomment'}
-G-computation is highly sensitive to on **model misspecification**; and when model is **not correctly specified**, result is subject to bias. 
+G-computation is highly sensitive to **model misspecification**; and when model is **not correctly specified**, result is subject to bias. 
 ```
 
 - Therefore, it can be a good idea to use **machine learning** methods, that are more flexible, than parametric methods to estimate the treatment effect.

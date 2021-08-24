@@ -271,9 +271,9 @@ saveRDS(fit.matched, file = "data/match.RDS")
 There are other papers that have used RHC data [@keele2021comparing;@keele2018pre]. 
 
 ```{block, type='rmdcomment'}
-@keele2021comparing used TMLE (with super learner) method in estimating the impact of RHC on length of stay, and found point estimate $2.01 (95\% CI: 0.6-3.41)$.  
+@keele2021comparing used TMLE (with super learner SL) method in estimating the impact of RHC on length of stay, and found point estimate $2.01 (95\% CI: 0.6-3.41)$.  
 ```
 
-In today's workshop, we will learn about TMLE-SL methods.
+In today's workshop, we will learn about this **TMLE-SL** methods.
 
 

@@ -385,7 +385,7 @@ CIs <- cbind(CIr, CIm, CIgc, ci.b, ci.b, ci.b,
 
 ```{r summarytable, cache=cachex, echo=TRUE}
 method.list <- c("Adj. Reg","PS match", 
-                 "G-comp (logistic)","G-comp (xgboost)", 
+                 "G-comp (linear reg.)","G-comp (xgboost)", 
                  "G-comp (lasso)", "G-comp (SL)", 
                  "IPW (logistic)", "IPW (SL)", 
                  "TMLE (9 steps)", "TMLE (package)", 

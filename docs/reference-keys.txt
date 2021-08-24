@@ -1,8 +1,5 @@
-tab:reg2a
 fig:gcomppic
 fig:cvpic
-tab:ipw2psx4adj2
-tab:ipw2psx4adj3
 fig:role
 rhc-data-description
 data-download
