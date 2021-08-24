@@ -50,4 +50,4 @@ The online version of this book is licensed under the [Creative Commons Attribut
 
 ## How to cite
 
-Karim, ME and Frank, H (2021) "R Guide for TMLE in Medical Research", URL: [ehsanx.github.io/TMLEworkshop/](https://ehsanx.github.io/TMLEworkshop/)
+Karim, ME and Frank, H (2021) "R Guide for TMLE in Medical Research", URL: [ehsanx.github.io/TMLEworkshop/](https://ehsanx.github.io/TMLEworkshop/), (v1.1). Zenodo. https://doi.org/10.5281/zenodo.5246085
